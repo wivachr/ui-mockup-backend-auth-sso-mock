@@ -251,6 +251,7 @@ Bucket:
 
 - users
 - user_roles
+- access_requests
 - internship_rounds
 - students
 - companies
@@ -311,6 +312,7 @@ Bucket:
 
 - Login/logout
 - Role-based route guard
+- Staff อนุมัติบัญชีเข้าใช้งานก่อนเปิด portal ให้ student/advisor/company
 - Staff จัดการนักศึกษา
 - Student จัดการ profile ของตนเอง
 - Staff จัดการสถานประกอบการ

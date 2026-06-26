@@ -440,6 +440,7 @@
       <div class="nav-sec">ภาพรวม</div>
       <div class="nav-item" data-pg="dashboard"><i>◧</i> แดชบอร์ด</div>
       <div class="nav-sec">จัดการข้อมูล</div>
+      <div class="nav-item" data-pg="accessApprovals"><i>◉</i> อนุมัติบัญชี <span class="cnt" id="c-access"></span></div>
       <div class="nav-item" data-pg="students"><i>◍</i> นักศึกษา <span class="cnt" id="c-stu"></span></div>
       <div class="nav-item" data-pg="establishments"><i>▤</i> สถานประกอบการ <span class="cnt" id="c-est"></span></div>
       <div class="nav-item" data-pg="mentors"><i>◌</i> ติดตามพี่เลี้ยง <span class="cnt" id="c-mentor"></span></div>
@@ -463,7 +464,7 @@
       <span class="spacer"></span>
       <span class="round-chip">รอบปัจจุบัน <b>1 / 2569</b></span>
       <button class="icon-btn" onclick="toggleNotifications()" title="แจ้งเตือน">
-        <span style="font-size:18px">🔔</span><span class="notif-dot">5</span>
+        <span style="font-size:18px">🔔</span><span class="notif-dot" id="notif-count">5</span>
       </button>
       <div class="notif-panel hidden" id="notif-panel"></div>
       <button class="btn btn-sm btn-ghost" onclick="logoutStaff()" style="margin-left:10px;gap:6px"><span style="font-size:15px">⎋</span> ออกจากระบบ</button>
@@ -505,6 +506,33 @@
           </div>
           <div id="top-est"></div>
         </div>
+      </section>
+
+      <!-- ========== ACCESS APPROVALS ========== -->
+      <section id="page-accessApprovals" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>อนุมัติการเข้าใช้งานระบบ</h1><p>เจ้าหน้าที่ตรวจสอบและอนุมัติบัญชีนักศึกษา อาจารย์นิเทศ และสถานประกอบการก่อนเข้าใช้งานจริง</p></div>
+          <button class="btn btn-primary" onclick="toast('ส่งอีเมลแจ้งผู้สมัครที่รออนุมัติแล้ว (เดโม)')">แจ้งผลเป็นชุด</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">รออนุมัติทั้งหมด</div><div class="val" id="acc-pending">—</div><div class="sub">บัญชีใหม่ที่ยังเข้าไม่ได้</div></div>
+          <div class="metric"><div class="lbl2">นักศึกษา</div><div class="val" id="acc-student">—</div><div class="sub">รอตรวจรหัส/อีเมล</div></div>
+          <div class="metric"><div class="lbl2">อาจารย์นิเทศ</div><div class="val" id="acc-advisor">—</div><div class="sub">รอตรวจบัญชีมหาวิทยาลัย</div></div>
+          <div class="metric"><div class="lbl2">สถานประกอบการ</div><div class="val" id="acc-company">—</div><div class="sub">รอตรวจบริษัท/ผู้ประสานงาน</div></div>
+        </div>
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div><div class="sec-title">คิวบัญชีที่ขอเข้าใช้งาน</div><div class="sec-sub" style="margin:2px 0 0">อนุมัติแล้วจึงเข้าสู่ portal ของบทบาทนั้นได้ บัญชีที่ถูกปฏิเสธจะต้องแก้ข้อมูลและส่งใหม่</div></div>
+            <select id="access-filter" onchange="renderAccessApprovals()" style="width:220px">
+              <option value="pending">รออนุมัติ</option>
+              <option value="approved">อนุมัติแล้ว</option>
+              <option value="rejected">ปฏิเสธแล้ว</option>
+              <option value="all">ทั้งหมด</option>
+            </select>
+          </div>
+          <div id="access-queue"></div>
+        </div>
+        <div class="rule-note" style="margin-top:18px"><span>◎</span><span><b>กฎการเข้าใช้งาน</b><br>นักศึกษา อาจารย์นิเทศ และสถานประกอบการต้องมีสถานะบัญชีเป็น “อนุมัติแล้ว” ก่อน ระบบจึงเปิด Student Portal, Advisor Portal หรือ Company Portal ให้ใช้งาน</span></div>
       </section>
 
       <!-- ========== STUDENTS ========== -->
@@ -1036,6 +1064,15 @@ const notifications=[
   {ic:'◍',tone:'green',title:'Logbook ใหม่จากนักศึกษา',sub:'สัปดาห์ที่ 4 · รอพี่เลี้ยงตรวจ',pg:'audit'},
   {ic:'★',tone:'accent',title:'ผลประเมินสถานประกอบการเข้าใหม่',sub:'อ.ปรียาส่งผลนิเทศแล้ว',pg:'reports'},
 ];
+const accessRequests=[
+  {id:'acc-stu-approved',role:'student',roleLabel:'นักศึกษา',name:'กิตติพงษ์ ใจดี',login:'6512001',email:'6512001@university.ac.th',org:'ภาควิชาไอที',reason:'บัญชีเดโมที่อนุมัติแล้ว',status:'approved',submitted:'10 มิ.ย. 2569',approvedAt:'10 มิ.ย. 2569',reviewer:'อ.ผู้ประสานงาน'},
+  {id:'acc-adv-approved',role:'advisor',roleLabel:'อาจารย์นิเทศ',name:'อ.ปรียา วัฒนศิลป์',login:'preeya@university.ac.th',email:'preeya@university.ac.th',org:'Data / AI',reason:'บัญชีเดโมที่อนุมัติแล้ว',status:'approved',submitted:'10 มิ.ย. 2569',approvedAt:'10 มิ.ย. 2569',reviewer:'อ.ผู้ประสานงาน'},
+  {id:'acc-comp-approved',role:'company',roleLabel:'สถานประกอบการ',name:'บจก. คลาวด์เวิร์คส์',login:'hr@cloudworks.co.th',email:'hr@cloudworks.co.th',org:'บจก. คลาวด์เวิร์คส์',reason:'บัญชีเดโมที่อนุมัติแล้ว',status:'approved',submitted:'10 มิ.ย. 2569',approvedAt:'10 มิ.ย. 2569',reviewer:'อ.ผู้ประสานงาน'},
+  {id:'acc-stu-1',role:'student',roleLabel:'นักศึกษา',name:'ณัฐนรี สุขสวัสดิ์',login:'6512014',email:'6512014@university.ac.th',org:'สหกิจศึกษา',reason:'สมัครเข้าใช้งาน Student Portal เพื่อกรอก profile และติดตามการจับคู่',status:'pending',submitted:'27 มิ.ย. 2569',evidence:'รหัสนักศึกษา 6512014 · อีเมลมหาวิทยาลัย'},
+  {id:'acc-adv-1',role:'advisor',roleLabel:'อาจารย์นิเทศ',name:'อ.ดร.เมธา อินทร์แก้ว',login:'metha.i@university.ac.th',email:'metha.i@university.ac.th',org:'Software Engineering',reason:'ขอเข้าใช้งาน Advisor Portal เพื่อรับมอบหมายงานนิเทศ',status:'pending',submitted:'27 มิ.ย. 2569',evidence:'บัญชี SSO มหาวิทยาลัย · ภาควิชาไอที'},
+  {id:'acc-comp-1',role:'company',roleLabel:'สถานประกอบการ',name:'บจก. ไฟน์เทค โซลูชันส์',login:'hr@fintechsol.co.th',email:'hr@fintechsol.co.th',org:'บจก. ไฟน์เทค โซลูชันส์',reason:'ขอเปิด Company Portal เพื่อจัดการตำแหน่ง พี่เลี้ยง และเอกสาร CWIE',status:'pending',submitted:'27 มิ.ย. 2569',evidence:'หนังสือรับรองบริษัท · อีเมลโดเมนบริษัท'},
+  {id:'acc-comp-rejected',role:'company',roleLabel:'สถานประกอบการ',name:'บจก. ตัวอย่างไม่ครบข้อมูล',login:'contact@example-training.co.th',email:'contact@example-training.co.th',org:'Example Training',reason:'เอกสารบริษัทไม่ครบ',status:'rejected',submitted:'25 มิ.ย. 2569',reviewedAt:'26 มิ.ย. 2569',reviewer:'อ.ผู้ประสานงาน',rejectReason:'ยังไม่แนบข้อมูลผู้ประสานงานและตำแหน่งฝึกงานที่ชัดเจน'},
+];
 const cwieTimelines={
   '6512001':[
     ['done','ใบสมัคร / โปรไฟล์','นักศึกษาส่งครบ · 12 มิ.ย. 2569'],
@@ -1205,7 +1242,7 @@ function evalBadge(kind){
 
 /* ---------------- login + nav ---------------- */
 function toggleSide(){ $('#sidebar').classList.toggle('open'); }
-const titles={dashboard:'แดชบอร์ด',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
+const titles={dashboard:'แดชบอร์ด',accessApprovals:'อนุมัติบัญชี',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
 let loginRole='staff';
 let currentStudentId='6512001';
 let currentAdvisorId='t2';
@@ -1222,10 +1259,29 @@ function pickLoginRole(el,r){
   $('#lg-mail').value = loginDefaults[r];
   $('#lg-foot').textContent = loginFoot[r];
 }
+function findAccessRequest(role,loginValue){
+  const key=String(loginValue||'').trim().toLowerCase();
+  return accessRequests.find(x=>x.role===role&&(String(x.login||'').toLowerCase()===key||String(x.email||'').toLowerCase()===key));
+}
+function isAccessApproved(role,loginValue){
+  const req=findAccessRequest(role,loginValue);
+  return !!req&&req.status==='approved';
+}
 function doLogin(){
+  const loginValue=String($('#lg-mail').value||'').trim();
+  if(loginRole!=='staff'&&!isAccessApproved(loginRole,loginValue)){
+    const req=findAccessRequest(loginRole,loginValue);
+    const msg=req&&req.status==='pending'
+      ? 'บัญชีนี้รอเจ้าหน้าที่อนุมัติก่อนเข้าใช้งาน'
+      : req&&req.status==='rejected'
+        ? 'บัญชีนี้ถูกปฏิเสธ กรุณาแก้ข้อมูลและส่งคำขอใหม่'
+        : 'ยังไม่มีบัญชีที่ได้รับอนุมัติสำหรับบทบาทนี้';
+    toast(msg);
+    return;
+  }
   $('#login').classList.add('hidden');
   if(loginRole==='student'){
-    const key=String($('#lg-mail').value||'').trim().toLowerCase();
+    const key=loginValue.toLowerCase();
     const found=students.find(s=>s.id.toLowerCase()===key || String(s.email||'').toLowerCase()===key);
     if(found)currentStudentId=found.id;
     $('#student-portal').classList.remove('hidden');
@@ -1426,6 +1482,7 @@ function go(pg){
   $$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.pg===pg || (pg==='student360'&&n.dataset.pg==='students')));
   $('#pgTitle').textContent=titles[pg];
   if(pg==='student360')renderStudent360($('#student360-select')?.value||'6512001');
+  if(pg==='accessApprovals')renderAccessApprovals();
   if(pg==='mentors')renderMentors();
   if(pg==='cwie')renderCwie();
   if(pg==='evalSettings')renderEvalSettings();
@@ -1437,12 +1494,18 @@ function go(pg){
 $$('.nav-item').forEach(n=>n.addEventListener('click',()=>go(n.dataset.pg)));
 
 function renderNotifications(){
+  const pending=accessRequests.filter(x=>x.status==='pending');
+  const items=[
+    ...(pending.length?[{ic:'◉',tone:'amber',title:'มีบัญชีรออนุมัติ',sub:`นักศึกษา/อาจารย์/สถานประกอบการรวม ${pending.length} รายการ`,pg:'accessApprovals'}]:[]),
+    ...notifications
+  ];
+  $('#notif-count').textContent=items.length;
   $('#notif-panel').innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px 6px">
       <div style="font-weight:600">แจ้งเตือนเจ้าหน้าที่</div>
       <button class="link-arrow" onclick="toast('ทำเครื่องหมายว่าอ่านแล้ว (เดโม)')">อ่านทั้งหมด</button>
     </div>
-    ${notifications.map(n=>{
+    ${items.map(n=>{
       const bg=n.tone==='green'?'var(--green-soft)':n.tone==='amber'?'var(--amber-soft)':n.tone==='red'?'var(--red-soft)':'var(--accent-soft)';
       const fg=n.tone==='green'?'var(--green-ink)':n.tone==='amber'?'var(--amber-ink)':n.tone==='red'?'var(--red-ink)':'var(--accent-ink)';
       return `<div class="notif-item" onclick="go('${n.pg}');toggleNotifications(false)">
@@ -1455,6 +1518,69 @@ function toggleNotifications(force){
   const panel=$('#notif-panel');
   const shouldShow=force===undefined?panel.classList.contains('hidden'):force;
   panel.classList.toggle('hidden',!shouldShow);
+}
+
+function accessBadge(status){
+  if(status==='approved')return '<span class="badge b-green">อนุมัติแล้ว</span>';
+  if(status==='rejected')return '<span class="badge b-gray">ปฏิเสธแล้ว</span>';
+  return '<span class="badge b-amber">รออนุมัติ</span>';
+}
+function accessRoleTone(role){
+  return role==='student'?['◍','var(--accent-ink)','var(--accent-soft)']:role==='advisor'?['★','var(--green-ink)','var(--green-soft)']:['▤','var(--amber-ink)','var(--amber-soft)'];
+}
+function renderAccessApprovals(){
+  const filter=$('#access-filter')?$('#access-filter').value:'pending';
+  const pending=accessRequests.filter(x=>x.status==='pending');
+  const byRole=role=>pending.filter(x=>x.role===role).length;
+  $('#acc-pending').textContent=pending.length;
+  $('#acc-student').textContent=byRole('student');
+  $('#acc-advisor').textContent=byRole('advisor');
+  $('#acc-company').textContent=byRole('company');
+  const rows=accessRequests.filter(x=>filter==='all'||x.status===filter);
+  $('#access-queue').innerHTML=rows.length?rows.map(x=>{
+    const [ic,fg,bg]=accessRoleTone(x.role);
+    const meta=[x.roleLabel,x.email,x.submitted].filter(Boolean).join(' · ');
+    const review=x.status==='approved'
+      ? `อนุมัติโดย ${x.reviewer||'เจ้าหน้าที่'} · ${x.approvedAt||x.reviewedAt||'-'}`
+      : x.status==='rejected'
+        ? `เหตุผล: ${x.rejectReason||'ข้อมูลไม่ครบ'}`
+        : x.evidence;
+    const actions=x.status==='pending'
+      ? `<button class="btn btn-sm" onclick="rejectAccessRequest('${x.id}')">ปฏิเสธ</button><button class="btn btn-sm btn-primary" onclick="approveAccessRequest('${x.id}')">อนุมัติ</button>`
+      : `<button class="btn btn-sm" onclick="toast('เปิดประวัติคำขอบัญชี ${x.name} (เดโม)')">ดูประวัติ</button>`;
+    return `<div class="approval-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="display:flex;gap:12px;align-items:flex-start;min-width:260px;flex:1">
+          <div style="width:38px;height:38px;border-radius:10px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;flex-shrink:0">${ic}</div>
+          <div><div class="name">${x.name}</div><div class="meta">${meta}</div></div>
+        </div>
+        ${accessBadge(x.status)}
+      </div>
+      <div class="rule-note" style="margin-top:12px"><span>i</span><span><b>${x.org}</b><br>${x.reason}<br>${review}</span></div>
+      <div class="form-actions">${actions}</div>
+    </div>`;
+  }).join(''):'<div class="empty">ไม่มีบัญชีในสถานะนี้</div>';
+}
+function approveAccessRequest(id){
+  const req=accessRequests.find(x=>x.id===id);
+  if(!req)return;
+  req.status='approved';
+  req.approvedAt='ตอนนี้';
+  req.reviewer='อ.ผู้ประสานงาน';
+  auditLogs.unshift({type:'ผู้ใช้',time:'ตอนนี้',act:'อนุมัติบัญชีเข้าใช้งาน',detail:`${req.roleLabel} · ${req.name}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderAccessApprovals(); renderDash(); renderNotifications(); renderAuditLog();
+  toast('อนุมัติบัญชี '+req.name+' แล้ว');
+}
+function rejectAccessRequest(id){
+  const req=accessRequests.find(x=>x.id===id);
+  if(!req)return;
+  req.status='rejected';
+  req.reviewedAt='ตอนนี้';
+  req.reviewer='อ.ผู้ประสานงาน';
+  req.rejectReason='ข้อมูลยังไม่ครบหรือยังตรวจสอบตัวตนไม่ได้';
+  auditLogs.unshift({type:'ผู้ใช้',time:'ตอนนี้',act:'ปฏิเสธบัญชีเข้าใช้งาน',detail:`${req.roleLabel} · ${req.name}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderAccessApprovals(); renderDash(); renderNotifications(); renderAuditLog();
+  toast('ปฏิเสธบัญชี '+req.name+' แล้ว');
 }
 
 function renderCwie(){
@@ -1756,10 +1882,12 @@ function renderDash(){
   const total=students.length, coop=students.filter(s=>s.track==='สหกิจ').length;
   const matched=students.filter(s=>s.status!=='รอจับคู่').length;
   const wait=total-matched, warn=establishments.filter(e=>e.status==='เฝ้าระวัง').length;
+  const pendingAccess=accessRequests.filter(x=>x.status==='pending').length;
   $('#m-total').textContent=total; $('#m-coop').textContent=coop; $('#m-gen').textContent=total-coop;
   $('#m-matched').textContent=matched; $('#m-matchpct').textContent=Math.round(matched/total*100)+'%';
   $('#m-wait').textContent=wait; $('#m-est').textContent=establishments.length; $('#m-warn').textContent=warn;
   $('#c-stu').textContent=total; $('#c-est').textContent=establishments.length;
+  $('#c-access').textContent=pendingAccess;
   $('#c-mentor').textContent=allMentors().length;
 
   const prog=[['สหกิจ','สหกิจ'],['ฝึกงานทั่วไป','ฝึกงานทั่วไป']].map(([lab,tr])=>{
@@ -1772,6 +1900,7 @@ function renderDash(){
   $('#prog-list').innerHTML=prog;
 
   const todos=[
+    ['◉','var(--amber-ink)','var(--amber-soft)',pendingAccess+' บัญชีรออนุมัติเข้าใช้งาน','ตรวจสอบนักศึกษา อาจารย์ และสถานประกอบการก่อนเปิด portal','accessApprovals'],
     ['⚑','var(--amber-ink)','var(--amber-soft)','บจก. เน็กซ์เจน ติดธงเฝ้าระวัง','ตรวจสอบก่อนส่งนักศึกษารอบนี้','establishments'],
     ['◷','var(--accent-ink)','var(--accent-soft)',wait+' นักศึกษายังรอจับคู่','เปิดหน้าจับคู่เพื่อดำเนินการ','matching'],
     ['★','var(--green-ink)','var(--green-soft)','ผลประเมินสถานประกอบการเข้ามาใหม่','ดูสรุปคุณภาพในหน้ารายงาน','reports'],
@@ -2344,7 +2473,7 @@ function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.transform='
 renderDash(); renderStudents(); renderEst(); renderMatchStudents();
 renderAdvisorAssignments();
 renderReports(); initCompanyReport();
-renderNotifications(); renderCwie(); renderAuditLog(); renderEvalSettings(); renderMentors(); initStudent360Options(); renderStudent360('6512001'); renderCompanyTaskQueue(); renderCompanyWorkflow('positions');
+renderNotifications(); renderCwie(); renderAccessApprovals(); renderAuditLog(); renderEvalSettings(); renderMentors(); initStudent360Options(); renderStudent360('6512001'); renderCompanyTaskQueue(); renderCompanyWorkflow('positions');
 </script>
 
 <div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
