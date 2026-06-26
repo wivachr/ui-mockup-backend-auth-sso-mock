@@ -263,6 +263,9 @@ Bucket:
 - supervision_visits
 - student_comments
 - risk_alerts
+- change_requests
+- issue_reports
+- document_templates
 
 ### Workflow
 
@@ -366,6 +369,10 @@ Bucket:
 - Supervision schedule
 - Risk / Early Warning
 - Student 360 comment thread
+- Change request approval workflow
+- Issue/complaint triage
+- CWIE document templates with merge fields
+- Advisor workload dashboard
 
 ผลลัพธ์:
 

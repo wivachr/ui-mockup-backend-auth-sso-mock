@@ -447,6 +447,9 @@
       <div class="nav-item" data-pg="matching"><i>⇄</i> จับคู่ฝึกงาน</div>
       <div class="nav-item" data-pg="supervisionSchedule"><i>◷</i> นัดนิเทศ <span class="cnt" id="c-visit"></span></div>
       <div class="nav-item" data-pg="riskMonitor"><i>⚑</i> Risk Monitor <span class="cnt" id="c-risk"></span></div>
+      <div class="nav-item" data-pg="changeRequests"><i>✎</i> คำขอแก้ไข <span class="cnt" id="c-change"></span></div>
+      <div class="nav-item" data-pg="advisorWorkload"><i>▦</i> ภาระงานอาจารย์</div>
+      <div class="nav-item" data-pg="issueReports"><i>!</i> แจ้งปัญหา <span class="cnt" id="c-issue"></span></div>
       <div class="nav-item" data-pg="cwie"><i>▧</i> เอกสาร CWIE <span class="cnt">6</span></div>
       <div class="nav-sec">รายงาน</div>
       <div class="nav-item" data-pg="reports"><i>▥</i> รายงาน</div>
@@ -726,6 +729,77 @@
         </div>
       </section>
 
+      <!-- ========== CHANGE REQUESTS ========== -->
+      <section id="page-changeRequests" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>คำขอแก้ไขข้อมูลสำคัญ</h1><p>ฟิลด์สำคัญต้องผ่านเจ้าหน้าที่ก่อน เช่น ชื่อ ประเภทฝึกงาน บริษัท อาจารย์นิเทศ หรือข้อมูลผู้ประสานงานบริษัท</p></div>
+          <button class="btn btn-primary" onclick="toast('เปิดฟอร์มสร้างคำขอแก้ไขแทนผู้ใช้ (เดโม)')">＋ สร้างคำขอ</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">รอพิจารณา</div><div class="val" id="chg-pending">—</div><div class="sub">ต้องตรวจหลักฐาน</div></div>
+          <div class="metric"><div class="lbl2">อนุมัติแล้ว</div><div class="val" id="chg-approved">—</div><div class="sub">เปลี่ยนข้อมูลแล้ว</div></div>
+          <div class="metric"><div class="lbl2">ปฏิเสธ</div><div class="val" id="chg-rejected">—</div><div class="sub">รอผู้ใช้แก้ข้อมูล</div></div>
+          <div class="metric"><div class="lbl2">ฟิลด์เสี่ยงสูง</div><div class="val">5</div><div class="sub">ต้องมี approval</div></div>
+        </div>
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div><div class="sec-title">คิวคำขอแก้ไข</div><div class="sec-sub" style="margin:2px 0 0">อนุมัติแล้วระบบจึงอัปเดตข้อมูลจริงและบันทึก audit log</div></div>
+            <select id="change-filter" onchange="renderChangeRequests()" style="width:220px">
+              <option value="pending">รอพิจารณา</option>
+              <option value="approved">อนุมัติแล้ว</option>
+              <option value="rejected">ปฏิเสธแล้ว</option>
+              <option value="all">ทั้งหมด</option>
+            </select>
+          </div>
+          <div id="change-list"></div>
+        </div>
+      </section>
+
+      <!-- ========== ADVISOR WORKLOAD ========== -->
+      <section id="page-advisorWorkload" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>ภาระงานอาจารย์นิเทศ</h1><p>ดูจำนวนที่รับนิเทศ งานค้าง นัดนิเทศ และความเสี่ยง เพื่อกระจายภาระงานให้เหมาะสม</p></div>
+          <button class="btn btn-primary" onclick="toast('เปิดเครื่องมือกระจายงานอาจารย์ (เดโม)')">ปรับสมดุลภาระงาน</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">อาจารย์ทั้งหมด</div><div class="val" id="load-advisors">—</div><div class="sub">ในรอบนี้</div></div>
+          <div class="metric"><div class="lbl2">นักศึกษาที่มีอาจารย์</div><div class="val" id="load-assigned">—</div><div class="sub">มอบหมายแล้ว</div></div>
+          <div class="metric"><div class="lbl2">งานค้าง</div><div class="val" id="load-pending">—</div><div class="sub">รอประเมิน/รอยืนยันนัด</div></div>
+          <div class="metric"><div class="lbl2">เกิน 80% capacity</div><div class="val" id="load-heavy">—</div><div class="sub">ควรเลี่ยงมอบเพิ่ม</div></div>
+        </div>
+        <div class="card card-pad">
+          <div class="sec-title">สรุปภาระงานรายอาจารย์</div>
+          <div class="sec-sub">ใช้ประกอบการมอบหมายอาจารย์นิเทศภายหลังการจับคู่บริษัท</div>
+          <div id="advisor-load-list" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <!-- ========== ISSUE REPORTS ========== -->
+      <section id="page-issueReports" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>ร้องเรียน / แจ้งปัญหาระหว่างฝึกงาน</h1><p>ช่องทางให้นักศึกษาหรือผู้เกี่ยวข้องแจ้งปัญหาแบบเป็นระบบ พร้อม triage และการปกป้องความเป็นส่วนตัว</p></div>
+          <button class="btn btn-primary" onclick="toast('เปิดฟอร์มแจ้งปัญหาใหม่ (เดโม)')">＋ แจ้งปัญหา</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">เปิดอยู่</div><div class="val" id="issue-open">—</div><div class="sub">ยังต้องดูแล</div></div>
+          <div class="metric"><div class="lbl2">เร่งด่วน</div><div class="val" id="issue-urgent">—</div><div class="sub">ต้องตอบภายใน 24 ชม.</div></div>
+          <div class="metric"><div class="lbl2">กำลังดำเนินการ</div><div class="val" id="issue-progress">—</div><div class="sub">มีเจ้าของเคสแล้ว</div></div>
+          <div class="metric"><div class="lbl2">ปิดแล้ว</div><div class="val" id="issue-closed">—</div><div class="sub">มีผลการดำเนินการ</div></div>
+        </div>
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div><div class="sec-title">เคสปัญหา</div><div class="sec-sub" style="margin:2px 0 0">แสดงระดับความลับ ความเร่งด่วน เจ้าของเคส และ action ถัดไป</div></div>
+            <select id="issue-filter" onchange="renderIssueReports()" style="width:220px">
+              <option value="open">เปิดอยู่</option>
+              <option value="urgent">เร่งด่วน</option>
+              <option value="closed">ปิดแล้ว</option>
+              <option value="all">ทั้งหมด</option>
+            </select>
+          </div>
+          <div id="issue-list"></div>
+        </div>
+      </section>
+
       <!-- ========== CWIE DOCUMENTS ========== -->
       <section id="page-cwie" class="page hidden">
         <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
@@ -748,6 +822,13 @@
             <div class="doc-step warn"><div class="no">04</div><div class="nm">แผนฝึก / Job plan</div><div class="owner">พี่เลี้ยงบริษัท</div><div class="due">ครบกำหนด 30 มิ.ย.</div></div>
             <div class="doc-step"><div class="no">05</div><div class="nm">รายงานปิดเล่ม</div><div class="owner">นักศึกษา + อาจารย์</div><div class="due">เปิดหลังฝึกครบ 80%</div></div>
           </div>
+        </div>
+        <div class="card card-pad" style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div><div class="sec-title">แม่แบบเอกสาร CWIE</div><div class="sec-sub" style="margin:2px 0 0">เจ้าหน้าที่ตั้ง template และระบบเติมข้อมูลจาก Student 360 ให้อัตโนมัติ</div></div>
+            <button class="btn btn-sm btn-primary" onclick="toast('เปิดตัวแก้ไขแม่แบบเอกสาร (เดโม)')">แก้ไขแม่แบบ</button>
+          </div>
+          <div id="doc-template-list"></div>
         </div>
         <div class="split-2">
           <div class="card card-pad">
@@ -1140,6 +1221,23 @@ const studentComments=[
   {id:'cm2',studentId:'6512001',role:'อาจารย์นิเทศ',by:'อ.ดร.เมธา',time:'27 มิ.ย. 09:10',text:'นัด onsite วันที่ 20 ส.ค. ยืนยันเวลา 13:30 นักศึกษาควรเตรียมสรุปงานล่าสุด'},
   {id:'cm3',studentId:'6512030',role:'สถานประกอบการ',by:'คุณมณีรัตน์',time:'25 มิ.ย. 16:20',text:'พี่เลี้ยงจะส่ง link video call หลังสรุปตารางทีม data science'},
 ];
+const documentTemplates=[
+  {id:'tpl1',name:'หนังสือส่งตัว CWIE',owner:'เจ้าหน้าที่',status:'ใช้งาน',fields:['student.name','student.id','company.name','advisor.name','internship.period'],lastUpdated:'26 มิ.ย. 2569'},
+  {id:'tpl2',name:'แบบตอบรับสถานประกอบการ',owner:'สถานประกอบการ',status:'ใช้งาน',fields:['company.name','mentor.name','position.title','start_date'],lastUpdated:'24 มิ.ย. 2569'},
+  {id:'tpl3',name:'Job plan / แผนฝึกงาน',owner:'พี่เลี้ยงบริษัท',status:'ต้องทบทวน',fields:['student.skills','mentor.name','weekly_plan','expected_output'],lastUpdated:'18 มิ.ย. 2569'},
+  {id:'tpl4',name:'หนังสือรับรองการฝึกงาน',owner:'เจ้าหน้าที่ + บริษัท',status:'ร่าง',fields:['student.name','company.name','hours_total','evaluation_summary'],lastUpdated:'ร่างใหม่'},
+];
+const changeRequests=[
+  {id:'chg1',role:'student',requester:'กิตติพงษ์ ใจดี',studentId:'6512001',field:'เบอร์โทรศัพท์',before:'081-234-5601',after:'081-234-9999',reason:'เปลี่ยนเบอร์ที่ใช้ติดต่อระหว่างฝึกงาน',status:'pending',submitted:'27 มิ.ย. 2569',risk:'ต่ำ'},
+  {id:'chg2',role:'student',requester:'สุชานันท์ บุญมา',studentId:'6512101',field:'สถานประกอบการ',before:'บจก. ดาต้าเซนส์ แอนะลิติกส์',after:'บจก. รีโมทสแต็ก',reason:'บริษัทเดิมขอเลื่อนเริ่มงาน ต้องตรวจสอบก่อนเปลี่ยนข้อมูลจับคู่',status:'pending',submitted:'27 มิ.ย. 2569',risk:'สูง'},
+  {id:'chg3',role:'advisor',requester:'อ.ปรียา วัฒนศิลป์',advisorId:'t2',field:'รับนิเทศสูงสุด',before:'10',after:'8',reason:'ภาระสอนเพิ่มในช่วงกลางภาค',status:'approved',submitted:'25 มิ.ย. 2569',reviewed:'26 มิ.ย. 2569',risk:'กลาง'},
+  {id:'chg4',role:'company',requester:'บจก. ตัวอย่างไม่ครบข้อมูล',field:'อีเมลผู้ประสานงาน',before:'contact@example-training.co.th',after:'hr@example-training.co.th',reason:'ยังไม่ยืนยัน domain บริษัท',status:'rejected',submitted:'23 มิ.ย. 2569',reviewed:'24 มิ.ย. 2569',risk:'กลาง'},
+];
+const issueReports=[
+  {id:'iss1',studentId:'6512001',title:'พี่เลี้ยงยังไม่ตรวจ logbook หลายวัน',category:'Logbook',severity:'medium',confidentiality:'ปกติ',status:'open',owner:'เจ้าหน้าที่',submitted:'27 มิ.ย. 2569',detail:'นักศึกษาส่งสัปดาห์ที่ 4 แล้ว แต่ยังไม่ได้รับ feedback'},
+  {id:'iss2',studentId:'6512101',title:'งานที่ได้รับอาจไม่ตรงสาย Data / ML',category:'งานไม่ตรงสาย',severity:'high',confidentiality:'จำกัดเฉพาะเจ้าหน้าที่',status:'in_progress',owner:'อ.ผู้ประสานงาน',submitted:'26 มิ.ย. 2569',detail:'นักศึกษารายงานว่าได้รับงาน labeling และเอกสารมากกว่างานวิเคราะห์ข้อมูล'},
+  {id:'iss3',studentId:'6512030',title:'ต้องการเลื่อนวัน video call นิเทศ',category:'นัดนิเทศ',severity:'low',confidentiality:'ผู้เกี่ยวข้อง',status:'closed',owner:'อ.ปรียา',submitted:'24 มิ.ย. 2569',detail:'ปรับเป็นวันที่ 28 ส.ค. เวลา 10:00 แล้ว'},
+];
 const stackDemand = [['React',82],['Python',74],['Node.js',61],['TypeScript',48],['Go',35],['Kubernetes',28],['ML / AI',26]];
 
 const notifications=[
@@ -1327,7 +1425,7 @@ function evalBadge(kind){
 
 /* ---------------- login + nav ---------------- */
 function toggleSide(){ $('#sidebar').classList.toggle('open'); }
-const titles={dashboard:'แดชบอร์ด',accessApprovals:'อนุมัติบัญชี',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',supervisionSchedule:'นัดนิเทศ',riskMonitor:'Risk Monitor',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
+const titles={dashboard:'แดชบอร์ด',accessApprovals:'อนุมัติบัญชี',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',supervisionSchedule:'นัดนิเทศ',riskMonitor:'Risk Monitor',changeRequests:'คำขอแก้ไข',advisorWorkload:'ภาระงานอาจารย์',issueReports:'แจ้งปัญหา',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
 let loginRole='staff';
 let currentStudentId='6512001';
 let currentAdvisorId='t2';
@@ -1570,6 +1668,9 @@ function go(pg){
   if(pg==='accessApprovals')renderAccessApprovals();
   if(pg==='supervisionSchedule')renderSupervisionSchedule();
   if(pg==='riskMonitor')renderRiskMonitor();
+  if(pg==='changeRequests')renderChangeRequests();
+  if(pg==='advisorWorkload')renderAdvisorWorkload();
+  if(pg==='issueReports')renderIssueReports();
   if(pg==='mentors')renderMentors();
   if(pg==='cwie')renderCwie();
   if(pg==='evalSettings')renderEvalSettings();
@@ -1584,10 +1685,14 @@ function renderNotifications(){
   const pending=accessRequests.filter(x=>x.status==='pending');
   const pendingVisits=supervisionVisits.filter(v=>v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน');
   const openRisks=riskAlerts.filter(r=>r.status==='open');
+  const pendingChanges=changeRequests.filter(x=>x.status==='pending');
+  const openIssues=issueReports.filter(x=>x.status!=='closed');
   const items=[
     ...(pending.length?[{ic:'◉',tone:'amber',title:'มีบัญชีรออนุมัติ',sub:`นักศึกษา/อาจารย์/สถานประกอบการรวม ${pending.length} รายการ`,pg:'accessApprovals'}]:[]),
     ...(openRisks.length?[{ic:'⚑',tone:'red',title:'Early Warning เปิดอยู่',sub:`มี ${openRisks.length} รายการที่ต้องติดตาม`,pg:'riskMonitor'}]:[]),
     ...(pendingVisits.length?[{ic:'◷',tone:'accent',title:'นัดนิเทศรอยืนยัน',sub:`มี ${pendingVisits.length} นัดที่ต้องประสานต่อ`,pg:'supervisionSchedule'}]:[]),
+    ...(pendingChanges.length?[{ic:'✎',tone:'amber',title:'คำขอแก้ไขรอพิจารณา',sub:`มี ${pendingChanges.length} คำขอที่ต้องตรวจหลักฐาน`,pg:'changeRequests'}]:[]),
+    ...(openIssues.length?[{ic:'!',tone:'red',title:'เคสปัญหาระหว่างฝึกงาน',sub:`มี ${openIssues.length} เคสที่ยังเปิดอยู่`,pg:'issueReports'}]:[]),
     ...notifications
   ];
   $('#notif-count').textContent=items.length;
@@ -1764,6 +1869,127 @@ function resolveRisk(id){
   toast('ปิดความเสี่ยงแล้ว');
 }
 
+function changeBadge(status){
+  if(status==='approved')return '<span class="badge b-green">อนุมัติแล้ว</span>';
+  if(status==='rejected')return '<span class="badge b-gray">ปฏิเสธแล้ว</span>';
+  return '<span class="badge b-amber">รอพิจารณา</span>';
+}
+function renderChangeRequests(){
+  const filter=$('#change-filter')?$('#change-filter').value:'pending';
+  const rows=changeRequests.filter(x=>filter==='all'||x.status===filter);
+  $('#chg-pending').textContent=changeRequests.filter(x=>x.status==='pending').length;
+  $('#chg-approved').textContent=changeRequests.filter(x=>x.status==='approved').length;
+  $('#chg-rejected').textContent=changeRequests.filter(x=>x.status==='rejected').length;
+  $('#change-list').innerHTML=rows.length?rows.map(x=>{
+    const actions=x.status==='pending'
+      ? `<button class="btn btn-sm" onclick="rejectChangeRequest('${x.id}')">ปฏิเสธ</button><button class="btn btn-sm btn-primary" onclick="approveChangeRequest('${x.id}')">อนุมัติ</button>`
+      : `<button class="btn btn-sm" onclick="toast('เปิดประวัติคำขอ ${x.id} (เดโม)')">ดูประวัติ</button>`;
+    return `<div class="approval-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div><div class="name">${x.requester} · ${x.field}</div><div class="meta">${x.role} · ส่งเมื่อ ${x.submitted} · ความเสี่ยง ${x.risk}</div></div>
+        ${changeBadge(x.status)}
+      </div>
+      <div class="ctx-bar" style="margin-top:12px">
+        <div class="it"><div class="k">ก่อนแก้ไข</div><div class="v">${x.before}</div></div>
+        <div class="it"><div class="k">หลังแก้ไข</div><div class="v">${x.after}</div></div>
+        <div class="it"><div class="k">เหตุผล</div><div class="v">${x.reason}</div></div>
+      </div>
+      <div class="form-actions">${actions}</div>
+    </div>`;
+  }).join(''):'<div class="empty">ไม่มีคำขอในสถานะนี้</div>';
+}
+function approveChangeRequest(id){
+  const req=changeRequests.find(x=>x.id===id);
+  if(!req)return;
+  req.status='approved'; req.reviewed='ตอนนี้';
+  if(req.studentId){
+    const s=students.find(x=>x.id===req.studentId);
+    if(s&&req.field==='เบอร์โทรศัพท์')s.phone=req.after;
+  }
+  auditLogs.unshift({type:'ข้อมูล',time:'ตอนนี้',act:'อนุมัติคำขอแก้ไขข้อมูล',detail:`${req.requester} · ${req.field}: ${req.before} → ${req.after}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderChangeRequests(); renderDash(); renderNotifications(); renderStudents(); renderStudent360($('#student360-select')?.value||currentStudentId); renderAuditLog();
+  toast('อนุมัติคำขอแก้ไขแล้ว');
+}
+function rejectChangeRequest(id){
+  const req=changeRequests.find(x=>x.id===id);
+  if(!req)return;
+  req.status='rejected'; req.reviewed='ตอนนี้';
+  auditLogs.unshift({type:'ข้อมูล',time:'ตอนนี้',act:'ปฏิเสธคำขอแก้ไขข้อมูล',detail:`${req.requester} · ${req.field}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderChangeRequests(); renderDash(); renderNotifications(); renderAuditLog();
+  toast('ปฏิเสธคำขอแก้ไขแล้ว');
+}
+function renderAdvisorWorkload(){
+  const loads=advisors.map(a=>{
+    const assignments=advisorAssignments.filter(x=>x.advisorId===a.id);
+    const visits=supervisionVisits.filter(x=>x.advisorId===a.id);
+    const pendingEval=assignments.filter(x=>x.status!=='ประเมินแล้ว').length;
+    const pendingVisit=visits.filter(x=>x.status==='รอยืนยัน'||x.status==='ต้องเลื่อน').length;
+    const risk=riskAlerts.filter(r=>r.status==='open'&&assignments.some(x=>x.studentId===r.studentId)).length;
+    const loadPct=Math.round(assignments.length/(a.maxSupervise||1)*100);
+    return {...a,assignments,visits,pendingEval,pendingVisit,risk,loadPct};
+  });
+  $('#load-advisors').textContent=advisors.length;
+  $('#load-assigned').textContent=advisorAssignments.length;
+  $('#load-pending').textContent=loads.reduce((n,a)=>n+a.pendingEval+a.pendingVisit,0);
+  $('#load-heavy').textContent=loads.filter(a=>a.loadPct>=80).length;
+  $('#advisor-load-list').innerHTML=loads.map(a=>`
+    <div class="approval-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div><div class="name">${a.name}</div><div class="meta">${a.team} · รับนิเทศ ${a.assignments.length}/${a.maxSupervise} คน · นัดนิเทศ ${a.visits.length} นัด</div></div>
+        <span class="badge ${a.loadPct>=80?'b-amber':a.loadPct>=50?'b-accent':'b-green'}">${a.loadPct}% capacity</span>
+      </div>
+      <div class="ctx-bar" style="margin-top:12px">
+        <div class="it"><div class="k">รอประเมิน</div><div class="v">${a.pendingEval}</div></div>
+        <div class="it"><div class="k">นัดรอยืนยัน/เลื่อน</div><div class="v">${a.pendingVisit}</div></div>
+        <div class="it"><div class="k">Risk นักศึกษาที่ดูแล</div><div class="v">${a.risk}</div></div>
+      </div>
+      <div class="bar" style="height:8px;margin-top:12px"><i style="width:${Math.min(a.loadPct,100)}%;background:${a.loadPct>=80?'var(--amber)':'var(--accent)'}"></i></div>
+      <div class="form-actions"><button class="btn btn-sm" onclick="toast('เปิดรายละเอียดภาระงาน ${a.name} (เดโม)')">ดูรายละเอียด</button><button class="btn btn-sm btn-primary" onclick="toast('เปิดหน้ามอบหมายใหม่โดยใช้ capacity guard (เดโม)')">มอบหมายเพิ่ม</button></div>
+    </div>`).join('');
+}
+function issueBadge(x){
+  if(x.status==='closed')return '<span class="badge b-green">ปิดแล้ว</span>';
+  if(x.severity==='high')return '<span class="badge b-amber">เร่งด่วน</span>';
+  return '<span class="badge b-accent">เปิดอยู่</span>';
+}
+function renderIssueReports(){
+  const filter=$('#issue-filter')?$('#issue-filter').value:'open';
+  const rows=issueReports.filter(x=>{
+    if(filter==='all')return true;
+    if(filter==='open')return x.status!=='closed';
+    if(filter==='urgent')return x.status!=='closed'&&x.severity==='high';
+    return x.status==='closed';
+  });
+  $('#issue-open').textContent=issueReports.filter(x=>x.status!=='closed').length;
+  $('#issue-urgent').textContent=issueReports.filter(x=>x.status!=='closed'&&x.severity==='high').length;
+  $('#issue-progress').textContent=issueReports.filter(x=>x.status==='in_progress').length;
+  $('#issue-closed').textContent=issueReports.filter(x=>x.status==='closed').length;
+  $('#issue-list').innerHTML=rows.length?rows.map(x=>{
+    const student=students.find(s=>s.id===x.studentId);
+    const actions=x.status==='closed'
+      ? `<button class="btn btn-sm" onclick="openStudent360('${x.studentId}')">ดู Student 360</button>`
+      : `<button class="btn btn-sm" onclick="openStudent360('${x.studentId}')">เปิดบริบท</button><button class="btn btn-sm btn-primary" onclick="closeIssueReport('${x.id}')">ปิดเคส</button>`;
+    return `<div class="approval-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div><div class="name">${x.title}</div><div class="meta">${student?student.name:x.studentId} · ${x.category} · ${x.submitted}</div></div>
+        ${issueBadge(x)}
+      </div>
+      <div class="rule-note" style="margin-top:12px"><span>!</span><span><b>${x.confidentiality} · owner: ${x.owner}</b><br>${x.detail}</span></div>
+      <div class="form-actions">${actions}</div>
+    </div>`;
+  }).join(''):'<div class="empty">ไม่มีเคสในตัวกรองนี้</div>';
+}
+function closeIssueReport(id){
+  const issue=issueReports.find(x=>x.id===id);
+  if(!issue)return;
+  issue.status='closed';
+  const risk=riskAlerts.find(r=>r.studentId===issue.studentId&&r.status==='open');
+  if(r)r.status='resolved';
+  auditLogs.unshift({type:'ปัญหา',time:'ตอนนี้',act:'ปิดเคสแจ้งปัญหา',detail:issue.title,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderIssueReports(); renderRiskMonitor(); renderDash(); renderNotifications(); renderStudent360(issue.studentId); renderAuditLog();
+  toast('ปิดเคสปัญหาแล้ว');
+}
+
 function renderCwie(){
   const options=['6512001','6512030','6512101'].map(id=>{
     const s=students.find(x=>x.id===id);
@@ -1777,6 +2003,27 @@ function renderCwie(){
       <div class="meta">${who} · owner: ${owner}</div>
       <div class="form-actions"><button class="btn btn-sm" onclick="toast('เปิดรายการเอกสาร (เดโม)')">เปิด</button><button class="btn btn-sm btn-primary" onclick="toast('ส่งแจ้งเตือนแล้ว (เดโม)')">แจ้งเตือน</button></div>
     </div>`).join('');
+  renderDocumentTemplates();
+}
+function renderDocumentTemplates(){
+  $('#doc-template-list').innerHTML=documentTemplates.map(t=>{
+    const badge=t.status==='ใช้งาน'?'<span class="badge b-green">ใช้งาน</span>':t.status==='ต้องทบทวน'?'<span class="badge b-amber">ต้องทบทวน</span>':'<span class="badge b-gray">ร่าง</span>';
+    return `<div class="approval-card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div><div class="name">${t.name}</div><div class="meta">owner: ${t.owner} · updated ${t.lastUpdated}</div></div>
+        ${badge}
+      </div>
+      <div class="reasons" style="margin-top:10px">${t.fields.map(f=>`<span class="reason"><i>{}</i> ${f}</span>`).join('')}</div>
+      <div class="form-actions"><button class="btn btn-sm" onclick="toast('preview auto-fill ${t.name} จาก Student 360 (เดโม)')">Preview</button><button class="btn btn-sm btn-primary" onclick="generateDocumentFromTemplate('${t.id}')">สร้างเอกสาร</button></div>
+    </div>`;
+  }).join('');
+}
+function generateDocumentFromTemplate(id){
+  const tpl=documentTemplates.find(x=>x.id===id);
+  const student=students.find(s=>s.id===$('#cwie-student').value)||students[0];
+  auditLogs.unshift({type:'เอกสาร',time:'ตอนนี้',act:'สร้างเอกสารจากแม่แบบ',detail:`${tpl?tpl.name:id} · ${student.name}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderAuditLog();
+  toast('สร้าง '+(tpl?tpl.name:'เอกสาร')+' จากข้อมูล Student 360 แล้ว');
 }
 function renderCwieTimeline(id){
   const s=students.find(x=>x.id===id);
@@ -2095,6 +2342,8 @@ function renderDash(){
   const pendingAccess=accessRequests.filter(x=>x.status==='pending').length;
   const pendingVisits=supervisionVisits.filter(v=>v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน').length;
   const openRisks=riskAlerts.filter(r=>r.status==='open').length;
+  const pendingChanges=changeRequests.filter(x=>x.status==='pending').length;
+  const openIssues=issueReports.filter(x=>x.status!=='closed').length;
   $('#m-total').textContent=total; $('#m-coop').textContent=coop; $('#m-gen').textContent=total-coop;
   $('#m-matched').textContent=matched; $('#m-matchpct').textContent=Math.round(matched/total*100)+'%';
   $('#m-wait').textContent=wait; $('#m-est').textContent=establishments.length; $('#m-warn').textContent=warn;
@@ -2102,6 +2351,8 @@ function renderDash(){
   $('#c-access').textContent=pendingAccess;
   $('#c-visit').textContent=pendingVisits;
   $('#c-risk').textContent=openRisks;
+  $('#c-change').textContent=pendingChanges;
+  $('#c-issue').textContent=openIssues;
   $('#c-mentor').textContent=allMentors().length;
 
   const prog=[['สหกิจ','สหกิจ'],['ฝึกงานทั่วไป','ฝึกงานทั่วไป']].map(([lab,tr])=>{
@@ -2117,6 +2368,8 @@ function renderDash(){
     ['◉','var(--amber-ink)','var(--amber-soft)',pendingAccess+' บัญชีรออนุมัติเข้าใช้งาน','ตรวจสอบนักศึกษา อาจารย์ และสถานประกอบการก่อนเปิด portal','accessApprovals'],
     ['⚑','var(--red)','var(--red-soft)',openRisks+' Early Warning เปิดอยู่','ดูเจ้าของงานและปิดความเสี่ยงเมื่อแก้แล้ว','riskMonitor'],
     ['◷','var(--accent-ink)','var(--accent-soft)',pendingVisits+' นัดนิเทศรอยืนยัน/ต้องเลื่อน','ประสานอาจารย์และสถานประกอบการเพื่อยืนยันนัด','supervisionSchedule'],
+    ['✎','var(--amber-ink)','var(--amber-soft)',pendingChanges+' คำขอแก้ไขรอพิจารณา','ตรวจหลักฐานก่อนเปลี่ยนข้อมูลสำคัญ','changeRequests'],
+    ['!','var(--red-ink)','var(--red-soft)',openIssues+' เคสปัญหาระหว่างฝึกงาน','triage เคสเร่งด่วนและติดตามผล','issueReports'],
     ['⚑','var(--amber-ink)','var(--amber-soft)','บจก. เน็กซ์เจน ติดธงเฝ้าระวัง','ตรวจสอบก่อนส่งนักศึกษารอบนี้','establishments'],
     ['◷','var(--accent-ink)','var(--accent-soft)',wait+' นักศึกษายังรอจับคู่','เปิดหน้าจับคู่เพื่อดำเนินการ','matching'],
     ['★','var(--green-ink)','var(--green-soft)','ผลประเมินสถานประกอบการเข้ามาใหม่','ดูสรุปคุณภาพในหน้ารายงาน','reports'],
@@ -2708,7 +2961,7 @@ function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.transform='
 renderDash(); renderStudents(); renderEst(); renderMatchStudents();
 renderAdvisorAssignments();
 renderReports(); initCompanyReport();
-renderNotifications(); renderCwie(); renderAccessApprovals(); renderSupervisionSchedule(); renderRiskMonitor(); renderAuditLog(); renderEvalSettings(); renderMentors(); initStudent360Options(); renderStudent360('6512001'); renderCompanyTaskQueue(); renderCompanyWorkflow('positions');
+renderNotifications(); renderCwie(); renderAccessApprovals(); renderSupervisionSchedule(); renderRiskMonitor(); renderChangeRequests(); renderAdvisorWorkload(); renderIssueReports(); renderAuditLog(); renderEvalSettings(); renderMentors(); initStudent360Options(); renderStudent360('6512001'); renderCompanyTaskQueue(); renderCompanyWorkflow('positions');
 </script>
 
 <div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
