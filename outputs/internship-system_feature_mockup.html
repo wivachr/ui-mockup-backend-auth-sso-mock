@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบฝึกงาน ภาควิชาไอที</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --canvas:#F6F7F9; --surface:#FFFFFF; --surface-2:#FBFBFD;
+    --ink:#1A1D26; --ink-2:#565C6E; --muted:#8A90A0;
+    --border:#E7E9EF; --border-2:#DDE0E8;
+    --accent:#4F46E5; --accent-soft:#ECEBFB; --accent-ink:#3A33B5;
+    --green:#0E9F6E; --green-soft:#E3F5EE; --green-ink:#0A6E4D;
+    --amber:#C9780B; --amber-soft:#FBEFD8; --amber-ink:#8A5207;
+    --red:#DC2828; --red-soft:#FBE6E6; --red-ink:#9C1C1C;
+    --side:#181B24; --side-2:#212430; --side-line:#2C3040;
+    --side-ink:#C9CCD6; --side-muted:#7C8194;
+    --radius:10px; --radius-lg:14px;
+    --font:"IBM Plex Sans Thai",-apple-system,"Segoe UI","Noto Sans Thai",sans-serif;
+    --mono:"IBM Plex Mono","SFMono-Regular",Menlo,monospace;
+    --shadow:0 1px 2px rgba(20,22,34,.04),0 4px 16px rgba(20,22,34,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--font);background:var(--canvas);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .hidden{display:none!important}
+  .mono{font-family:var(--mono);font-feature-settings:"tnum"}
+  a{color:var(--accent);text-decoration:none}
+  button{font-family:inherit}
+  input,select,textarea{font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--border-2);border-radius:var(--radius);padding:9px 11px;width:100%;outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  ::placeholder{color:var(--muted)}
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:var(--radius);border:1px solid var(--border-2);background:var(--surface);color:var(--ink);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s,transform .05s;white-space:nowrap}
+  .btn:hover{background:var(--surface-2);border-color:var(--border)}
+  .btn:active{transform:scale(.985)}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-primary:hover{background:#4339d6;border-color:#4339d6}
+  .btn-sm{height:32px;padding:0 11px;font-size:13px}
+  .btn-ghost{border-color:transparent;background:transparent}
+  .btn-ghost:hover{background:var(--surface-2)}
+
+  /* ---------- login ---------- */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(140% 120% at 50% -10%,#EEF0FA 0%,var(--canvas) 55%)}
+  .login-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:30px 28px}
+  .brand-mark{width:48px;height:48px;border-radius:13px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .login-head{text-align:center;margin-bottom:22px}
+  .login-head .t{font-size:18px;font-weight:600;margin-top:12px}
+  .login-head .s{font-size:13px;color:var(--muted);margin-top:2px}
+  .lbl{display:block;font-size:13px;color:var(--ink-2);font-weight:500;margin:0 0 6px}
+  .login-foot{text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px}
+  .login-ext{border-top:1px solid var(--border);margin-top:16px;padding-top:16px;text-align:center;font-size:13px;color:var(--ink-2)}
+
+  /* ---------- app shell ---------- */
+  .app{display:flex;min-height:100vh}
+  .sidebar{width:236px;flex-shrink:0;background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid var(--side-line)}
+  .sb-brand{display:flex;align-items:center;gap:11px;padding:18px 18px 16px;border-bottom:1px solid var(--side-line)}
+  .sb-brand .m{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .sb-brand .nm{font-size:14.5px;font-weight:600;color:#fff;line-height:1.25}
+  .sb-brand .nm small{display:block;font-size:11.5px;font-weight:400;color:var(--side-muted)}
+  .nav{padding:12px 12px;flex:1;overflow:auto}
+  .nav-sec{font-size:11px;letter-spacing:.04em;color:var(--side-muted);text-transform:uppercase;margin:14px 10px 6px;font-weight:600}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:var(--side-ink);font-size:14px;cursor:pointer;font-weight:500;transition:background .13s,color .13s;margin-bottom:2px}
+  .nav-item i{font-size:18px;width:20px;text-align:center;color:var(--side-muted);transition:color .13s}
+  .nav-item:hover{background:var(--side-2);color:#fff}
+  .nav-item:hover i{color:var(--side-ink)}
+  .nav-item.active{background:var(--accent);color:#fff}
+  .nav-item.active i{color:#fff}
+  .nav-item .cnt{margin-left:auto;font-size:11.5px;background:var(--side-2);color:var(--side-ink);padding:1px 8px;border-radius:999px;font-family:var(--mono)}
+  .nav-item.active .cnt{background:rgba(255,255,255,.22);color:#fff}
+  .sb-user{padding:13px 16px;border-top:1px solid var(--side-line);display:flex;align-items:center;gap:10px}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+  .sb-user .nm{font-size:13px;color:#fff;font-weight:500;line-height:1.2}
+  .sb-user .nm small{display:block;color:var(--side-muted);font-weight:400;font-size:11.5px}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{height:60px;display:flex;align-items:center;gap:14px;padding:0 26px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+  .topbar .pg-title{font-size:17px;font-weight:600}
+  .topbar .spacer{flex:1}
+  .round-chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);padding:6px 12px;border-radius:999px}
+  .round-chip b{color:var(--ink);font-weight:600}
+  .hamb{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);padding:4px}
+  .content{padding:26px;max-width:1180px;width:100%;margin:0 auto}
+  .page{animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .page-intro{margin-bottom:20px}
+  .page-intro h1{font-size:21px;font-weight:600;margin:0 0 3px}
+  .page-intro p{margin:0;color:var(--muted);font-size:13.5px}
+
+  /* ---------- cards / metrics ---------- */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+  .card-pad{padding:18px 20px}
+  .grid{display:grid;gap:16px}
+  .metrics{grid-template-columns:repeat(4,1fr)}
+  .metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
+  .metric .lbl2{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .metric .lbl2 i{font-size:16px}
+  .metric .val{font-size:27px;font-weight:600;font-family:var(--mono);margin-top:8px;letter-spacing:-.5px}
+  .metric .sub{font-size:12px;color:var(--ink-2);margin-top:3px}
+  .metric .sub.up{color:var(--green-ink)}
+
+  .sec-title{font-size:15px;font-weight:600;margin:0 0 2px}
+  .sec-sub{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+
+  /* ---------- badges / pills / tags ---------- */
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .badge i{font-size:13px}
+  .b-green{background:var(--green-soft);color:var(--green-ink)}
+  .b-amber{background:var(--amber-soft);color:var(--amber-ink)}
+  .b-red{background:var(--red-soft);color:var(--red-ink)}
+  .b-accent{background:var(--accent-soft);color:var(--accent-ink)}
+  .b-gray{background:#EEF0F3;color:var(--ink-2)}
+  .tag{display:inline-block;font-size:12px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);padding:2px 9px;border-radius:7px;font-family:var(--mono)}
+  .pillbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .pill{font-size:13px;padding:6px 14px;border-radius:999px;border:1px solid var(--border-2);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:all .13s}
+  .pill:hover{border-color:var(--muted)}
+  .pill.active{background:var(--ink);border-color:var(--ink);color:#fff}
+
+  /* ---------- table ---------- */
+  .tbl-wrap{overflow-x:auto}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tbl th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.02em;padding:11px 14px;border-bottom:1px solid var(--border);text-transform:uppercase;white-space:nowrap}
+  .tbl td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl tr.row:hover{background:var(--surface-2)}
+  .who{display:flex;align-items:center;gap:11px}
+  .who .nm{font-weight:500;color:var(--ink)}
+  .who .id{font-size:12px;color:var(--muted);font-family:var(--mono)}
+
+  /* ---------- capacity bar ---------- */
+  .bar{height:6px;border-radius:3px;background:#EDEFF3;overflow:hidden;min-width:84px}
+  .bar > i{display:block;height:100%;border-radius:3px}
+
+  /* ---------- establishment cards ---------- */
+  .est-grid{grid-template-columns:repeat(2,1fr)}
+  .est{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .est.warn{border-color:#F0D9A8}
+  .est .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .est .nm{font-size:15px;font-weight:600}
+  .est .loc{font-size:12px;color:var(--muted);margin-top:2px}
+  .scores{display:flex;gap:10px;margin:14px 0}
+  .scorebox{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:8px 11px}
+  .scorebox .k{font-size:11px;color:var(--muted)}
+  .scorebox .v{font-size:19px;font-weight:600;font-family:var(--mono);letter-spacing:-.5px}
+  .scorebox .v small{font-size:11.5px;color:var(--muted);font-weight:400}
+  .scorebox .v.warn{color:var(--amber-ink)}
+  .scorebox .v.na{color:var(--muted);font-size:15px}
+  .flagbox{background:var(--amber-soft);border-radius:9px;padding:9px 11px;display:flex;gap:8px;align-items:flex-start;margin-bottom:12px}
+  .flagbox i{color:var(--amber-ink);font-size:15px;margin-top:1px}
+  .flagbox span{font-size:12.5px;color:var(--amber-ink);line-height:1.45}
+  .est .foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+  .est .foot .cap{flex:1;min-width:130px}
+  .est .foot .cap .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-bottom:5px}
+  .link-arrow{font-size:13px;color:var(--accent);cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:4px;background:none;border:none}
+
+  /* ---------- matching ---------- */
+  .match-layout{display:grid;grid-template-columns:300px 1fr;gap:18px}
+  .stu-pick{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:8px;background:var(--surface);transition:all .13s}
+  .stu-pick:hover{border-color:var(--accent);background:var(--surface-2)}
+  .stu-pick.active{border-color:var(--accent);background:var(--accent-soft)}
+  .rank{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--surface)}
+  .fit{width:54px;height:54px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono)}
+  .fit .n{font-size:18px;font-weight:600;line-height:1}
+  .fit .p{font-size:9.5px;opacity:.8;margin-top:1px}
+  .fit.hi{background:var(--green-soft);color:var(--green-ink)}
+  .fit.mid{background:var(--accent-soft);color:var(--accent-ink)}
+  .fit.lo{background:var(--amber-soft);color:var(--amber-ink)}
+  .reasons{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+  .reason{font-size:11.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;display:inline-flex;align-items:center;gap:4px}
+  .reason i{font-size:13px}
+  .reason.good i{color:var(--green-ink)}
+  .reason.warnr i{color:var(--amber-ink)}
+  .advisor-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .advisor-select{width:auto;min-width:190px;height:32px;padding:5px 9px;font-size:12.5px;border-radius:8px}
+  .assignment-board{margin-top:18px}
+  .assignment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .assign-card{border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:13px 14px}
+  .assign-card .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:9px}
+  .assign-card .nm{font-size:13.5px;font-weight:600}
+  .assign-card .sub{font-size:12px;color:var(--muted);margin-top:1px}
+  .assign-card .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .assign-card .due{font-family:var(--mono);font-size:11.5px;color:var(--ink-2)}
+
+  /* ---------- forms ---------- */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+  .ctx-bar{display:flex;gap:22px;flex-wrap:wrap;padding:14px 18px;background:var(--accent-soft);border-radius:12px;margin-bottom:20px}
+  .ctx-bar .it .k{font-size:11.5px;color:var(--accent-ink);opacity:.75}
+  .ctx-bar .it .v{font-size:14px;font-weight:600;color:var(--accent-ink)}
+  .crit{padding:14px 0;border-bottom:1px solid var(--border)}
+  .crit:last-of-type{border-bottom:none}
+  .crit .cn{font-size:14px;font-weight:500}
+  .crit .cd{font-size:12px;color:var(--muted);margin-top:1px}
+  .crit-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .stars{display:flex;gap:3px}
+  .star{font-size:24px;color:#D8DBE3;cursor:pointer;transition:color .1s,transform .1s;line-height:1}
+  .star:hover{transform:scale(1.12)}
+  .star.on{color:#F2A93B}
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg .opt{font-size:13px;padding:6px 13px;border:1px solid var(--border-2);border-radius:999px;cursor:pointer;color:var(--ink-2);transition:all .13s}
+  .seg .opt:hover{border-color:var(--muted)}
+  .seg .opt.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);padding:4px;border-radius:11px;margin-bottom:22px;width:fit-content}
+  .tab{padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--ink-2);cursor:pointer;border:none;background:none;transition:all .13s}
+  .tab.active{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  .teacher-eval-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .teacher-eval-head select{max-width:360px}
+
+  /* ---------- reports ---------- */
+  .rep-bar-row{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+  .rep-bar-row .nm{width:120px;font-size:13px;flex-shrink:0}
+  .rep-bar-row .tr{flex:1;height:22px;background:var(--surface-2);border-radius:6px;overflow:hidden}
+  .rep-bar-row .tr > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#6A60F0);border-radius:6px}
+  .rep-bar-row .vv{width:42px;text-align:right;font-family:var(--mono);font-size:13px;color:var(--ink-2)}
+
+  /* ---------- company report ---------- */
+  .cr-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:18px}
+  .cr-dim{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+  .cr-dim .nm{width:188px;font-size:13px;flex-shrink:0}
+  .cr-dim .tr{flex:1;height:9px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+  .cr-dim .tr>i{display:block;height:100%;border-radius:5px}
+  .cr-dim .vv{width:34px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:500}
+  .roledist{display:flex;height:26px;border-radius:7px;overflow:hidden;margin:4px 0 12px;gap:2px}
+  .roledist span{display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:500;min-width:0;white-space:nowrap;overflow:hidden}
+  .role-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
+  .role-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .review{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+  .review:last-child{border-bottom:none}
+  .review .q{font-size:13.5px;color:var(--ink);line-height:1.55;margin-top:5px}
+  .review .meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .review .rname{font-size:13px;font-weight:500}
+  .ministars{font-family:var(--mono);font-size:13px;color:#F2A93B;letter-spacing:1.5px}
+
+  /* ---------- student portal ---------- */
+  .sp-top{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+  .sp-top .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:15px}
+  .sp-top .brand .m{width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .sp-content{max-width:720px;margin:0 auto;padding:28px 22px}
+  .student-wide{max-width:1040px}
+  .sp-hero{margin-bottom:20px}
+  .sp-hero h1{font-size:22px;margin:0 0 4px}
+  .sp-hero p{margin:0;color:var(--muted);font-size:14px}
+  .pl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 22px;margin-top:14px}
+  .pl-it .k{font-size:12px;color:var(--muted)}
+  .pl-it .v{font-size:14px;font-weight:500;margin-top:2px}
+  .sp-done{text-align:center;padding:34px 24px}
+  .sp-done .ic{width:60px;height:60px;border-radius:50%;background:var(--green-soft);color:var(--green-ink);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 14px}
+  @media(max-width:560px){.pl-grid{grid-template-columns:1fr}}
+
+  /* ---------- feature mockup additions ---------- */
+  .icon-btn{width:38px;height:38px;border:1px solid var(--border);background:var(--surface);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:var(--ink-2)}
+  .icon-btn:hover{background:var(--surface-2);color:var(--ink)}
+  .notif-dot{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font-size:11px;font-family:var(--mono);display:flex;align-items:center;justify-content:center;border:2px solid var(--surface)}
+  .notif-panel{position:absolute;right:92px;top:52px;width:min(380px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 18px 48px rgba(20,22,34,.18);padding:8px;z-index:40}
+  .notif-item{display:flex;gap:10px;padding:10px;border-radius:9px;border-bottom:1px solid var(--border)}
+  .notif-item:last-child{border-bottom:none}
+  .notif-item:hover{background:var(--surface-2)}
+  .notif-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .notif-t{font-size:13px;font-weight:600}
+  .notif-s{font-size:12px;color:var(--muted);margin-top:1px}
+  .split-2{display:grid;grid-template-columns:1.25fr .85fr;gap:16px;align-items:start}
+  .doc-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .doc-step{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:12px;min-height:120px}
+  .doc-step.done{border-color:#BEE5D6;background:#F3FBF8}
+  .doc-step.active{border-color:#BEB9F2;background:var(--accent-soft)}
+  .doc-step.warn{border-color:#F0D9A8;background:#FFF9EC}
+  .doc-step .no{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .doc-step .nm{font-weight:600;font-size:13.5px;margin-top:5px}
+  .doc-step .owner{font-size:12px;color:var(--ink-2);margin-top:6px}
+  .doc-step .due{font-size:11.5px;color:var(--muted);margin-top:10px}
+  .person-timeline{position:relative;padding-left:26px}
+  .person-timeline:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;background:var(--border)}
+  .tl-row{position:relative;padding:0 0 16px}
+  .tl-row:last-child{padding-bottom:0}
+  .tl-row:before{content:"";position:absolute;left:-23px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--border-2)}
+  .tl-row.done:before{background:var(--green);border-color:var(--green)}
+  .tl-row.active:before{background:var(--accent);border-color:var(--accent)}
+  .tl-row.warn:before{background:var(--amber);border-color:var(--amber)}
+  .tl-title{font-size:13.5px;font-weight:600}
+  .tl-meta{font-size:12px;color:var(--muted);margin-top:1px}
+  .mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .mini-card{border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--surface-2)}
+  .mini-card .k{font-size:12px;color:var(--muted)}
+  .mini-card .v{font-size:20px;font-family:var(--mono);font-weight:600;margin-top:3px}
+  .logbook-list{display:grid;gap:10px}
+  .log-entry{border:1px solid var(--border);border-radius:10px;padding:13px 14px;background:var(--surface)}
+  .log-entry .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .log-entry .wk{font-weight:600;font-size:13.5px}
+  .log-entry .txt{font-size:13px;color:var(--ink-2);margin-top:6px}
+  .daily-log-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(380px,.75fr);gap:18px;align-items:start}
+  .day-list{display:grid;gap:8px}
+  .day-row{display:grid;grid-template-columns:74px 1fr auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:10px 11px;cursor:pointer}
+  .day-row:hover{background:var(--surface-2)}
+  .day-row.active{border-color:var(--accent);background:var(--accent-soft)}
+  .day-row .date{font-family:var(--mono);font-size:12px;font-weight:600}
+  .day-row .work{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .day-row .meta{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .daily-form{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:14px;min-width:0}
+  .daily-form textarea{min-height:74px;resize:vertical;line-height:1.45}
+  .compact-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .compact-fields > div{min-width:0}
+  .compact-fields .lbl{line-height:1.35;min-height:18px}
+  .weekly-summary{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:13px 14px;margin-top:12px}
+  .weekly-summary .row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+  .weekly-summary .row:last-child{border-bottom:none}
+  .audit-row{display:grid;grid-template-columns:140px 1fr 150px 120px;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid var(--border)}
+  .audit-row:last-child{border-bottom:none}
+  .audit-time{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .audit-act{font-size:13.5px;font-weight:600}
+  .audit-detail{font-size:12px;color:var(--muted);margin-top:2px}
+  .audit-user,.audit-ip{font-size:12.5px;color:var(--ink-2)}
+  .portal-wide{max-width:980px}
+  .company-hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}
+  .mentor-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .approval-card{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--surface)}
+  .approval-card .name{font-weight:600}
+  .approval-card .meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .mentor-list{display:grid;gap:8px;margin:10px 0 13px}
+  .mentor-row{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--border);background:var(--surface-2);border-radius:10px;padding:10px 11px}
+  .mentor-row .avatar{width:30px;height:30px;font-size:12px}
+  .mentor-row .name{font-size:13px;font-weight:600}
+  .mentor-row .meta{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .mentor-row .students{font-size:12px;color:var(--ink-2);margin-top:5px}
+  .rule-note{display:flex;gap:9px;align-items:flex-start;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--ink-2)}
+  .rule-note b{color:var(--ink)}
+  .owner-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--border);background:var(--surface-2);border-radius:999px;padding:4px 9px;font-size:12px;color:var(--ink-2);white-space:nowrap}
+  .status-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0 18px}
+  .status-tile{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:10px 11px;min-height:82px}
+  .status-tile.done{border-color:#BEE5D6;background:#F3FBF8}
+  .status-tile.active{border-color:#BEB9F2;background:var(--accent-soft)}
+  .status-tile.warn{border-color:#F0D9A8;background:#FFF9EC}
+  .status-tile .k{font-size:11.5px;color:var(--muted)}
+  .status-tile .v{font-size:13px;font-weight:600;margin-top:4px}
+  .status-tile .o{font-size:11.5px;color:var(--ink-2);margin-top:7px}
+  .profile-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px}
+  .profile-title{display:flex;align-items:center;gap:12px}
+  .profile-title .avatar{width:44px;height:44px;font-size:16px}
+  .portal-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+  .portal-tabs .tab{border:1px solid var(--border);background:var(--surface);box-shadow:none}
+  .portal-tabs .tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+  .workflow-panel{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:14px;margin-bottom:18px}
+  .breadcrumb{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin-bottom:10px}
+  .breadcrumb button{border:none;background:none;color:var(--accent);font:inherit;cursor:pointer;padding:0}
+  .action-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid #F0D9A8;background:#FFF9EC;border-radius:12px;padding:13px 15px;margin-bottom:16px}
+  .action-banner .t{font-size:14px;font-weight:700;color:var(--amber-ink)}
+  .action-banner .s{font-size:12.5px;color:var(--amber-ink);margin-top:2px}
+  .task-queue{display:grid;gap:10px;margin-bottom:18px}
+  .task-item{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:12px 13px}
+  .task-item .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .task-item .t{font-size:13.5px;font-weight:700}
+  .task-item .s{font-size:12px;color:var(--muted);margin-top:1px}
+
+  /* ---------- modal ---------- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,22,34,.42);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;animation:fade .15s}
+  .modal{background:var(--surface);border-radius:16px;max-width:520px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 20px 60px rgba(20,22,34,.25)}
+  .modal.wide{max-width:720px}
+  .modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:20px 22px 0}
+  .modal-x{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
+  .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:var(--muted)}
+  .kv .v{font-weight:500}
+  .modal-form{padding:16px 22px 22px}
+  .modal-form .field-full{grid-column:1 / -1}
+  .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+  .check-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);padding-top:26px}
+  .check-row input{width:auto}
+
+  .empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:14px}
+
+  @media(max-width:980px){
+    .metrics{grid-template-columns:repeat(2,1fr)}
+    .est-grid{grid-template-columns:1fr}
+    .match-layout{grid-template-columns:1fr}
+    .assignment-grid{grid-template-columns:1fr}
+    .form-grid{grid-template-columns:1fr}
+    .split-2{grid-template-columns:1fr!important}
+    .doc-flow{grid-template-columns:1fr 1fr}
+    .mentor-grid{grid-template-columns:1fr}
+    .status-strip{grid-template-columns:1fr 1fr}
+    .daily-log-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:900px){
+    .daily-log-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:760px){
+    .sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:transform .25s}
+    .sidebar.open{transform:none}
+    .hamb{display:block}
+    .scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55}
+    .content{padding:18px}
+    .topbar{padding:0 16px}
+    .round-chip{display:none}
+    .notif-panel{right:16px}
+    .doc-flow,.mini-grid,.status-strip,.compact-fields{grid-template-columns:1fr}
+    .audit-row{grid-template-columns:1fr;gap:4px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login">
+  <div class="login-card">
+    <div class="login-head">
+      <div class="brand-mark" style="margin:0 auto"><span class="ti">▦</span></div>
+      <div class="t">ระบบฝึกงาน ภาควิชาไอที</div>
+      <div class="s">จัดการและประเมินสถานประกอบการ</div>
+    </div>
+    <div class="seg" data-seg="loginrole" style="justify-content:center;margin-bottom:18px">
+      <span class="opt sel" onclick="pickLoginRole(this,'staff')">เจ้าหน้าที่</span>
+      <span class="opt" onclick="pickLoginRole(this,'advisor')">อาจารย์นิเทศ</span>
+      <span class="opt" onclick="pickLoginRole(this,'student')">นักศึกษา</span>
+      <span class="opt" onclick="pickLoginRole(this,'company')">สถานประกอบการ</span>
+    </div>
+    <label class="lbl" id="lg-label">อีเมลมหาวิทยาลัย</label>
+    <input id="lg-mail" type="text" placeholder="name@university.ac.th" style="margin-bottom:14px" value="coordinator@university.ac.th">
+    <label class="lbl">รหัสผ่าน</label>
+    <input type="password" placeholder="••••••••" style="margin-bottom:9px" value="demo1234">
+    <div style="text-align:right;margin-bottom:16px"><a href="#">ลืมรหัสผ่าน</a></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="login-foot" id="lg-foot">ผู้ประสานงาน — จัดการนักศึกษา บริษัท และการจับคู่</div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="app hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="m">▦</div>
+      <div class="nm">ระบบฝึกงาน<small>ภาควิชาไอที</small></div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="nav-sec">ภาพรวม</div>
+      <div class="nav-item" data-pg="dashboard"><i>◧</i> แดชบอร์ด</div>
+      <div class="nav-sec">จัดการข้อมูล</div>
+      <div class="nav-item" data-pg="students"><i>◍</i> นักศึกษา <span class="cnt" id="c-stu"></span></div>
+      <div class="nav-item" data-pg="establishments"><i>▤</i> สถานประกอบการ <span class="cnt" id="c-est"></span></div>
+      <div class="nav-item" data-pg="mentors"><i>◌</i> ติดตามพี่เลี้ยง <span class="cnt" id="c-mentor"></span></div>
+      <div class="nav-item" data-pg="matching"><i>⇄</i> จับคู่ฝึกงาน</div>
+      <div class="nav-item" data-pg="cwie"><i>▧</i> เอกสาร CWIE <span class="cnt">6</span></div>
+      <div class="nav-sec">รายงาน</div>
+      <div class="nav-item" data-pg="reports"><i>▥</i> รายงาน</div>
+      <div class="nav-item" data-pg="evalSettings"><i>★</i> ตั้งค่าประเมิน</div>
+      <div class="nav-item" data-pg="audit"><i>≣</i> Audit log</div>
+    </nav>
+    <div class="sb-user">
+      <div class="avatar">ผป</div>
+      <div class="nm">อ.ผู้ประสานงาน<small>Coordinator</small></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamb" onclick="toggleSide()">☰</button>
+      <span class="pg-title" id="pgTitle">แดชบอร์ด</span>
+      <span class="spacer"></span>
+      <span class="round-chip">รอบปัจจุบัน <b>1 / 2569</b></span>
+      <button class="icon-btn" onclick="toggleNotifications()" title="แจ้งเตือน">
+        <span style="font-size:18px">🔔</span><span class="notif-dot">5</span>
+      </button>
+      <div class="notif-panel hidden" id="notif-panel"></div>
+      <button class="btn btn-sm btn-ghost" onclick="logoutStaff()" style="margin-left:10px;gap:6px"><span style="font-size:15px">⎋</span> ออกจากระบบ</button>
+    </header>
+
+    <div class="content">
+
+      <!-- ========== DASHBOARD ========== -->
+      <section id="page-dashboard" class="page">
+        <div class="page-intro">
+          <h1>แดชบอร์ด</h1>
+          <p>สรุปสถานะการส่งนักศึกษาฝึกงาน รอบ 1 / 2569</p>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2"><i>◍</i> นักศึกษาทั้งหมด</div><div class="val" id="m-total">—</div><div class="sub">สหกิจ <span id="m-coop">–</span> · ฝึกงานทั่วไป <span id="m-gen">–</span></div></div>
+          <div class="metric"><div class="lbl2"><i>✓</i> จับคู่แล้ว</div><div class="val" id="m-matched">—</div><div class="sub up">คิดเป็น <span id="m-matchpct">–</span> ของทั้งหมด</div></div>
+          <div class="metric"><div class="lbl2"><i>◷</i> รอจับคู่</div><div class="val" id="m-wait">—</div><div class="sub">ต้องดำเนินการรอบนี้</div></div>
+          <div class="metric"><div class="lbl2"><i>▤</i> สถานประกอบการ</div><div class="val" id="m-est">—</div><div class="sub">ใช้งานรอบนี้ · <span id="m-warn">–</span> เฝ้าระวัง</div></div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1.4fr 1fr;align-items:start">
+          <div class="card card-pad">
+            <div class="sec-title">ความคืบหน้าการจับคู่</div>
+            <div class="sec-sub">เป้าหมายรอบนี้ ส่งนักศึกษาออกฝึกครบทุกคน</div>
+            <div id="prog-list"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">ต้องดำเนินการ</div>
+            <div class="sec-sub">รายการที่ควรจัดการก่อน</div>
+            <div id="todo-list"></div>
+          </div>
+        </div>
+
+        <div class="card card-pad" style="margin-top:18px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+            <div><div class="sec-title">5 อันดับสถานประกอบการคะแนนสูงสุด</div>
+              <div class="sec-sub" style="margin:0">เฉลี่ยจากผลประเมินสะสมทุกสาย</div></div>
+            <button class="link-arrow" onclick="go('establishments')">ดูทั้งหมด ›</button>
+          </div>
+          <div id="top-est"></div>
+        </div>
+      </section>
+
+      <!-- ========== STUDENTS ========== -->
+      <section id="page-students" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>นักศึกษา</h1><p>รายชื่อนักศึกษาที่ออกฝึกงานรอบนี้</p></div>
+          <button class="btn btn-primary" onclick="openStudentForm()">＋ เพิ่มนักศึกษา</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <input id="stu-search" placeholder="ค้นหาชื่อ รหัส หรือทักษะ…" style="max-width:320px" oninput="renderStudents()">
+          <div class="pillbar" style="margin:0" id="stu-pills">
+            <span class="pill active" data-f="all" onclick="setStuFilter(this)">ทั้งหมด</span>
+            <span class="pill" data-f="สหกิจ" onclick="setStuFilter(this)">สหกิจ</span>
+            <span class="pill" data-f="ฝึกงานทั่วไป" onclick="setStuFilter(this)">ฝึกงานทั่วไป</span>
+            <span class="pill" data-f="รอจับคู่" onclick="setStuFilter(this)">รอจับคู่</span>
+          </div>
+        </div>
+        <div class="card tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>นักศึกษา</th><th>สาย</th><th>ทักษะหลัก</th><th>สถานะ</th><th>สถานประกอบการ</th><th></th></tr></thead>
+            <tbody id="stu-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== STUDENT 360 ========== -->
+      <section id="page-student360" class="page hidden">
+        <div class="breadcrumb"><button onclick="go('students')">นักศึกษา</button><span>›</span><span id="student360-bc">รายละเอียดรายคน</span></div>
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>นักศึกษา 360°</h1><p>หน้ารวมข้อมูลรายคน: นักศึกษา บริษัท พี่เลี้ยง อาจารย์นิเทศ CWIE logbook และประวัติกิจกรรม</p></div>
+          <select id="student360-select" onchange="renderStudent360(this.value)" style="max-width:300px"></select>
+        </div>
+        <div id="student360-action"></div>
+        <div class="card card-pad" id="student360-profile"></div>
+        <div class="split-2" style="margin-top:18px">
+          <div class="card card-pad">
+            <div class="sec-title">Workflow รายคน</div>
+            <div class="sec-sub">เห็นทันทีว่างานค้างอยู่ที่บทบาทใด และ action ต่อไปคืออะไร</div>
+            <div id="student360-workflow"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">ผู้รับผิดชอบ</div>
+            <div class="sec-sub">ทีมที่เกี่ยวข้องกับนักศึกษาคนนี้</div>
+            <div id="student360-owners"></div>
+          </div>
+        </div>
+        <div class="split-2" style="grid-template-columns:1fr 1fr;margin-top:18px">
+          <div class="card card-pad">
+            <div class="sec-title">Logbook ล่าสุด</div>
+            <div class="sec-sub">สถานะส่งและการตรวจจากพี่เลี้ยง</div>
+            <div id="student360-logbook"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">Audit / History</div>
+            <div class="sec-sub">ประวัติสำคัญของนักศึกษารายนี้</div>
+            <div id="student360-audit"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== ESTABLISHMENTS ========== -->
+      <section id="page-establishments" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>สถานประกอบการ</h1><p>ฐานข้อมูลบริษัทพร้อมคะแนนสะสมจากผลประเมินรุ่นก่อน</p></div>
+          <button class="btn btn-primary" onclick="openCompanyForm()">＋ ลงทะเบียนบริษัท</button>
+        </div>
+        <div class="pillbar" id="est-pills">
+          <span class="pill active" data-f="all" onclick="setEstFilter(this)">ทั้งหมด</span>
+          <span class="pill" data-f="สหกิจ" onclick="setEstFilter(this)">รับสหกิจ</span>
+          <span class="pill" data-f="ฝึกงานทั่วไป" onclick="setEstFilter(this)">รับฝึกงานทั่วไป</span>
+          <span class="pill" data-f="ว่าง" onclick="setEstFilter(this)">ยังมีที่ว่าง</span>
+          <span class="pill" data-f="เฝ้าระวัง" onclick="setEstFilter(this)">เฝ้าระวัง</span>
+        </div>
+        <div class="grid est-grid" id="est-grid"></div>
+      </section>
+
+      <!-- ========== MENTORS ========== -->
+      <section id="page-mentors" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>ติดตามพี่เลี้ยง</h1><p>เจ้าหน้าที่ใช้ตรวจสอบสถานะเท่านั้น การเพิ่ม/แก้ไข/ผูกนักศึกษากับพี่เลี้ยงให้สถานประกอบการดำเนินการในพอร์ทัลของตนเอง</p></div>
+          <button class="btn" onclick="toast('ส่งคำขอให้สถานประกอบการอัปเดตข้อมูลพี่เลี้ยง (เดโม)')">↗ ขอให้บริษัทอัปเดต</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">พี่เลี้ยงทั้งหมด</div><div class="val" id="mentor-total">—</div><div class="sub">จากสถานประกอบการรอบนี้</div></div>
+          <div class="metric"><div class="lbl2">ดูแลนักศึกษาอยู่</div><div class="val" id="mentor-active">—</div><div class="sub">มีนักศึกษาผูกแล้ว</div></div>
+          <div class="metric"><div class="lbl2">นักศึกษามีพี่เลี้ยง</div><div class="val" id="mentor-students">—</div><div class="sub">จับคู่แล้วและระบุผู้ดูแล</div></div>
+          <div class="metric"><div class="lbl2">Logbook รอตรวจ</div><div class="val" id="mentor-logbook">—</div><div class="sub">งานของพี่เลี้ยงบริษัท</div></div>
+        </div>
+        <div class="split-2">
+          <div class="card card-pad">
+            <div class="sec-title">พี่เลี้ยงตามสถานประกอบการ</div>
+            <div class="sec-sub">แสดงผู้รับผิดชอบโดยตรง พร้อมนักศึกษาที่อยู่ในความดูแล ข้อมูลนี้บริษัทเป็นผู้ดูแล</div>
+            <div id="mentor-directory"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">นักศึกษาที่ต้องติดตามพี่เลี้ยง</div>
+            <div class="sec-sub">ใช้เช็กว่าใครยังไม่มี mentor หรือมี logbook รอตรวจ</div>
+            <div id="mentor-followups"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== MATCHING ========== -->
+      <section id="page-matching" class="page hidden">
+        <div class="page-intro"><h1>จับคู่ฝึกงาน</h1><p>เลือกนักศึกษา แล้วระบบจัดอันดับสถานประกอบการที่เหมาะที่สุดจาก stack คะแนน และที่ว่าง</p></div>
+        <div class="match-layout">
+          <div>
+            <div class="sec-sub" style="margin-bottom:8px">นักศึกษารอจับคู่</div>
+            <div id="match-students"></div>
+          </div>
+          <div class="card card-pad" id="match-result">
+            <div class="empty">เลือกนักศึกษาทางซ้ายเพื่อดูบริษัทที่แนะนำ</div>
+          </div>
+        </div>
+        <div class="card card-pad assignment-board">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+            <div>
+              <div class="sec-title">มอบหมายอาจารย์นิเทศ</div>
+              <div class="sec-sub" style="margin:2px 0 0">หลังจับคู่สถานประกอบการแล้ว เลือกอาจารย์ผู้รับผิดชอบนิเทศ — อาจารย์จะเข้าประเมินสถานประกอบการผ่านบัญชีของตนเอง</div>
+            </div>
+          </div>
+          <div id="advisor-assignments"></div>
+        </div>
+      </section>
+
+      <!-- ========== CWIE DOCUMENTS ========== -->
+      <section id="page-cwie" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>วงจรเอกสาร CWIE</h1><p>ติดตามสถานะเอกสารและ timeline รายคน ตั้งแต่รับรองตำแหน่งถึงปิดเล่ม</p></div>
+          <button class="btn btn-primary" onclick="toast('สร้างชุดเอกสาร CWIE รอบนี้ (เดโม)')">＋ สร้างชุดเอกสาร</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">เอกสารครบแล้ว</div><div class="val">34</div><div class="sub">จาก 52 รายการ</div></div>
+          <div class="metric"><div class="lbl2">รอลายเซ็น</div><div class="val">9</div><div class="sub">นักศึกษา / บริษัท / อาจารย์</div></div>
+          <div class="metric"><div class="lbl2">ใกล้ครบกำหนด</div><div class="val">6</div><div class="sub">ภายใน 7 วัน</div></div>
+          <div class="metric"><div class="lbl2">เกินกำหนด</div><div class="val" style="color:var(--red)">2</div><div class="sub">ต้องแจ้งเตือนซ้ำ</div></div>
+        </div>
+        <div class="card card-pad" style="margin-bottom:18px">
+          <div class="sec-title">Flow เอกสารมาตรฐานต่อรายคน</div>
+          <div class="sec-sub">เห็นคอขวดได้ทันทีว่าเอกสารค้างที่ใคร และต้องทำ action อะไรต่อ</div>
+          <div class="doc-flow">
+            <div class="doc-step done"><div class="no">01</div><div class="nm">ใบสมัคร / โปรไฟล์</div><div class="owner">นักศึกษา</div><div class="due">เสร็จแล้ว 12 มิ.ย.</div></div>
+            <div class="doc-step done"><div class="no">02</div><div class="nm">รับรองตำแหน่งงาน</div><div class="owner">สถานประกอบการ</div><div class="due">เสร็จแล้ว 18 มิ.ย.</div></div>
+            <div class="doc-step active"><div class="no">03</div><div class="nm">หนังสือส่งตัว CWIE</div><div class="owner">เจ้าหน้าที่</div><div class="due">กำลังรอลายเซ็นหัวหน้าภาค</div></div>
+            <div class="doc-step warn"><div class="no">04</div><div class="nm">แผนฝึก / Job plan</div><div class="owner">พี่เลี้ยงบริษัท</div><div class="due">ครบกำหนด 30 มิ.ย.</div></div>
+            <div class="doc-step"><div class="no">05</div><div class="nm">รายงานปิดเล่ม</div><div class="owner">นักศึกษา + อาจารย์</div><div class="due">เปิดหลังฝึกครบ 80%</div></div>
+          </div>
+        </div>
+        <div class="split-2">
+          <div class="card card-pad">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px">
+              <div><div class="sec-title">Timeline รายคน</div><div class="sec-sub" style="margin:0">เลือกนักศึกษาเพื่อดูเอกสาร คำเตือน และประวัติการติดตาม</div></div>
+              <select id="cwie-student" onchange="renderCwieTimeline(this.value)" style="max-width:260px"></select>
+            </div>
+            <div id="cwie-timeline"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">คิวที่ต้องเร่ง</div>
+            <div class="sec-sub">ระบบรวมงานค้างตาม owner ให้เจ้าหน้าที่ไล่ปิดได้</div>
+            <div id="cwie-queue"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== REPORTS ========== -->
+      <section id="page-reports" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>รายงาน</h1><p>ข่าวกรองจากผลประเมินสะสม สำหรับหลักสูตรและงานประกันคุณภาพ</p></div>
+          <div style="display:flex;gap:10px">
+            <button class="btn" onclick="toast('ส่งออก CSV (เดโม)')">⬇ CSV</button>
+            <button class="btn btn-primary" onclick="toast('ส่งออกรายงาน CWIE (เดโม)')">⬇ รายงาน CWIE</button>
+          </div>
+        </div>
+        <div class="grid" style="grid-template-columns:1.2fr 1fr;align-items:start">
+          <div class="card card-pad">
+            <div class="sec-title">Tech stack ที่บริษัทต้องการจริง</div>
+            <div class="sec-sub">รวมจากบทบาทและงานที่นักศึกษารายงาน — ใช้ชี้ทิศหลักสูตร</div>
+            <div id="rep-stack"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">ภาพรวมคุณภาพ</div>
+            <div class="sec-sub">เฉลี่ยจากผลประเมินรอบล่าสุด</div>
+            <div style="display:flex;gap:12px;margin-bottom:16px">
+              <div class="metric" style="flex:1;box-shadow:none;background:var(--surface-2)"><div class="lbl2">คะแนนเฉลี่ยสหกิจ</div><div class="val" style="font-size:23px">4.2<small style="font-size:12px;color:var(--muted)"> /5</small></div></div>
+              <div class="metric" style="flex:1;box-shadow:none;background:var(--surface-2)"><div class="lbl2">รับเข้าทำงานต่อ</div><div class="val" style="font-size:23px">38<small style="font-size:12px;color:var(--muted)">%</small></div></div>
+            </div>
+            <div class="kv"><span class="k">บริษัทระดับ “แนะนำ”</span><span class="v" id="rep-rec">–</span></div>
+            <div class="kv"><span class="k">บริษัทติดธงเฝ้าระวัง</span><span class="v" id="rep-watch">–</span></div>
+            <div class="kv"><span class="k">งานตรงสายไอที (dev role)</span><span class="v">71%</span></div>
+            <div class="kv"><span class="k">ฝึกแบบ remote / hybrid</span><span class="v">44%</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:26px 0 14px">
+          <div><div class="sec-title" style="font-size:16px;margin:0">รายงานรายบริษัท</div><div class="sec-sub" style="margin:2px 0 0">เจาะคะแนนรายด้าน บทบาทที่นักศึกษาได้ทำจริง และเสียงจากนักศึกษา</div></div>
+          <select id="cr-select" onchange="renderCompanyReport(this.value)" style="max-width:300px"></select>
+        </div>
+        <div class="card card-pad" id="company-report"></div>
+      </section>
+
+      <!-- ========== EVALUATION SETTINGS ========== -->
+      <section id="page-evalSettings" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>ตั้งค่าช่วงเวลาประเมิน</h1><p>เจ้าหน้าที่เป็นผู้กำหนดช่วงเปิด/ปิดแบบประเมินของนักศึกษาและอาจารย์นิเทศ</p></div>
+          <button class="btn btn-primary" onclick="saveEvalWindows()">บันทึกช่วงเวลา</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">นักศึกษาประเมินบริษัท</div><div class="val" id="eval-stu-state">—</div><div class="sub" id="eval-stu-range">—</div></div>
+          <div class="metric"><div class="lbl2">อาจารย์นิเทศประเมินบริษัท</div><div class="val" id="eval-adv-state">—</div><div class="sub" id="eval-adv-range">—</div></div>
+          <div class="metric"><div class="lbl2">แจ้งเตือนอัตโนมัติ</div><div class="val">3</div><div class="sub">ก่อนปิด 7/3/1 วัน</div></div>
+          <div class="metric"><div class="lbl2">รอบประเมิน</div><div class="val">1/2569</div><div class="sub">ใช้กับทุก portal</div></div>
+        </div>
+        <div class="split-2">
+          <div class="card card-pad">
+            <div class="sec-title">ช่วงนักศึกษาประเมินสถานประกอบการ</div>
+            <div class="sec-sub">เมื่อยังไม่ถึงช่วง นักศึกษาจะเห็นสถานะล็อกและไม่สามารถส่งแบบประเมินได้</div>
+            <div class="form-grid" style="margin-top:14px">
+              <div><label class="lbl">วันที่เปิด</label><input id="eval-student-start" type="date"></div>
+              <div><label class="lbl">วันที่ปิด</label><input id="eval-student-end" type="date"></div>
+              <div class="field-full"><label class="lbl">ข้อความแจ้งนักศึกษา</label><input id="eval-student-note" placeholder="เปิดให้ประเมินหลังจบการฝึกงาน"></div>
+            </div>
+            <div class="rule-note" style="margin-top:14px"><span>◍</span><span><b>ผลกับ Student Portal</b><br>ฟอร์มประเมินบริษัทจะแสดงเฉพาะในช่วงวันที่กำหนด</span></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">ช่วงอาจารย์นิเทศประเมินสถานประกอบการ</div>
+            <div class="sec-sub">ใช้ควบคุมแบบฟอร์มประเมินใน advisor portal ของอาจารย์นิเทศ</div>
+            <div class="form-grid" style="margin-top:14px">
+              <div><label class="lbl">วันที่เปิด</label><input id="eval-advisor-start" type="date"></div>
+              <div><label class="lbl">วันที่ปิด</label><input id="eval-advisor-end" type="date"></div>
+              <div class="field-full"><label class="lbl">ข้อความแจ้งอาจารย์</label><input id="eval-advisor-note" placeholder="เปิดหลังเริ่มฝึกครบ 30 วัน"></div>
+            </div>
+            <div class="rule-note" style="margin-top:14px"><span>★</span><span><b>ผลกับ Advisor Portal</b><br>อาจารย์จะประเมินได้เมื่อถึงช่วงเวลาที่เจ้าหน้าที่ตั้งไว้เท่านั้น</span></div>
+          </div>
+        </div>
+        <div class="card card-pad" style="margin-top:18px">
+          <div class="sec-title">Preview การเปิดสิทธิ์ประเมิน</div>
+          <div class="sec-sub">แสดงผลที่ผู้ใช้แต่ละบทบาทจะเห็น ณ วันที่ปัจจุบัน</div>
+          <div id="eval-preview"></div>
+        </div>
+      </section>
+
+      <!-- ========== AUDIT LOG ========== -->
+      <section id="page-audit" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>Audit log</h1><p>บันทึกกิจกรรมสำคัญของระบบ เพื่อย้อนตรวจสอบการจับคู่ เอกสาร และการประเมิน</p></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <select id="audit-filter" onchange="renderAuditLog()" style="width:190px"><option value="all">ทุกกิจกรรม</option><option>จับคู่</option><option>เอกสาร</option><option>ประเมิน</option><option>เข้าสู่ระบบ</option></select>
+            <button class="btn" onclick="toast('ส่งออก audit log (เดโม)')">⬇ ส่งออก</button>
+          </div>
+        </div>
+        <div class="card card-pad">
+          <div id="audit-list"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================== STUDENT PORTAL ===================== -->
+<div id="student-portal" class="hidden">
+  <header class="sp-top">
+    <div class="brand"><div class="m">▦</div> ระบบฝึกงาน ภาควิชาไอที</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="avatar">ก</div>
+      <button class="btn btn-sm btn-ghost" onclick="logoutStudent()">ออกจากระบบ</button>
+    </div>
+  </header>
+  <div class="sp-content student-wide">
+    <div class="sp-hero"><h1>สวัสดี, กิตติพงษ์</h1><p>ส่งแบบประเมินสถานประกอบการที่คุณไปฝึกงานได้ที่นี่</p></div>
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div class="sec-title">การฝึกงานของคุณ</div>
+      <div class="sec-sub" style="margin:0">รอบ 1 / 2569</div>
+      <div class="pl-grid">
+        <div class="pl-it"><div class="k">สถานประกอบการ</div><div class="v">บจก. คลาวด์เวิร์คส์</div></div>
+        <div class="pl-it"><div class="k">สาย</div><div class="v">สหกิจศึกษา</div></div>
+        <div class="pl-it"><div class="k">พี่เลี้ยง</div><div class="v">คุณวีรภัทร · Senior Developer</div></div>
+        <div class="pl-it"><div class="k">รูปแบบงาน</div><div class="v">Hybrid · กรุงเทพฯ</div></div>
+        <div class="pl-it"><div class="k">ช่วงเวลา</div><div class="v">มิ.ย. – ก.ย. 2569</div></div>
+        <div class="pl-it"><div class="k">สถานะ</div><div class="v"><span class="badge b-green">กำลังฝึกงาน</span></div></div>
+      </div>
+    </div>
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+        <div><div class="sec-title">สมุดบันทึกการปฏิบัติงานรายวัน</div><div class="sec-sub" style="margin:0">บันทึกสิ่งที่ทำจริงทุกวัน แล้วส่งสรุปรายสัปดาห์ให้พี่เลี้ยงตรวจ</div></div>
+        <button class="btn btn-primary btn-sm" onclick="saveDailyLog()">บันทึกวันนี้</button>
+      </div>
+      <div class="daily-log-grid">
+        <div>
+          <div class="sec-sub" style="margin-bottom:8px">สัปดาห์ที่ 4 · 24-28 มิ.ย. 2569</div>
+          <div id="daily-log-list" class="day-list"></div>
+        </div>
+        <div class="daily-form">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+            <div><div class="sec-title" id="daily-form-title">บันทึกประจำวัน</div><div class="sec-sub" id="daily-form-sub" style="margin:2px 0 0">เลือกวันที่ด้านซ้ายเพื่อดูหรือแก้ไข</div></div>
+            <span class="badge b-amber" id="daily-form-status">แบบร่าง</span>
+          </div>
+          <div class="compact-fields">
+            <div><label class="lbl">เวลาเริ่ม</label><input id="daily-start" value="09:00"></div>
+            <div><label class="lbl">เวลาสิ้นสุด</label><input id="daily-end" value="18:00"></div>
+            <div><label class="lbl">รูปแบบงาน</label><select id="daily-mode"><option>Hybrid</option><option>Onsite</option><option>Remote</option></select></div>
+            <div><label class="lbl">ชั่วโมงรวม</label><input id="daily-hours" value="8"></div>
+          </div>
+          <div style="margin-top:10px"><label class="lbl">งานที่ปฏิบัติจริง</label><textarea id="daily-work" placeholder="วันนี้ทำอะไรบ้าง"></textarea></div>
+          <div style="margin-top:10px"><label class="lbl">ผลลัพธ์ / หลักฐาน</label><input id="daily-evidence" placeholder="PR #42, commit, ticket, เอกสาร, test case"></div>
+          <div class="compact-fields" style="margin-top:10px">
+            <div><label class="lbl">ปัญหา / อุปสรรค</label><textarea id="daily-blocker" placeholder="ติดอะไรบ้าง"></textarea></div>
+            <div><label class="lbl">สิ่งที่ได้เรียนรู้ / แผนพรุ่งนี้</label><textarea id="daily-learning" placeholder="เรียนรู้อะไร และพรุ่งนี้จะทำอะไร"></textarea></div>
+          </div>
+          <div class="form-actions"><button class="btn btn-sm" onclick="saveDailyLog()">บันทึกแบบร่าง</button><button class="btn btn-sm btn-primary" onclick="submitWeeklyLog()">ส่งสัปดาห์นี้</button></div>
+        </div>
+      </div>
+      <div class="weekly-summary">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px">
+          <div><div class="sec-title">สรุปรายสัปดาห์สำหรับพี่เลี้ยง</div><div class="sec-sub" style="margin:2px 0 0">ระบบรวมจาก daily log ให้อัตโนมัติ ก่อนส่งให้พี่เลี้ยงตรวจ</div></div>
+          <span class="badge b-amber" id="weekly-status">รอตรวจ</span>
+        </div>
+        <div class="row"><span>ชั่วโมงรวม</span><b id="log-hours">—</b></div>
+        <div class="row"><span>บันทึกแล้ว</span><b id="log-submitted">—</b></div>
+        <div class="row"><span>รอตรวจ / ขอแก้ไข</span><b id="log-pending">—</b></div>
+      </div>
+    </div>
+    <div id="sp-eval-wrap"></div>
+  </div>
+</div>
+
+<!-- ===================== ADVISOR PORTAL ===================== -->
+<div id="advisor-portal" class="hidden">
+  <header class="sp-top">
+    <div class="brand"><div class="m">▦</div> ระบบฝึกงาน ภาควิชาไอที</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="avatar" id="ap-avatar">อ</div>
+      <button class="btn btn-sm btn-ghost" onclick="logoutAdvisor()">ออกจากระบบ</button>
+    </div>
+  </header>
+  <div class="sp-content">
+    <div class="sp-hero">
+      <h1 id="ap-hello">สวัสดี</h1>
+      <p id="ap-sub">ประเมินสถานประกอบการที่คุณรับผิดชอบนิเทศ</p>
+    </div>
+    <div id="ap-body"></div>
+  </div>
+</div>
+
+<!-- ===================== COMPANY PORTAL ===================== -->
+<div id="company-portal" class="hidden">
+  <header class="sp-top">
+    <div class="brand"><div class="m">▦</div> พอร์ทัลสถานประกอบการ</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="avatar">ค</div>
+      <button class="btn btn-sm btn-ghost" onclick="logoutCompany()">ออกจากระบบ</button>
+    </div>
+  </header>
+  <div class="sp-content portal-wide">
+    <div class="company-hero">
+      <div class="sp-hero" style="margin:0">
+        <h1>บจก. คลาวด์เวิร์คส์</h1>
+        <p>จัดการตำแหน่งฝึกงาน ยืนยันเอกสาร CWIE และประเมินนักศึกษาที่มาฝึก</p>
+      </div>
+      <button class="btn btn-primary" onclick="toast('เพิ่มตำแหน่งฝึกงานรอบใหม่ (เดโม)')">＋ เปิดรับตำแหน่ง</button>
+    </div>
+    <div class="grid metrics" style="margin-bottom:18px">
+      <div class="metric"><div class="lbl2">รับได้รอบนี้</div><div class="val">4</div><div class="sub">ใช้ไปแล้ว 3 ที่</div></div>
+      <div class="metric"><div class="lbl2">นักศึกษาปัจจุบัน</div><div class="val">2</div><div class="sub">1 คนรอเริ่มงาน</div></div>
+      <div class="metric"><div class="lbl2">เอกสารรอยืนยัน</div><div class="val">3</div><div class="sub">Job plan / Mentor confirm</div></div>
+      <div class="metric"><div class="lbl2">Logbook รอตรวจ</div><div class="val">2</div><div class="sub">จากนักศึกษาฝึกงาน</div></div>
+    </div>
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px">
+        <div><div class="sec-title">งานของสถานประกอบการ</div><div class="sec-sub" style="margin:2px 0 0">รายการที่บริษัทต้องดำเนินการต่อในรอบ 1 / 2569</div></div>
+        <button class="btn btn-sm" onclick="toast('ส่งออกคิวงานบริษัท (เดโม)')">⬇ Export</button>
+      </div>
+      <div id="company-task-queue"></div>
+    </div>
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div class="portal-tabs" id="company-tabs">
+        <button class="tab active" onclick="switchCompanyWorkflow(this,'positions')">ตำแหน่งที่เปิดรับ</button>
+        <button class="tab" onclick="switchCompanyWorkflow(this,'mentors')">พี่เลี้ยง</button>
+        <button class="tab" onclick="switchCompanyWorkflow(this,'students')">นักศึกษาที่ดูแล</button>
+        <button class="tab" onclick="switchCompanyWorkflow(this,'documents')">เอกสาร CWIE</button>
+        <button class="tab" onclick="switchCompanyWorkflow(this,'logbook')">Logbook</button>
+        <button class="tab" onclick="switchCompanyWorkflow(this,'evaluation')">ประเมิน</button>
+      </div>
+      <div class="workflow-panel" id="company-workflow-panel"></div>
+    </div>
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+        <div>
+          <div class="sec-title">จัดการพี่เลี้ยงของสถานประกอบการ</div>
+          <div class="sec-sub" style="margin:2px 0 0">บริษัทเป็นผู้เพิ่มพี่เลี้ยง แก้ไขข้อมูลติดต่อ และผูกนักศึกษากับพี่เลี้ยงที่รับผิดชอบ</div>
+        </div>
+        <button class="btn btn-primary" onclick="toast('เปิดฟอร์มเพิ่มพี่เลี้ยงในพอร์ทัลบริษัท (เดโม)')">＋ เพิ่มพี่เลี้ยง</button>
+      </div>
+      <div id="company-mentor-manager"></div>
+    </div>
+    <div class="split-2">
+      <div class="card card-pad">
+        <div class="sec-title">นักศึกษาที่ดูแล</div>
+        <div class="sec-sub">พี่เลี้ยงบริษัทเห็นงานที่ต้องอนุมัติในที่เดียว</div>
+        <div class="mentor-grid">
+          <div class="approval-card">
+            <div class="name">กิตติพงษ์ ใจดี</div>
+            <div class="meta">Frontend Intern · พี่เลี้ยง คุณวีรภัทร</div>
+            <div class="reasons" style="margin-top:10px"><span class="reason good"><i>✓</i> เริ่มงานแล้ว</span><span class="reason warnr"><i>!</i> logbook รอตรวจ</span></div>
+            <div class="form-actions"><button class="btn btn-sm">ดู logbook</button><button class="btn btn-sm btn-primary" onclick="toast('อนุมัติ logbook แล้ว (เดโม)')">อนุมัติ</button></div>
+          </div>
+          <div class="approval-card">
+            <div class="name">จิราพร แสงเดือน</div>
+            <div class="meta">Full-stack Intern · พี่เลี้ยง คุณณัฐวุฒิ</div>
+            <div class="reasons" style="margin-top:10px"><span class="reason good"><i>✓</i> ประเมินแล้ว</span><span class="reason"><i>▧</i> รอปิดเล่ม</span></div>
+            <div class="form-actions"><button class="btn btn-sm">ดูโปรไฟล์</button><button class="btn btn-sm" onclick="toast('เปิดแบบประเมินนักศึกษา (เดโม)')">ประเมิน</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="card card-pad">
+        <div class="sec-title">เอกสารที่ต้องดำเนินการ</div>
+        <div class="sec-sub">รายการฝั่งบริษัทในวงจร CWIE</div>
+        <div class="person-timeline">
+          <div class="tl-row done"><div class="tl-title">ยืนยันรับนักศึกษา</div><div class="tl-meta">ลงนามแล้วโดย HR · 18 มิ.ย.</div></div>
+          <div class="tl-row active"><div class="tl-title">ส่ง Job plan</div><div class="tl-meta">รอพี่เลี้ยงแนบแผนงาน · ครบกำหนด 30 มิ.ย.</div></div>
+          <div class="tl-row warn"><div class="tl-title">ยืนยัน mentor</div><div class="tl-meta">ยังไม่ระบุผู้ประเมินปลายภาค</div></div>
+          <div class="tl-row"><div class="tl-title">ประเมินนักศึกษา</div><div class="tl-meta">เปิดแบบฟอร์มหลังฝึกครบ 70%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- toast -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120%);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:13.5px;z-index:80;transition:transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.2)"></div>
+
+<script>
+/* ---------------- data ---------------- */
+const students = [
+  {id:'6512001', name:'กิตติพงษ์ ใจดี', track:'สหกิจ', skills:['React','Node.js','AWS'], status:'จับคู่แล้ว', company:'บจก. คลาวด์เวิร์คส์'},
+  {id:'6512014', name:'ณัฐนรี สุขสวัสดิ์', track:'สหกิจ', skills:['Python','ML','PyTorch'], status:'รอจับคู่', company:null},
+  {id:'6512022', name:'ภาคิน วงศ์ทอง', track:'ฝึกงานทั่วไป', skills:['Vue','Go','Docker'], status:'รอจับคู่', company:null},
+  {id:'6512030', name:'ศิรประภา มั่นคง', track:'สหกิจ', skills:['Java','Spring','SQL'], status:'กำลังฝึก', company:'บจก. ดาต้าเซนส์'},
+  {id:'6512041', name:'ธนกร เกียรติศักดิ์', track:'ฝึกงานทั่วไป', skills:['React','TypeScript'], status:'รอจับคู่', company:null},
+  {id:'6512055', name:'พิมพ์ชนก อารีย์', track:'สหกิจ', skills:['Python','Django','GCP'], status:'จับคู่แล้ว', company:'บจก. ดาต้าเซนส์'},
+  {id:'6512063', name:'อนุชา พูนทรัพย์', track:'ฝึกงานทั่วไป', skills:['Vue','Go','K8s'], status:'รอจับคู่', company:null},
+  {id:'6512078', name:'จิราพร แสงเดือน', track:'สหกิจ', skills:['Node.js','React','MongoDB'], status:'ประเมินแล้ว', company:'บจก. คลาวด์เวิร์คส์'},
+  {id:'6512090', name:'วรเมธ ชัยพัฒน์', track:'ฝึกงานทั่วไป', skills:['PHP','Laravel','MySQL'], status:'รอจับคู่', company:null},
+  {id:'6512101', name:'สุชานันท์ บุญมา', track:'สหกิจ', skills:['Python','ML','Data'], status:'กำลังฝึก', company:'บจก. ดาต้าเซนส์'},
+];
+
+const establishments = [
+  {id:'e1', name:'บจก. คลาวด์เวิร์คส์', mode:'Hybrid', loc:'กรุงเทพฯ', coop:4.6, gen:4.2, status:'แนะนำ', stack:['React','Node.js','AWS','PostgreSQL'], used:3, total:4, hire:40, nda:true, flag:null, mentors:[
+    {name:'วีรภัทร ศิริกุล', title:'Senior Frontend Developer', email:'weeraphat@cloudworks.co.th', phone:'089-112-4401', students:['6512001']},
+    {name:'ณัฐวุฒิ แสงทอง', title:'Full-stack Lead', email:'nattawut@cloudworks.co.th', phone:'086-771-2208', students:['6512078']}
+  ]},
+  {id:'e2', name:'บจก. ดาต้าเซนส์ แอนะลิติกส์', mode:'Onsite', loc:'เชียงใหม่', coop:4.3, gen:null, status:'ใช้ได้', stack:['Python','ML','PyTorch','GCP'], used:2, total:2, hire:55, nda:false, flag:null, mentors:[
+    {name:'มณีรัตน์ พัฒนากร', title:'Data Science Manager', email:'maneerat@datasense.co.th', phone:'081-555-9012', students:['6512030','6512055','6512101']}
+  ]},
+  {id:'e3', name:'บจก. รีโมทสแต็ก', mode:'Remote', loc:'ทำงานทางไกล', coop:null, gen:4.4, status:'แนะนำ', stack:['Vue','Go','Kubernetes'], used:0, total:5, hire:25, nda:true, flag:null, mentors:[
+    {name:'กวิน โชติวัฒน์', title:'Platform Engineer', email:'kawin@remotestack.co.th', phone:'082-440-1188', students:[]}
+  ]},
+  {id:'e4', name:'บจก. เน็กซ์เจน ซอฟต์แวร์', mode:'Onsite', loc:'นนทบุรี', coop:2.8, gen:3.1, status:'เฝ้าระวัง', stack:['PHP','jQuery','MySQL'], used:1, total:3, hire:12, nda:false, flag:'นักศึกษา 3 ใน 5 คนรุ่นล่าสุดรายงานว่าได้ทำ manual QA และงานเอกสารเป็นหลัก ไม่ตรงบทบาท developer', mentors:[
+    {name:'อรทัย วงศ์นิล', title:'QA Supervisor', email:'orathai@nextgen.co.th', phone:'088-901-7761', students:[]}
+  ]},
+  {id:'e5', name:'บจก. ไฟน์เทค โซลูชันส์', mode:'Hybrid', loc:'กรุงเทพฯ', coop:4.1, gen:3.9, status:'ใช้ได้', stack:['React','TypeScript','Node.js'], used:1, total:4, hire:33, nda:true, flag:null, mentors:[
+    {name:'ปริญญา เทพมนตรี', title:'Engineering Lead', email:'parinya@fintechsol.co.th', phone:'085-660-3310', students:[]}
+  ]},
+  {id:'e6', name:'บจก. กรีนบิต ไอที', mode:'Onsite', loc:'ขอนแก่น', coop:null, gen:3.6, status:'ใช้ได้', stack:['Java','Spring','Docker'], used:2, total:3, hire:20, nda:false, flag:null, mentors:[
+    {name:'ศราวุธ ลิ้มสกุล', title:'Backend Developer', email:'sarawut@greenbit.co.th', phone:'087-330-4415', students:[]}
+  ]},
+];
+
+const dimLabels=['การดูแลของพี่เลี้ยง','ความตรงกับสาขาไอที','ได้ลงมือทำงานจริง','สภาพแวดล้อม / ความปลอดภัย','โอกาส / การสนับสนุน'];
+const roleColor={'Developer':'#4F46E5','QA / Test':'#C9780B','Data / ML':'#0E9F6E','DevOps':'#6A60F0','Support':'#8A90A0','UX / UI':'#D4537E'};
+const companyReports={
+  e1:{dims:[4.7,4.6,4.5,4.6,4.3], roles:[['Developer',7],['DevOps',2],['QA / Test',1]], reviews:[
+    {name:'จิราพร แสงเดือน', role:'Developer', score:5, text:'ได้ทำฟีเจอร์จริงที่ขึ้น production พี่เลี้ยงรีวิวโค้ดให้ทุก PR เรียนรู้เยอะมาก'},
+    {name:'กิตติพงษ์ ใจดี', role:'Developer', score:5, text:'งานตรงกับที่เรียนมา ได้ใช้ React และ Node เต็มที่ ทีมเปิดให้ถามได้ตลอด'},
+    {name:'ธีรภัทร ก้องเกียรติ', role:'DevOps', score:4, text:'ได้แตะ CI/CD และ AWS จริง ช่วงแรกต้องปรับตัวกับ workflow อยู่บ้าง'},
+  ]},
+  e2:{dims:[4.4,4.5,4.2,4.3,3.9], roles:[['Data / ML',5],['Developer',1]], reviews:[
+    {name:'พิมพ์ชนก อารีย์', role:'Data / ML', score:4, text:'ได้ทำโมเดลจริงกับข้อมูลของบริษัท พี่เลี้ยงสายวิชาการให้คำแนะนำดีมาก'},
+    {name:'สุชานันท์ บุญมา', role:'Data / ML', score:5, text:'โจทย์ท้าทายและตรงสาย ได้เรียนรู้ MLOps เพิ่มเติมนอกเหนือจากที่คาดไว้'},
+  ]},
+  e3:{dims:[4.2,4.5,4.6,4.2,4.0], roles:[['Developer',4],['DevOps',1]], reviews:[
+    {name:'อนุชา พูนทรัพย์', role:'Developer', score:5, text:'remote เต็มรูปแบบแต่ดูแลดี มี standup ทุกเช้า ได้ commit งานจริงตั้งแต่สัปดาห์แรก'},
+    {name:'ปวีณา รัตนชัย', role:'Developer', score:4, text:'อิสระสูง เหมาะกับคนจัดการเวลาเองได้ พี่เลี้ยงตอบใน Slack ไว'},
+  ]},
+  e4:{dims:[3.2,2.4,2.1,3.6,2.8], roles:[['QA / Test',3],['Support',1],['Developer',1]], reviews:[
+    {name:'นักศึกษา (ไม่ระบุชื่อ)', role:'QA / Test', score:3, text:'ส่วนใหญ่ได้ทำ manual test และกรอกเอกสาร อยากได้เขียนโค้ดมากกว่านี้'},
+    {name:'นักศึกษา (ไม่ระบุชื่อ)', role:'QA / Test', score:2, text:'งานไม่ค่อยตรงกับที่เรียน ได้ช่วยทดสอบเว็บและงานทั่วไปเป็นหลัก'},
+    {name:'นักศึกษา (ไม่ระบุชื่อ)', role:'Developer', score:4, text:'ได้แก้บั๊กบ้าง แต่ต้องขอเองถึงจะได้งานเขียนโปรแกรมจริง'},
+  ]},
+  e5:{dims:[4.2,4.0,3.9,4.1,3.8], roles:[['Developer',5],['QA / Test',1]], reviews:[
+    {name:'นักศึกษา (ไม่ระบุชื่อ)', role:'Developer', score:4, text:'ได้ทำงานหน้าบ้านจริง ทีมเป็นกันเอง ปริมาณงานกำลังพอดี'},
+  ]},
+  e6:{dims:[3.7,3.6,3.5,3.8,3.4], roles:[['Developer',3],['Support',1]], reviews:[
+    {name:'นักศึกษา (ไม่ระบุชื่อ)', role:'Developer', score:4, text:'ได้เขียน backend จริง แต่เครื่องมือบางอย่างค่อนข้างเก่า ต้องปรับตัว'},
+  ]},
+};
+const critEst = [
+  ['การดูแลของพี่เลี้ยง','มีพี่เลี้ยงให้คำแนะนำสม่ำเสมอ',5],
+  ['ความตรงกับสาขาไอที','งานที่ได้รับตรงกับที่เรียนมา',5],
+  ['ได้ลงมือทำงานจริง','ได้แตะงาน production / commit จริง',4],
+  ['สภาพแวดล้อมและความปลอดภัย','สถานที่ อุปกรณ์ และการดูแล',5],
+  ['โอกาสและการสนับสนุน','โอกาสได้งานต่อ / การสนับสนุนการเรียนรู้',4],
+];
+const critStu = [
+  ['ความรับผิดชอบและวินัย','ตรงต่อเวลา รับผิดชอบงานที่มอบหมาย',5],
+  ['ทักษะทางเทคนิค','ความสามารถด้านการเขียนโปรแกรม',4],
+  ['การทำงานร่วมกับทีม','ปรับตัวและทำงานร่วมกับผู้อื่น',5],
+  ['การเรียนรู้และปรับตัว','เรียนรู้สิ่งใหม่ได้เร็ว',5],
+  ['การสื่อสาร','สื่อสารและรายงานความคืบหน้า',4],
+  ['คุณภาพงานที่ส่งมอบ','ความเรียบร้อยและถูกต้องของงาน',4],
+];
+const critTeacher = [
+  ['ความพร้อมของแผนงานฝึก','มีแผนงาน บทบาท และผลลัพธ์ที่คาดหวังชัดเจน',4],
+  ['ความเหมาะสมของงานกับหลักสูตร','งานที่มอบหมายสอดคล้องกับสายไอทีและระดับนักศึกษา',5],
+  ['การดูแลของพี่เลี้ยง','พี่เลี้ยงติดตามงาน ให้ feedback และเปิดโอกาสให้ถาม',4],
+  ['สภาพแวดล้อมและความปลอดภัย','สถานที่ เครื่องมือ และเงื่อนไขการทำงานเหมาะสม',4],
+  ['ความก้าวหน้าของนักศึกษา','นักศึกษามีพัฒนาการและได้ลงมือทำงานจริงตามแผน',5],
+];
+const advisors=[
+  {id:'t1', name:'อ.ดร.เมธา อินทร์แก้ว', team:'Software Engineering'},
+  {id:'t2', name:'อ.ปรียา วัฒนศิลป์', team:'Data / AI'},
+  {id:'t3', name:'อ.ภาณุพงศ์ ศรีสุข', team:'Network / Cloud'},
+];
+const advisorAssignments=[
+  {id:'as1', studentId:'6512001', companyId:'e1', advisorId:'t1', due:'20 ส.ค. 2569', visit:'นัดเยี่ยม onsite', status:'รอประเมิน'},
+  {id:'as2', studentId:'6512030', companyId:'e2', advisorId:'t2', due:'28 ส.ค. 2569', visit:'video call', status:'กำลังติดตาม'},
+  {id:'as3', studentId:'6512101', companyId:'e2', advisorId:'t2', due:'5 ก.ย. 2569', visit:'รอเลือกเวลา', status:'รอประเมิน'},
+];
+const stackDemand = [['React',82],['Python',74],['Node.js',61],['TypeScript',48],['Go',35],['Kubernetes',28],['ML / AI',26]];
+
+const notifications=[
+  {ic:'▧',tone:'accent',title:'หนังสือส่งตัว CWIE รอลายเซ็น',sub:'กิตติพงษ์ ใจดี · ครบกำหนดวันนี้',pg:'cwie'},
+  {ic:'!',tone:'amber',title:'Job plan จากบริษัทใกล้ครบกำหนด',sub:'บจก. คลาวด์เวิร์คส์ · เหลือ 2 วัน',pg:'cwie'},
+  {ic:'⇄',tone:'red',title:'ระบบกันจับคู่บริษัทเต็ม',sub:'บจก. ดาต้าเซนส์ ใช้ครบ 2/2 ที่แล้ว',pg:'matching'},
+  {ic:'◍',tone:'green',title:'Logbook ใหม่จากนักศึกษา',sub:'สัปดาห์ที่ 4 · รอพี่เลี้ยงตรวจ',pg:'audit'},
+  {ic:'★',tone:'accent',title:'ผลประเมินสถานประกอบการเข้าใหม่',sub:'อ.ปรียาส่งผลนิเทศแล้ว',pg:'reports'},
+];
+const cwieTimelines={
+  '6512001':[
+    ['done','ใบสมัคร / โปรไฟล์','นักศึกษาส่งครบ · 12 มิ.ย. 2569'],
+    ['done','บริษัทรับรองตำแหน่ง Frontend Intern','HR ลงนามแล้ว · 18 มิ.ย. 2569'],
+    ['active','หนังสือส่งตัว CWIE','รอลายเซ็นหัวหน้าภาค · ครบกำหนดวันนี้'],
+    ['warn','Job plan จากพี่เลี้ยง','ยังไม่แนบไฟล์ · ระบบแจ้งเตือนบริษัทแล้ว'],
+    ['','บันทึกนิเทศกลางภาค','เปิดงานให้อาจารย์หลังเริ่มฝึก 30 วัน'],
+  ],
+  '6512030':[
+    ['done','ใบสมัคร / โปรไฟล์','ส่งครบ · 10 มิ.ย. 2569'],
+    ['done','บริษัทรับรองตำแหน่ง Data Intern','ลงนามแล้ว · 14 มิ.ย. 2569'],
+    ['done','หนังสือส่งตัว CWIE','ส่งถึงบริษัทแล้ว · 20 มิ.ย. 2569'],
+    ['active','Job plan จากพี่เลี้ยง','อัปโหลดแล้ว · รอเจ้าหน้าที่ตรวจ'],
+    ['','บันทึกนิเทศกลางภาค','นัด video call 28 ส.ค. 2569'],
+  ],
+  '6512101':[
+    ['done','ใบสมัคร / โปรไฟล์','ส่งครบ · 11 มิ.ย. 2569'],
+    ['active','บริษัทรับรองตำแหน่ง ML Intern','รอ HR ยืนยัน mentor'],
+    ['','หนังสือส่งตัว CWIE','สร้างอัตโนมัติหลังบริษัทรับรอง'],
+    ['','Job plan จากพี่เลี้ยง','ยังไม่ถึงขั้นตอน'],
+    ['','บันทึกนิเทศกลางภาค','ยังไม่ถึงขั้นตอน'],
+  ]
+};
+const cwieQueue=[
+  ['หนังสือส่งตัวรอลายเซ็น','กิตติพงษ์ ใจดี','เจ้าหน้าที่','วันนี้','warn'],
+  ['Job plan ยังไม่แนบ','บจก. คลาวด์เวิร์คส์','สถานประกอบการ','30 มิ.ย.','warn'],
+  ['รับรองตำแหน่งค้าง','สุชานันท์ บุญมา','สถานประกอบการ','1 ก.ค.','active'],
+  ['ตรวจไฟล์ Job plan','ภาคิน วงศ์ทอง','เจ้าหน้าที่','3 ก.ค.',''],
+];
+const auditLogs=[
+  {type:'จับคู่',time:'26 มิ.ย. 23:10',act:'ป้องกันการจับคู่เกินความจุ',detail:'บจก. ดาต้าเซนส์เต็ม 2/2 จึงปิดปุ่มมอบหมาย',user:'system',ip:'rule-engine'},
+  {type:'เอกสาร',time:'26 มิ.ย. 22:48',act:'สร้างหนังสือส่งตัว CWIE',detail:'กิตติพงษ์ ใจดี → บจก. คลาวด์เวิร์คส์',user:'อ.ผู้ประสานงาน',ip:'10.10.4.18'},
+  {type:'ประเมิน',time:'26 มิ.ย. 21:32',act:'อาจารย์ส่งผลนิเทศ',detail:'อ.ปรียา ประเมิน บจก. ดาต้าเซนส์',user:'preeya@university.ac.th',ip:'49.228.12.8'},
+  {type:'เข้าสู่ระบบ',time:'26 มิ.ย. 20:14',act:'สถานประกอบการเข้าสู่ระบบ',detail:'บจก. คลาวด์เวิร์คส์ เปิดดู logbook นักศึกษา',user:'hr@cloudworks.co.th',ip:'203.144.18.21'},
+  {type:'เอกสาร',time:'26 มิ.ย. 19:55',act:'แจ้งเตือน Job plan',detail:'ส่งอีเมลเตือนบริษัทก่อนครบกำหนด 2 วัน',user:'system',ip:'notification'},
+  {type:'จับคู่',time:'26 มิ.ย. 18:20',act:'คำนวณ skill synonym',detail:'ML ตรงกับ Machine Learning, K8s ตรงกับ Kubernetes',user:'system',ip:'matching'},
+];
+const logbookEntries=[
+  {week:4,date:'24-28 มิ.ย. 2569',hours:40,status:'รอพี่เลี้ยงตรวจ',tone:'amber',text:'พัฒนา dashboard component, ต่อ API mock, เขียน unit test และส่ง PR ให้พี่เลี้ยง review'},
+  {week:3,date:'17-21 มิ.ย. 2569',hours:38,status:'อนุมัติแล้ว',tone:'green',text:'แก้ bug authentication flow, ทำเอกสาร endpoint และเข้าร่วม sprint planning'},
+  {week:2,date:'10-14 มิ.ย. 2569',hours:40,status:'อนุมัติแล้ว',tone:'green',text:'เรียนรู้ codebase, ตั้งค่า local environment และทำ UI task แรกใน module internship'},
+];
+const dailyLogEntries=[
+  {id:'d1',date:'24 มิ.ย.',day:'จันทร์',start:'09:00',end:'18:00',hours:8,mode:'Hybrid',status:'อนุมัติแล้ว',tone:'green',work:'ศึกษา requirement และแตก task dashboard',evidence:'Jira INT-42, note design review',blocker:'ยังไม่คุ้นกับ naming ของ component',learning:'เรียนรู้ flow การแตกงานและ coding standard ของทีม'},
+  {id:'d2',date:'25 มิ.ย.',day:'อังคาร',start:'09:00',end:'18:00',hours:8,mode:'Hybrid',status:'อนุมัติแล้ว',tone:'green',work:'พัฒนา component สรุปสถานะ logbook',evidence:'PR #42, commit a81f2c',blocker:'ติดปัญหา responsive layout',learning:'ใช้ CSS grid และตรวจ breakpoint ได้ดีขึ้น'},
+  {id:'d3',date:'26 มิ.ย.',day:'พุธ',start:'09:00',end:'18:00',hours:8,mode:'Remote',status:'ส่งแล้ว',tone:'amber',work:'ต่อ API mock และจัดการ state ของรายการแจ้งเตือน',evidence:'PR #43, Postman collection',blocker:'ข้อมูล mock ยังไม่ตรงกับ schema จริง',learning:'แยก DTO สำหรับหน้า UI และ payload API'},
+  {id:'d4',date:'27 มิ.ย.',day:'พฤหัส',start:'09:00',end:'18:00',hours:8,mode:'Hybrid',status:'ขอแก้ไข',tone:'amber',work:'เขียน unit test และแก้ edge case ของ capacity guard',evidence:'test report, commit 7be21d',blocker:'พี่เลี้ยงขอให้เพิ่ม test กรณีบริษัทเต็ม',learning:'ออกแบบ test case จาก business rule ไม่ใช่จาก UI อย่างเดียว'},
+  {id:'d5',date:'28 มิ.ย.',day:'ศุกร์',start:'09:00',end:'18:00',hours:8,mode:'Onsite',status:'แบบร่าง',tone:'gray',work:'สรุปสิ่งที่เรียนรู้และเตรียม demo ให้พี่เลี้ยง',evidence:'demo checklist',blocker:'รอ feedback จาก code review',learning:'วางแผนปรับปรุงหน้า mockup สำหรับรอบถัดไป'},
+];
+const evaluationWindows={
+  student:{label:'นักศึกษาประเมินสถานประกอบการ',start:'2026-06-20',end:'2026-09-30',note:'เปิดให้ประเมินสถานประกอบการหลังเริ่มฝึกงาน และปิดหลังสิ้นรอบ 1/2569'},
+  advisor:{label:'อาจารย์นิเทศประเมินสถานประกอบการ',start:'2026-07-01',end:'2026-09-30',note:'เปิดหลังเริ่มฝึกครบ 30 วัน เพื่อให้อาจารย์บันทึกผลนิเทศสถานประกอบการ'}
+};
+const skillSynonyms={
+  'ml':['ml','machine learning','ai','data science'],
+  'machine learning':['ml','machine learning','ai','data science'],
+  'k8s':['k8s','kubernetes'],
+  'kubernetes':['k8s','kubernetes'],
+  'node.js':['node.js','node','nodejs','express'],
+  'react':['react','next.js','nextjs'],
+  'vue':['vue','vue.js'],
+  'spring':['spring','spring boot'],
+  'gcp':['gcp','google cloud'],
+  'aws':['aws','amazon web services'],
+  'sql':['sql','mysql','postgresql','postgres'],
+};
+
+/* ---------------- helpers ---------------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function escapeHtml(v){
+  return String(v||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function cleanInput(v){return escapeHtml(String(v||'').trim());}
+function splitTags(v){
+  return String(v||'').split(',').map(x=>cleanInput(x)).filter(Boolean).slice(0,6);
+}
+function skillTokens(v){
+  const key=String(v||'').trim().toLowerCase();
+  return new Set([key,...(skillSynonyms[key]||[])]);
+}
+function skillMatch(studentSkills,companyStack){
+  const matched=[];
+  companyStack.forEach(stack=>{
+    const stackTokens=skillTokens(stack);
+    const hit=studentSkills.find(sk=>[...skillTokens(sk)].some(t=>stackTokens.has(t)));
+    if(hit)matched.push({student:hit,stack});
+  });
+  return matched;
+}
+function statusBadge(s){
+  if(s==='แนะนำ')return '<span class="badge b-green">● แนะนำ</span>';
+  if(s==='ใช้ได้')return '<span class="badge b-accent">ใช้ได้</span>';
+  if(s==='เฝ้าระวัง')return '<span class="badge b-amber">⚑ เฝ้าระวัง</span>';
+  if(s==='ใหม่')return '<span class="badge b-gray">ยังไม่มีคะแนน</span>';
+  return '<span class="badge b-gray">'+s+'</span>';
+}
+function stuStatusBadge(s){
+  const map={'จับคู่แล้ว':'b-accent','กำลังฝึก':'b-green','ประเมินแล้ว':'b-gray','รอจับคู่':'b-amber'};
+  return '<span class="badge '+(map[s]||'b-gray')+'">'+s+'</span>';
+}
+function barColor(used,total){const r=used/total;return r>=1?'var(--red)':r>=.66?'var(--amber)':'var(--green)';}
+function acceptsTrack(e,track){
+  if(track==='สหกิจ')return e.acceptCoop===true || e.coop!=null;
+  if(track==='ฝึกงานทั่วไป')return e.acceptGen===true || e.gen!=null;
+  return false;
+}
+function scoreText(v,accepts){
+  if(!accepts)return 'ไม่รับ';
+  return v==null?'ยังไม่มีคะแนน':v.toFixed(1)+' / 5';
+}
+function studentNames(ids){
+  const names=(ids||[]).map(id=>students.find(s=>s.id===id)?.name||id);
+  return names.length?names.join(', '):'ยังไม่ผูกนักศึกษา';
+}
+function mentorBlock(e,compact=false){
+  const mentors=e.mentors||[];
+  if(!mentors.length)return `<div class="rule-note" style="margin:10px 0 13px"><span>!</span><span><b>ยังไม่มีข้อมูลพี่เลี้ยง</b><br>ควรระบุผู้รับผิดชอบก่อนส่งนักศึกษาไปฝึกงาน</span></div>`;
+  const shown=compact?mentors.slice(0,2):mentors;
+  return `<div class="mentor-list">${shown.map(m=>`
+    <div class="mentor-row">
+      <div class="avatar">${m.name.charAt(0)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="name">${m.name}</div>
+        <div class="meta">${m.title}${compact?'':' · '+m.email+' · '+m.phone}</div>
+        <div class="students">ดูแล: ${studentNames(m.students)}</div>
+      </div>
+    </div>`).join('')}${compact&&mentors.length>2?`<div class="meta">+ พี่เลี้ยงอีก ${mentors.length-2} คน</div>`:''}</div>`;
+}
+function allMentors(){
+  return establishments.flatMap(e=>(e.mentors||[]).map(m=>({...m, companyId:e.id, companyName:e.name, companyMode:e.mode, companyLoc:e.loc})));
+}
+function studentMentor(student){
+  if(!student.company)return null;
+  const company=establishments.find(e=>e.name===student.company);
+  const mentor=(company?.mentors||[]).find(m=>(m.students||[]).includes(student.id)) || (company?.mentors||[])[0] || null;
+  return mentor?{company,mentor}:null;
+}
+function advisorLoad(id){return advisorAssignments.filter(a=>a.advisorId===id&&a.status!=='ประเมินแล้ว').length;}
+function advisorOptions(){
+  return advisors.map(a=>`<option value="${a.id}">${a.name} · ${advisorLoad(a.id)} งาน</option>`).join('');
+}
+function assignmentContext(a){
+  return {
+    student:students.find(s=>s.id===a.studentId),
+    company:establishments.find(e=>e.id===a.companyId),
+    advisor:advisors.find(t=>t.id===a.advisorId)
+  };
+}
+function todayISO(){ return '2026-06-27'; }
+function thDate(iso){
+  const [y,m,d]=String(iso).split('-').map(Number);
+  const mos=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${d} ${mos[m-1]} ${y+543}`;
+}
+function evalWindowState(kind){
+  const w=evaluationWindows[kind], now=todayISO();
+  const state=now<w.start?'upcoming':now>w.end?'closed':'open';
+  return {...w,state,open:state==='open',range:`${thDate(w.start)} - ${thDate(w.end)}`};
+}
+function evalBadge(kind){
+  const s=evalWindowState(kind);
+  if(s.state==='open')return '<span class="badge b-green">เปิดให้ประเมิน</span>';
+  if(s.state==='upcoming')return '<span class="badge b-amber">ยังไม่เปิด</span>';
+  return '<span class="badge b-gray">ปิดแล้ว</span>';
+}
+
+/* ---------------- login + nav ---------------- */
+function toggleSide(){ $('#sidebar').classList.toggle('open'); }
+const titles={dashboard:'แดชบอร์ด',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
+let loginRole='staff';
+let currentAdvisorId='t2';
+const loginFoot={
+  staff:'ผู้ประสานงาน — จัดการนักศึกษา บริษัท และการจับคู่',
+  advisor:'อาจารย์นิเทศ — ประเมินสถานประกอบการที่รับผิดชอบ',
+  student:'นักศึกษา — logbook และประเมินสถานประกอบการ',
+  company:'สถานประกอบการ — ยืนยันเอกสารและประเมินนักศึกษา'
+};
+const loginDefaults={staff:'coordinator@university.ac.th',advisor:'preeya@university.ac.th',student:'6512001',company:'hr@cloudworks.co.th'};
+function pickLoginRole(el,r){
+  $$('.opt',el.parentElement).forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); loginRole=r;
+  $('#lg-label').textContent = r==='student'?'รหัสนักศึกษา / อีเมล':'อีเมลมหาวิทยาลัย';
+  $('#lg-mail').value = loginDefaults[r];
+  $('#lg-foot').textContent = loginFoot[r];
+}
+function doLogin(){
+  $('#login').classList.add('hidden');
+  if(loginRole==='student'){ $('#student-portal').classList.remove('hidden'); openStudentPortal(); }
+  else if(loginRole==='advisor'){ $('#advisor-portal').classList.remove('hidden'); openAdvisorPortal(); }
+  else if(loginRole==='company'){ $('#company-portal').classList.remove('hidden'); openCompanyPortal(); }
+  else { $('#app').classList.remove('hidden'); go('dashboard'); }
+}
+function logoutStudent(){ $('#student-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
+function logoutAdvisor(){ $('#advisor-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
+function logoutCompany(){ $('#company-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
+function logoutStaff(){ $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); $('#sidebar').classList.remove('open'); window.scrollTo(0,0); }
+function openStudentPortal(){
+  renderLogbook();
+  renderStudentEvaluation();
+}
+function renderStudentEvaluation(){
+  const win=evalWindowState('student');
+  if(!win.open){
+    $('#sp-eval-wrap').innerHTML=`
+      <div class="card card-pad">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+          <div><div class="sec-title">ประเมินสถานประกอบการ</div><div class="sec-sub">แบบประเมินเปิดตามช่วงเวลาที่เจ้าหน้าที่กำหนดเท่านั้น</div></div>
+          ${evalBadge('student')}
+        </div>
+        <div class="rule-note" style="margin-top:14px"><span>◷</span><span><b>${win.state==='upcoming'?'ยังไม่ถึงช่วงประเมิน':'ปิดช่วงประเมินแล้ว'}</b><br>ช่วงที่กำหนด: ${win.range}<br>${win.note}</span></div>
+      </div>`;
+    return;
+  }
+  $('#sp-eval-wrap').innerHTML=`
+    <div class="card card-pad">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div><div class="sec-title">ประเมินสถานประกอบการ</div>
+        <div class="sec-sub">ให้คะแนนตามประสบการณ์จริงของคุณ — เปิดตามช่วงเวลาที่เจ้าหน้าที่กำหนด: ${win.range}</div></div>
+        ${evalBadge('student')}
+      </div>
+      <div id="sp-crit"></div>
+      <div style="margin-top:18px">
+        <div class="cn" style="margin-bottom:8px">บทบาทที่คุณได้ทำจริง</div>
+        <div class="seg" data-seg="sprole">${['Developer','QA / Test','Data / ML','DevOps','UX / UI','Support','อื่นๆ'].map((r,i)=>`<span class="opt${i===0?' sel':''}" onclick="pickSeg(this)">${r}</span>`).join('')}</div>
+      </div>
+      <div style="margin-top:16px"><label class="lbl">ความเห็นเพิ่มเติม</label><textarea rows="3" placeholder="งานที่ได้รับ การดูแลของพี่เลี้ยง สิ่งที่ได้เรียนรู้…"></textarea></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+        <button class="btn">บันทึกแบบร่าง</button>
+        <button class="btn btn-primary" onclick="submitStudentEval()">ส่งแบบประเมิน</button>
+      </div>
+    </div>`;
+  buildCrit(critEst,'#sp-crit',false);
+}
+function renderLogbook(){
+  const totalHours=dailyLogEntries.reduce((a,b)=>a+b.hours,0);
+  const pending=dailyLogEntries.filter(x=>!['อนุมัติแล้ว'].includes(x.status)).length;
+  $('#log-hours').textContent=totalHours+' ชม.';
+  $('#log-submitted').textContent=dailyLogEntries.filter(x=>x.status!=='ยังไม่บันทึก').length+'/'+dailyLogEntries.length+' วัน';
+  $('#log-pending').textContent=pending+' วัน';
+  $('#daily-log-list').innerHTML=dailyLogEntries.map((x,i)=>`
+    <div class="day-row ${i===0?'active':''}" data-daily="${x.id}" onclick="pickDailyLog('${x.id}')">
+      <div><div class="date">${x.date}</div><div class="meta">${x.day}</div></div>
+      <div><div class="work">${x.work}</div><div class="meta">${x.mode} · ${x.hours} ชม. · ${x.evidence}</div></div>
+      <span class="badge ${x.status==='อนุมัติแล้ว'?'b-green':x.status==='แบบร่าง'?'b-gray':'b-amber'}">${x.status}</span>
+    </div>`).join('');
+  pickDailyLog(dailyLogEntries[0].id);
+}
+function pickDailyLog(id){
+  const x=dailyLogEntries.find(d=>d.id===id)||dailyLogEntries[0];
+  $$('.day-row').forEach(r=>r.classList.toggle('active',r.dataset.daily===x.id));
+  $('#daily-form-title').textContent='บันทึกประจำวัน · '+x.date;
+  $('#daily-form-sub').textContent=x.day+' · '+x.mode+' · '+x.hours+' ชั่วโมง';
+  $('#daily-form-status').textContent=x.status;
+  $('#daily-form-status').className='badge '+(x.status==='อนุมัติแล้ว'?'b-green':x.status==='แบบร่าง'?'b-gray':'b-amber');
+  $('#daily-start').value=x.start;
+  $('#daily-end').value=x.end;
+  $('#daily-mode').value=x.mode;
+  $('#daily-hours').value=x.hours;
+  $('#daily-work').value=x.work;
+  $('#daily-evidence').value=x.evidence;
+  $('#daily-blocker').value=x.blocker;
+  $('#daily-learning').value=x.learning;
+}
+function saveDailyLog(){
+  const active=$('.day-row.active');
+  const x=dailyLogEntries.find(d=>d.id===active?.dataset.daily)||dailyLogEntries[0];
+  x.start=cleanInput($('#daily-start').value);
+  x.end=cleanInput($('#daily-end').value);
+  x.mode=$('#daily-mode').value;
+  x.hours=Number($('#daily-hours').value)||x.hours;
+  x.work=cleanInput($('#daily-work').value);
+  x.evidence=cleanInput($('#daily-evidence').value);
+  x.blocker=cleanInput($('#daily-blocker').value);
+  x.learning=cleanInput($('#daily-learning').value);
+  x.status='แบบร่าง';
+  x.tone='gray';
+  renderLogbook();
+  pickDailyLog(x.id);
+  toast('บันทึก daily log แบบร่างแล้ว');
+}
+function submitWeeklyLog(){
+  dailyLogEntries.forEach(x=>{ if(x.status==='แบบร่าง'){x.status='ส่งแล้ว'; x.tone='amber';} });
+  const wk=logbookEntries.find(x=>x.week===4);
+  if(wk){ wk.status='รอพี่เลี้ยงตรวจ'; wk.tone='amber'; wk.hours=dailyLogEntries.reduce((a,b)=>a+b.hours,0); }
+  $('#weekly-status').textContent='ส่งให้พี่เลี้ยงแล้ว';
+  renderLogbook();
+  toast('ส่ง logbook สัปดาห์นี้ให้พี่เลี้ยงตรวจแล้ว');
+}
+function submitStudentEval(){
+  const vals=$$('#sp-crit .stars').map(g=>+g.dataset.val);
+  if(vals.some(v=>v===0)){ toast('กรุณาให้คะแนนทุกด้านก่อนส่ง'); return; }
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const st=students.find(s=>s.id==='6512001'); if(st)st.status='ประเมินแล้ว';
+  renderStudents(); renderDash();
+  $('#sp-eval-wrap').innerHTML=`
+    <div class="card"><div class="sp-done">
+      <div class="ic">✓</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:4px">ส่งแบบประเมินแล้ว</div>
+      <p style="color:var(--muted);margin:0 0 18px">ขอบคุณที่สละเวลาประเมิน บจก. คลาวด์เวิร์คส์</p>
+      <div style="display:inline-flex;gap:24px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 24px">
+        <div><div style="font-size:12px;color:var(--muted)">คะแนนเฉลี่ยที่คุณให้</div><div style="font-size:22px;font-weight:600;font-family:var(--mono)">${avg.toFixed(1)}<small style="font-size:12px;color:var(--muted)"> /5</small></div></div>
+        <div style="border-left:1px solid var(--border);padding-left:24px"><div style="font-size:12px;color:var(--muted)">สถานะ</div><div style="margin-top:7px"><span class="badge b-green">ประเมินแล้ว</span></div></div>
+      </div>
+    </div></div>`;
+  toast('ส่งแบบประเมินสถานประกอบการแล้ว');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function go(pg){
+  $$('.page').forEach(p=>p.classList.add('hidden'));
+  $('#page-'+pg).classList.remove('hidden');
+  $$('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.pg===pg || (pg==='student360'&&n.dataset.pg==='students')));
+  $('#pgTitle').textContent=titles[pg];
+  if(pg==='student360')renderStudent360($('#student360-select')?.value||'6512001');
+  if(pg==='mentors')renderMentors();
+  if(pg==='cwie')renderCwie();
+  if(pg==='evalSettings')renderEvalSettings();
+  if(pg==='audit')renderAuditLog();
+  toggleNotifications(false);
+  $('#sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+$$('.nav-item').forEach(n=>n.addEventListener('click',()=>go(n.dataset.pg)));
+
+function renderNotifications(){
+  $('#notif-panel').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px 6px">
+      <div style="font-weight:600">แจ้งเตือนเจ้าหน้าที่</div>
+      <button class="link-arrow" onclick="toast('ทำเครื่องหมายว่าอ่านแล้ว (เดโม)')">อ่านทั้งหมด</button>
+    </div>
+    ${notifications.map(n=>{
+      const bg=n.tone==='green'?'var(--green-soft)':n.tone==='amber'?'var(--amber-soft)':n.tone==='red'?'var(--red-soft)':'var(--accent-soft)';
+      const fg=n.tone==='green'?'var(--green-ink)':n.tone==='amber'?'var(--amber-ink)':n.tone==='red'?'var(--red-ink)':'var(--accent-ink)';
+      return `<div class="notif-item" onclick="go('${n.pg}');toggleNotifications(false)">
+        <div class="notif-ic" style="background:${bg};color:${fg}">${n.ic}</div>
+        <div style="flex:1"><div class="notif-t">${n.title}</div><div class="notif-s">${n.sub}</div></div>
+      </div>`;
+    }).join('')}`;
+}
+function toggleNotifications(force){
+  const panel=$('#notif-panel');
+  const shouldShow=force===undefined?panel.classList.contains('hidden'):force;
+  panel.classList.toggle('hidden',!shouldShow);
+}
+
+function renderCwie(){
+  const options=['6512001','6512030','6512101'].map(id=>{
+    const s=students.find(x=>x.id===id);
+    return `<option value="${id}">${s?s.name:id}</option>`;
+  }).join('');
+  $('#cwie-student').innerHTML=options;
+  renderCwieTimeline($('#cwie-student').value||'6512001');
+  $('#cwie-queue').innerHTML=cwieQueue.map(([task,who,owner,due,tone])=>`
+    <div class="approval-card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;gap:10px"><div class="name">${task}</div><span class="badge ${tone==='warn'?'b-amber':tone==='active'?'b-accent':'b-gray'}">${due}</span></div>
+      <div class="meta">${who} · owner: ${owner}</div>
+      <div class="form-actions"><button class="btn btn-sm" onclick="toast('เปิดรายการเอกสาร (เดโม)')">เปิด</button><button class="btn btn-sm btn-primary" onclick="toast('ส่งแจ้งเตือนแล้ว (เดโม)')">แจ้งเตือน</button></div>
+    </div>`).join('');
+}
+function renderCwieTimeline(id){
+  const s=students.find(x=>x.id===id);
+  const rows=cwieTimelines[id]||[];
+  $('#cwie-timeline').innerHTML=`
+    <div class="mini-grid" style="margin-bottom:16px">
+      <div class="mini-card"><div class="k">นักศึกษา</div><div class="v" style="font-size:14px;font-family:var(--font)">${s?s.name:'-'}</div></div>
+      <div class="mini-card"><div class="k">สถานประกอบการ</div><div class="v" style="font-size:14px;font-family:var(--font)">${s&&s.company?s.company:'รอจับคู่'}</div></div>
+      <div class="mini-card"><div class="k">สถานะรวม</div><div style="margin-top:8px"><span class="badge b-amber">มีงานค้าง</span></div></div>
+    </div>
+    <div class="person-timeline">${rows.map(([st,t,m])=>`<div class="tl-row ${st}"><div class="tl-title">${t}</div><div class="tl-meta">${m}</div></div>`).join('')}</div>`;
+}
+
+function renderAuditLog(){
+  const f=$('#audit-filter')?$('#audit-filter').value:'all';
+  const rows=auditLogs.filter(x=>f==='all'||x.type===f);
+  $('#audit-list').innerHTML=rows.map(x=>`
+    <div class="audit-row">
+      <div class="audit-time">${x.time}</div>
+      <div><div class="audit-act">${x.act}</div><div class="audit-detail">${x.type} · ${x.detail}</div></div>
+      <div class="audit-user">${x.user}</div>
+      <div class="audit-ip">${x.ip}</div>
+    </div>`).join('');
+}
+
+function renderEvalSettings(){
+  const stu=evalWindowState('student'), adv=evalWindowState('advisor');
+  $('#eval-student-start').value=evaluationWindows.student.start;
+  $('#eval-student-end').value=evaluationWindows.student.end;
+  $('#eval-student-note').value=evaluationWindows.student.note;
+  $('#eval-advisor-start').value=evaluationWindows.advisor.start;
+  $('#eval-advisor-end').value=evaluationWindows.advisor.end;
+  $('#eval-advisor-note').value=evaluationWindows.advisor.note;
+  $('#eval-stu-state').textContent=stu.state==='open'?'เปิด':'ยังไม่เปิด';
+  $('#eval-stu-range').textContent=stu.range;
+  $('#eval-adv-state').textContent=adv.state==='open'?'เปิด':adv.state==='upcoming'?'ยังไม่เปิด':'ปิดแล้ว';
+  $('#eval-adv-range').textContent=adv.range;
+  $('#eval-preview').innerHTML=`
+    <div class="task-queue">
+      <div class="task-item">
+        <div class="ic" style="background:${stu.open?'var(--green-soft)':'var(--amber-soft)'};color:${stu.open?'var(--green-ink)':'var(--amber-ink)'}">◍</div>
+        <div style="flex:1"><div class="t">Student Portal: ${stu.label}</div><div class="s">${stu.open?'นักศึกษาเห็นฟอร์มและส่งแบบประเมินได้':'นักศึกษาเห็นการ์ดล็อกและช่วงวันที่เปิด'} · ${stu.range}</div></div>
+        ${evalBadge('student')}
+      </div>
+      <div class="task-item">
+        <div class="ic" style="background:${adv.open?'var(--green-soft)':'var(--amber-soft)'};color:${adv.open?'var(--green-ink)':'var(--amber-ink)'}">★</div>
+        <div style="flex:1"><div class="t">Advisor Portal: ${adv.label}</div><div class="s">${adv.open?'อาจารย์เห็นฟอร์มและส่งผลนิเทศได้':'อาจารย์เห็นการ์ดล็อกและช่วงวันที่เปิด'} · ${adv.range}</div></div>
+        ${evalBadge('advisor')}
+      </div>
+    </div>`;
+}
+function saveEvalWindows(){
+  evaluationWindows.student.start=$('#eval-student-start').value;
+  evaluationWindows.student.end=$('#eval-student-end').value;
+  evaluationWindows.student.note=cleanInput($('#eval-student-note').value);
+  evaluationWindows.advisor.start=$('#eval-advisor-start').value;
+  evaluationWindows.advisor.end=$('#eval-advisor-end').value;
+  evaluationWindows.advisor.note=cleanInput($('#eval-advisor-note').value);
+  renderEvalSettings();
+  renderStudentEvaluation();
+  toast('บันทึกช่วงเวลาประเมินแล้ว');
+}
+
+function initStudent360Options(){
+  const sel=$('#student360-select');
+  if(!sel)return;
+  sel.innerHTML=students.map(s=>`<option value="${s.id}">${s.name} · ${s.id}</option>`).join('');
+}
+function openStudent360(id){
+  initStudent360Options();
+  const sel=$('#student360-select');
+  if(sel)sel.value=id;
+  go('student360');
+  renderStudent360(id);
+}
+function renderStudent360(id='6512001'){
+  initStudent360Options();
+  const s=students.find(x=>x.id===id)||students[0];
+  const company=establishments.find(e=>e.name===s.company);
+  const mentorCtx=studentMentor(s);
+  const advisorItem=advisorAssignments.find(a=>a.studentId===s.id);
+  const advisor=advisorItem?advisors.find(a=>a.id===advisorItem.advisorId):null;
+  const timeline=cwieTimelines[s.id]||[
+    ['warn','รอจับคู่สถานประกอบการ','เจ้าหน้าที่ต้องจับคู่ก่อนสร้างเอกสาร CWIE'],
+    ['','รับรองตำแหน่ง','รอสถานประกอบการหลังจับคู่'],
+    ['','หนังสือส่งตัว','ยังไม่ถึงขั้นตอน'],
+  ];
+  const workflow=[
+    {k:'จับคู่บริษัท',v:s.company||'รอจับคู่',owner:'เจ้าหน้าที่',cls:s.company?'done':'warn'},
+    {k:'พี่เลี้ยง',v:mentorCtx?mentorCtx.mentor.name:'รอบริษัทผูกพี่เลี้ยง',owner:'สถานประกอบการ',cls:mentorCtx?'done':'active'},
+    {k:'เอกสาร CWIE',v:timeline.some(x=>x[0]==='warn')?'มีงานค้าง':'กำลังดำเนินการ',owner:timeline.find(x=>x[0]==='warn')?'ผู้เกี่ยวข้อง':'เจ้าหน้าที่',cls:timeline.some(x=>x[0]==='warn')?'warn':'active'},
+    {k:'Logbook',v:s.id==='6512001'?'รอตรวจ 2 รายการ':'ไม่มีรายการค้าง',owner:'พี่เลี้ยงบริษัท',cls:s.id==='6512001'?'warn':'done'},
+    {k:'ประเมินผล',v:s.status==='ประเมินแล้ว'?'ส่งแล้ว':'ยังไม่ครบขั้นตอน',owner:'นักศึกษา / อาจารย์ / บริษัท',cls:s.status==='ประเมินแล้ว'?'done':'active'},
+  ];
+  const actionText=s.id==='6512001'
+    ? {t:'ต้องดำเนินการต่อ: พี่เลี้ยงตรวจ logbook 2 รายการ',s:'ค้างที่สถานประกอบการ / พี่เลี้ยงบริษัท หากเกินกำหนดให้เจ้าหน้าที่ส่งแจ้งเตือนซ้ำ'}
+    : (!mentorCtx?{t:'ต้องดำเนินการต่อ: บริษัทต้องผูกพี่เลี้ยงให้นักศึกษา',s:'ข้อมูลนี้ต้องอัปเดตจากพอร์ทัลสถานประกอบการ'}:{t:'กำลังดำเนินการตามแผน',s:'ไม่มีงานวิกฤตในขณะนี้'});
+  $('#student360-bc').textContent=s.name;
+  $('#student360-action').innerHTML=`
+    <div class="action-banner">
+      <div><div class="t">${actionText.t}</div><div class="s">${actionText.s}</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+        <button class="btn btn-sm" onclick="go('students')">← กลับรายชื่อ</button>
+        <button class="btn btn-sm btn-primary" onclick="toast('ส่งแจ้งเตือนเจ้าของงานแล้ว (เดโม)')">แจ้งเตือน</button>
+      </div>
+    </div>`;
+  $('#student360-profile').innerHTML=`
+    <div class="profile-head">
+      <div class="profile-title">
+        <div class="avatar">${s.name.charAt(0)}</div>
+        <div><div style="font-size:18px;font-weight:600">${s.name}</div><div class="id">${s.id} · ${s.track} · ${s.skills.join(', ')}</div></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${stuStatusBadge(s.status)}<span class="owner-chip">บริษัท: ${s.company||'ยังไม่จับคู่'}</span></div>
+    </div>
+    <div class="status-strip">${workflow.map(w=>`
+      <div class="status-tile ${w.cls}">
+        <div class="k">${w.k}</div><div class="v">${w.v}</div><div class="o">ค้าง/ดูแลโดย: ${w.owner}</div>
+      </div>`).join('')}</div>
+    <div class="rule-note"><span>◎</span><span><b>หน้าเดียวสำหรับติดตามรายคน</b><br>ใช้เป็นจุดอ้างอิงร่วมของเจ้าหน้าที่ นักศึกษา อาจารย์ และสถานประกอบการเมื่อต้องไล่งานค้าง</span></div>`;
+  $('#student360-workflow').innerHTML=`
+    <div class="person-timeline">${timeline.map(([st,t,m])=>`<div class="tl-row ${st}"><div class="tl-title">${t}</div><div class="tl-meta">${m}</div></div>`).join('')}</div>`;
+  $('#student360-owners').innerHTML=`
+    <div class="kv"><span class="k">สถานประกอบการ</span><span class="v">${company?company.name:'-'}</span></div>
+    <div class="kv"><span class="k">พี่เลี้ยงบริษัท</span><span class="v">${mentorCtx?mentorCtx.mentor.name:'ยังไม่ผูก'}</span></div>
+    <div class="kv"><span class="k">อีเมลพี่เลี้ยง</span><span class="v">${mentorCtx?mentorCtx.mentor.email:'-'}</span></div>
+    <div class="kv"><span class="k">อาจารย์นิเทศ</span><span class="v">${advisor?advisor.name:'รอมอบหมาย'}</span></div>
+    <div class="kv"><span class="k">นัดนิเทศ</span><span class="v">${advisorItem?advisorItem.visit:'-'}</span></div>
+    <div class="form-actions"><button class="btn btn-sm" onclick="go('cwie')">ดู CWIE</button><button class="btn btn-sm btn-primary" onclick="toast('ส่งแจ้งเตือนเจ้าของงานแล้ว (เดโม)')">แจ้งเตือนเจ้าของงาน</button></div>`;
+  $('#student360-logbook').innerHTML=logbookEntries.slice(0,3).map(x=>`
+    <div class="log-entry">
+      <div class="top"><div><div class="wk">สัปดาห์ที่ ${x.week} · ${x.hours} ชม.</div><div class="tl-meta">${x.date}</div></div>
+      <span class="badge ${x.tone==='green'?'b-green':'b-amber'}">${x.status}</span></div>
+      <div class="txt">${x.text}</div>
+    </div>`).join('');
+  $('#student360-audit').innerHTML=[
+    ['26 มิ.ย. 22:48','สร้างหนังสือส่งตัว CWIE','เจ้าหน้าที่'],
+    ['26 มิ.ย. 20:14','บริษัทเปิดดู logbook','สถานประกอบการ'],
+    ['24 มิ.ย. 18:05','นักศึกษาส่ง logbook สัปดาห์ที่ 4','นักศึกษา'],
+    ['18 มิ.ย. 09:30','บริษัทรับรองตำแหน่งและพี่เลี้ยง','สถานประกอบการ'],
+  ].map(([time,act,owner])=>`<div class="audit-row" style="grid-template-columns:110px 1fr 110px"><div class="audit-time">${time}</div><div><div class="audit-act">${act}</div><div class="audit-detail">เกี่ยวข้องกับ ${s.name}</div></div><div class="audit-user">${owner}</div></div>`).join('');
+}
+
+function renderMentors(){
+  const mentors=allMentors();
+  const active=mentors.filter(m=>(m.students||[]).length>0);
+  const mentoredStudentIds=new Set(mentors.flatMap(m=>m.students||[]));
+  const matchedStudents=students.filter(s=>s.company);
+  const pendingLogs=logbookEntries.filter(x=>x.status!=='อนุมัติแล้ว').length;
+  $('#mentor-total').textContent=mentors.length;
+  $('#mentor-active').textContent=active.length;
+  $('#mentor-students').textContent=mentoredStudentIds.size+'/'+matchedStudents.length;
+  $('#mentor-logbook').textContent=pendingLogs;
+  $('#c-mentor').textContent=mentors.length;
+
+  $('#mentor-directory').innerHTML=establishments.map(e=>{
+    const mentorsHtml=mentorBlock(e,false);
+    const covered=(e.mentors||[]).reduce((sum,m)=>sum+(m.students||[]).length,0);
+    return `<div class="approval-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div><div class="name">${e.name}</div><div class="meta">${e.mode} · ${e.loc} · พี่เลี้ยง ${(e.mentors||[]).length} คน</div></div>
+        <span class="badge ${covered?'b-green':'b-amber'}">${covered?`ดูแล ${covered} คน`:'ยังไม่ผูกนักศึกษา'}</span>
+      </div>
+      ${mentorsHtml}
+      <div class="form-actions"><button class="btn btn-sm" onclick="openEst('${e.id}')">ดูบริษัท</button><button class="btn btn-sm btn-primary" onclick="toast('ส่งคำขอให้บริษัทอัปเดตข้อมูลพี่เลี้ยง (เดโม)')">ขอให้อัปเดต</button></div>
+    </div>`;
+  }).join('');
+
+  $('#mentor-followups').innerHTML=matchedStudents.map(s=>{
+    const ctx=studentMentor(s);
+    const hasMentor=!!ctx;
+    const logText=s.id==='6512001'?'2 รายการรอตรวจ':'ไม่มี logbook ค้าง';
+    return `<div class="approval-card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div><div class="name">${s.name}</div><div class="meta">${s.id} · ${s.track} · ${s.company}</div></div>
+        <span class="badge ${hasMentor?'b-green':'b-amber'}">${hasMentor?'มีพี่เลี้ยง':'ยังไม่มีพี่เลี้ยง'}</span>
+      </div>
+      <div class="kv"><span class="k">พี่เลี้ยง</span><span class="v">${hasMentor?ctx.mentor.name:'-'}</span></div>
+      <div class="kv"><span class="k">ตำแหน่ง</span><span class="v">${hasMentor?ctx.mentor.title:'-'}</span></div>
+      <div class="kv"><span class="k">Logbook</span><span class="v">${logText}</span></div>
+      <div class="form-actions"><button class="btn btn-sm" onclick="toast('ส่งแจ้งเตือนพี่เลี้ยงแล้ว (เดโม)')">แจ้งเตือน</button><button class="btn btn-sm btn-primary" onclick="go('cwie')">ดู CWIE</button></div>
+    </div>`;
+  }).join('');
+}
+
+function renderCompanyMentorManager(){
+  const company=establishments.find(e=>e.id==='e1')||establishments[0];
+  const assignedIds=new Set((company.mentors||[]).flatMap(m=>m.students||[]));
+  const companyStudents=students.filter(s=>s.company===company.name);
+  const unassigned=companyStudents.filter(s=>!assignedIds.has(s.id));
+  $('#company-mentor-manager').innerHTML=`
+    <div class="mentor-grid">
+      ${(company.mentors||[]).map(m=>`
+        <div class="approval-card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <div><div class="name">${m.name}</div><div class="meta">${m.title}</div></div>
+            <span class="badge ${(m.students||[]).length?'b-green':'b-amber'}">${(m.students||[]).length} คน</span>
+          </div>
+          <div class="kv"><span class="k">อีเมล</span><span class="v">${m.email}</span></div>
+          <div class="kv"><span class="k">โทรศัพท์</span><span class="v">${m.phone}</span></div>
+          <div class="kv"><span class="k">นักศึกษาที่ดูแล</span><span class="v">${studentNames(m.students)}</span></div>
+          <div class="form-actions">
+            <button class="btn btn-sm" onclick="toast('เปิดฟอร์มแก้ไขข้อมูลพี่เลี้ยง (เดโม)')">แก้ไข</button>
+            <button class="btn btn-sm btn-primary" onclick="toast('เปิดหน้าผูกนักศึกษากับพี่เลี้ยง (เดโม)')">ผูกนักศึกษา</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="rule-note" style="margin-top:14px">
+      <span>▧</span>
+      <span><b>นักศึกษาที่ยังต้องผูกพี่เลี้ยง</b><br>${unassigned.length?unassigned.map(s=>s.name+' ('+s.id+')').join(', '):'ผูกพี่เลี้ยงครบทุกคนแล้ว'}</span>
+    </div>`;
+}
+
+function switchCompanyWorkflow(el,key){
+  $$('#company-tabs .tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderCompanyWorkflow(key);
+}
+function renderCompanyWorkflow(key='positions'){
+  const company=establishments.find(e=>e.id==='e1')||establishments[0];
+  const companyStudents=students.filter(s=>s.company===company.name);
+  const map={
+    positions:`
+      <div class="mini-grid">
+        <div class="mini-card"><div class="k">Frontend Intern</div><div class="v" style="font-size:16px;font-family:var(--font)">2/3</div><div class="tl-meta">React, Node.js · Hybrid</div></div>
+        <div class="mini-card"><div class="k">DevOps Intern</div><div class="v" style="font-size:16px;font-family:var(--font)">1/1</div><div class="tl-meta">AWS, CI/CD · เต็มแล้ว</div></div>
+        <div class="mini-card"><div class="k">เปิดรับเพิ่ม</div><div class="v" style="font-size:16px;font-family:var(--font)">1 ที่</div><div class="tl-meta">รออนุมัติจาก HR</div></div>
+      </div>`,
+    mentors:`
+      <div class="rule-note"><span>◌</span><span><b>บริษัทเป็นเจ้าของข้อมูลพี่เลี้ยง</b><br>เพิ่ม แก้ไข และผูกนักศึกษากับพี่เลี้ยงได้จาก panel ด้านล่าง</span></div>`,
+    students:companyStudents.map(s=>{
+      const ctx=studentMentor(s);
+      return `<div class="approval-card" style="margin-bottom:10px"><div class="name">${s.name}</div><div class="meta">${s.id} · ${s.track}</div>
+      <div class="kv"><span class="k">พี่เลี้ยง</span><span class="v">${ctx?ctx.mentor.name:'ยังไม่ผูก'}</span></div>
+      <div class="form-actions"><button class="btn btn-sm">ดูโปรไฟล์</button><button class="btn btn-sm btn-primary">ผูกพี่เลี้ยง</button></div></div>`;
+    }).join(''),
+    documents:`
+      <div class="person-timeline">
+        <div class="tl-row done"><div class="tl-title">ยืนยันรับนักศึกษา</div><div class="tl-meta">บริษัทดำเนินการแล้ว</div></div>
+        <div class="tl-row active"><div class="tl-title">ส่ง Job plan</div><div class="tl-meta">ค้างที่พี่เลี้ยงบริษัท · ครบกำหนด 30 มิ.ย.</div></div>
+        <div class="tl-row warn"><div class="tl-title">ยืนยัน mentor ผู้ประเมินปลายภาค</div><div class="tl-meta">ค้างที่สถานประกอบการ</div></div>
+      </div>`,
+    logbook:logbookEntries.slice(0,2).map(x=>`<div class="log-entry"><div class="top"><div><div class="wk">สัปดาห์ที่ ${x.week}</div><div class="tl-meta">${x.date} · ${x.hours} ชม.</div></div><span class="badge ${x.tone==='green'?'b-green':'b-amber'}">${x.status}</span></div><div class="txt">${x.text}</div></div>`).join(''),
+    evaluation:`
+      <div class="mini-grid">
+        <div class="mini-card"><div class="k">ประเมินนักศึกษา</div><div class="v" style="font-size:16px;font-family:var(--font)">เปิดหลัง 70%</div></div>
+        <div class="mini-card"><div class="k">ประเมิน CWIE</div><div class="v" style="font-size:16px;font-family:var(--font)">ปลายภาค</div></div>
+        <div class="mini-card"><div class="k">ผลประเมินค้าง</div><div class="v">0</div></div>
+      </div>`
+  };
+  $('#company-workflow-panel').innerHTML=map[key]||map.positions;
+}
+function renderCompanyTaskQueue(){
+  const tasks=[
+    {ic:'◌',tone:'amber',title:'ผูกพี่เลี้ยงให้นักศึกษา 1 คน',sub:'จิราพร แสงเดือน ยังไม่มี mentor ผู้ประเมินปลายภาค',action:'ผูกพี่เลี้ยง'},
+    {ic:'▤',tone:'amber',title:'ตรวจ logbook 2 รายการ',sub:'กิตติพงษ์ ใจดี ส่งสัปดาห์ที่ 4 แล้ว รอพี่เลี้ยงอนุมัติ',action:'ตรวจ logbook'},
+    {ic:'▧',tone:'red',title:'ส่ง Job plan ภายใน 30 มิ.ย.',sub:'เอกสาร CWIE ค้างที่สถานประกอบการ',action:'ส่ง Job plan'},
+    {ic:'★',tone:'accent',title:'เตรียมประเมินนักศึกษา',sub:'แบบประเมินจะเปิดหลังฝึกครบ 70%',action:'ดูเงื่อนไข'},
+  ];
+  $('#company-task-queue').innerHTML=`<div class="task-queue">${tasks.map(t=>{
+    const bg=t.tone==='red'?'var(--red-soft)':t.tone==='amber'?'var(--amber-soft)':t.tone==='green'?'var(--green-soft)':'var(--accent-soft)';
+    const fg=t.tone==='red'?'var(--red-ink)':t.tone==='amber'?'var(--amber-ink)':t.tone==='green'?'var(--green-ink)':'var(--accent-ink)';
+    return `<div class="task-item">
+      <div class="ic" style="background:${bg};color:${fg}">${t.ic}</div>
+      <div style="flex:1"><div class="t">${t.title}</div><div class="s">${t.sub}</div></div>
+      <button class="btn btn-sm" onclick="toast('${t.action} (เดโม)')">${t.action}</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function openCompanyPortal(){
+  renderAuditLog();
+  renderCompanyTaskQueue();
+  renderCompanyMentorManager();
+  renderCompanyWorkflow('positions');
+  toast('เข้าสู่พอร์ทัลสถานประกอบการ');
+}
+
+/* ---------------- dashboard ---------------- */
+function renderDash(){
+  const total=students.length, coop=students.filter(s=>s.track==='สหกิจ').length;
+  const matched=students.filter(s=>s.status!=='รอจับคู่').length;
+  const wait=total-matched, warn=establishments.filter(e=>e.status==='เฝ้าระวัง').length;
+  $('#m-total').textContent=total; $('#m-coop').textContent=coop; $('#m-gen').textContent=total-coop;
+  $('#m-matched').textContent=matched; $('#m-matchpct').textContent=Math.round(matched/total*100)+'%';
+  $('#m-wait').textContent=wait; $('#m-est').textContent=establishments.length; $('#m-warn').textContent=warn;
+  $('#c-stu').textContent=total; $('#c-est').textContent=establishments.length;
+  $('#c-mentor').textContent=allMentors().length;
+
+  const prog=[['สหกิจ','สหกิจ'],['ฝึกงานทั่วไป','ฝึกงานทั่วไป']].map(([lab,tr])=>{
+    const g=students.filter(s=>s.track===tr); const m=g.filter(s=>s.status!=='รอจับคู่').length;
+    const pct=Math.round(m/g.length*100);
+    return `<div style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px"><span style="font-weight:500">${lab}</span><span class="mono" style="color:var(--ink-2)">${m}/${g.length} คน</span></div>
+      <div class="bar" style="height:9px"><i style="width:${pct}%;background:var(--accent)"></i></div></div>`;
+  }).join('');
+  $('#prog-list').innerHTML=prog;
+
+  const todos=[
+    ['⚑','var(--amber-ink)','var(--amber-soft)','บจก. เน็กซ์เจน ติดธงเฝ้าระวัง','ตรวจสอบก่อนส่งนักศึกษารอบนี้','establishments'],
+    ['◷','var(--accent-ink)','var(--accent-soft)',wait+' นักศึกษายังรอจับคู่','เปิดหน้าจับคู่เพื่อดำเนินการ','matching'],
+    ['★','var(--green-ink)','var(--green-soft)','ผลประเมินสถานประกอบการเข้ามาใหม่','ดูสรุปคุณภาพในหน้ารายงาน','reports'],
+  ].map(([ic,c,bg,t,d,pg])=>`<div onclick="go('${pg}')" style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer">
+    <div style="width:32px;height:32px;border-radius:9px;background:${bg};color:${c};display:flex;align-items:center;justify-content:center;flex-shrink:0">${ic}</div>
+    <div style="flex:1"><div style="font-size:13.5px;font-weight:500">${t}</div><div style="font-size:12px;color:var(--muted)">${d}</div></div>
+    <div style="color:var(--muted);align-self:center">›</div></div>`).join('');
+  $('#todo-list').innerHTML=todos;
+
+  const ranked=establishments.map(e=>{
+    const ss=[e.coop,e.gen].filter(v=>v!=null);
+    return {e, avg: ss.length?ss.reduce((a,b)=>a+b,0)/ss.length:null};
+  }).filter(r=>r.avg!=null).sort((a,b)=>b.avg-a.avg).slice(0,5);
+  const rkBg=['#FBEFD8','#EEF0F3','#FBEAE0','#EEF0F3','#EEF0F3'];
+  const rkFg=['#B8860B','#6B7280','#A0522D','#9AA0AC','#9AA0AC'];
+  $('#top-est').innerHTML=ranked.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:14px;padding:11px 2px;${i<ranked.length-1?'border-bottom:1px solid var(--border)':''}">
+      <div style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:13px;flex-shrink:0;background:${rkBg[i]};color:${rkFg[i]}">${i+1}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:500;font-size:14px">${r.e.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${r.e.mode} · ${r.e.loc}</div></div>
+      <span class="ministars" style="font-size:12px">${miniStars(r.avg)}</span>
+      <div style="font-family:var(--mono);font-weight:600;font-size:16px;width:44px;text-align:right">${r.avg.toFixed(2)}</div>
+      ${statusBadge(r.e.status)}
+    </div>`).join('');
+}
+
+/* ---------------- students ---------------- */
+let stuFilter='all';
+function setStuFilter(el){ $$('#stu-pills .pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); stuFilter=el.dataset.f; renderStudents(); }
+function renderStudents(){
+  const q=($('#stu-search').value||'').toLowerCase();
+  const rows=students.filter(s=>{
+    if(stuFilter!=='all'){ if(['สหกิจ','ฝึกงานทั่วไป'].includes(stuFilter)){if(s.track!==stuFilter)return false;} else if(s.status!==stuFilter)return false; }
+    if(q){ const hay=(s.name+s.id+s.skills.join(' ')).toLowerCase(); if(!hay.includes(q))return false; }
+    return true;
+  });
+  $('#stu-body').innerHTML = rows.length? rows.map(s=>{
+    const init=s.name.trim().charAt(0);
+    return `<tr class="row" onclick="openStudent360('${s.id}')" style="cursor:pointer">
+      <td><div class="who"><div class="avatar" style="width:32px;height:32px;font-size:12px">${init}</div><div><div class="nm">${s.name}</div><div class="id">${s.id}</div></div></div></td>
+      <td><span class="badge ${s.track==='สหกิจ'?'b-accent':'b-gray'}">${s.track}</span></td>
+      <td>${s.skills.slice(0,3).map(k=>`<span class="tag">${k}</span>`).join(' ')}</td>
+      <td>${stuStatusBadge(s.status)}</td>
+      <td style="color:${s.company?'var(--ink)':'var(--muted)'}">${s.company||'—'}</td>
+      <td style="text-align:right">${s.status==='รอจับคู่'?'<button class="btn btn-sm" onclick="event.stopPropagation();go(\'matching\');pickStudent(\''+s.id+'\')">จับคู่ ›</button>':'<button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openStudent360(\''+s.id+'\')">ดู 360°</button>'}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6"><div class="empty">ไม่พบนักศึกษาที่ตรงกับเงื่อนไข</div></td></tr>';
+}
+
+/* ---------------- establishments ---------------- */
+let estFilter='all';
+function setEstFilter(el){ $$('#est-pills .pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); estFilter=el.dataset.f; renderEst(); }
+function renderEst(){
+  const list=establishments.filter(e=>{
+    if(estFilter==='all')return true;
+    if(estFilter==='สหกิจ')return acceptsTrack(e,'สหกิจ');
+    if(estFilter==='ฝึกงานทั่วไป')return acceptsTrack(e,'ฝึกงานทั่วไป');
+    if(estFilter==='ว่าง')return e.used<e.total;
+    if(estFilter==='เฝ้าระวัง')return e.status==='เฝ้าระวัง';
+    return true;
+  });
+  $('#est-grid').innerHTML=list.map(e=>{
+    const pct=Math.round(e.used/e.total*100), full=e.used>=e.total;
+    const sc=(v,k,accepts)=> !accepts?`<div class="scorebox"><div class="k">${k}</div><div class="v na">ไม่รับ</div></div>`
+      : v==null?`<div class="scorebox"><div class="k">${k}</div><div class="v na">ยังไม่มีคะแนน</div></div>`
+      :`<div class="scorebox"><div class="k">${k}</div><div class="v ${e.status==='เฝ้าระวัง'?'warn':''}">${v.toFixed(1)}<small> /5</small></div></div>`;
+    const modeIcon=e.mode==='Remote'?'🌐':'🏢';
+    return `<div class="est ${e.status==='เฝ้าระวัง'?'warn':''}">
+      <div class="top"><div><div class="nm">${e.name}</div><div class="loc">${modeIcon} ${e.mode} · ${e.loc}</div></div>${statusBadge(e.status)}</div>
+      <div class="scores">${sc(e.coop,'สหกิจ',acceptsTrack(e,'สหกิจ'))}${sc(e.gen,'ฝึกงานทั่วไป',acceptsTrack(e,'ฝึกงานทั่วไป'))}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px">${e.stack.map(k=>`<span class="tag">${k}</span>`).join('')}</div>
+      <div class="sec-sub" style="margin:0 0 7px">พี่เลี้ยงที่รับผิดชอบนักศึกษา</div>
+      ${mentorBlock(e,true)}
+      ${e.flag?`<div class="flagbox"><i>⚑</i><span>${e.flag}</span></div>`:''}
+      <div class="foot">
+        <div class="cap"><div class="lab"><span>ความจุรอบนี้</span><span class="mono" style="${full?'color:var(--red)':''}">${e.used}/${e.total}${full?' · เต็ม':''}</span></div>
+          <div class="bar"><i style="width:${pct}%;background:${barColor(e.used,e.total)}"></i></div></div>
+        ${e.nda?'<span class="reason warnr" style="font-size:11.5px">🔒 NDA</span>':`<span style="font-size:12px;color:var(--ink-2)">รับต่อ ${e.hire}%</span>`}
+        <button class="link-arrow" onclick="openEst('${e.id}')">รายละเอียด ›</button>
+      </div></div>`;
+  }).join('');
+}
+function openEst(id){
+  const e=establishments.find(x=>x.id===id);
+  $('#modalBody').className='modal';
+  $('#modalBody').innerHTML=`
+    <div class="modal-head"><div><div style="font-size:17px;font-weight:600">${e.name}</div><div style="font-size:12.5px;color:var(--muted)">${e.mode} · ${e.loc}</div></div>
+    <button class="modal-x" onclick="closeModal()">×</button></div>
+    <div style="padding:16px 22px 22px">
+      <div style="display:flex;gap:10px;margin:6px 0 16px">${statusBadge(e.status)}${e.nda?'<span class="badge b-gray">🔒 ต้องเซ็น NDA</span>':''}</div>
+      <div class="kv"><span class="k">คะแนนสหกิจ</span><span class="v">${scoreText(e.coop,acceptsTrack(e,'สหกิจ'))}</span></div>
+      <div class="kv"><span class="k">คะแนนฝึกงานทั่วไป</span><span class="v">${scoreText(e.gen,acceptsTrack(e,'ฝึกงานทั่วไป'))}</span></div>
+      <div class="kv"><span class="k">ความจุรอบนี้</span><span class="v">${e.used} / ${e.total} คน</span></div>
+      <div class="kv"><span class="k">รับเข้าทำงานต่อ</span><span class="v">${e.hire}%</span></div>
+      <div class="kv"><span class="k">Tech stack</span><span class="v">${e.stack.join(', ')}</span></div>
+      <div style="margin-top:16px">
+        <div class="sec-title">พี่เลี้ยงที่รับผิดชอบนักศึกษา</div>
+        <div class="sec-sub">ผู้ประสานงานฝั่งสถานประกอบการ ใช้ติดตาม logbook, job plan และประเมินนักศึกษา</div>
+        ${mentorBlock(e,false)}
+      </div>
+      ${e.flag?`<div class="flagbox" style="margin-top:14px"><i>⚑</i><span>${e.flag}</span></div>`:''}
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+        <button class="btn" onclick="closeModal()">ปิด</button>
+        <button class="btn btn-primary" onclick="closeModal();go('matching')">ส่งนักศึกษาที่นี่ ›</button>
+      </div>
+    </div>`;
+  $('#modal').classList.remove('hidden');
+}
+function closeModal(){ $('#modal').classList.add('hidden'); }
+
+/* ---------------- registration forms ---------------- */
+function openStudentForm(){
+  $('#modalBody').className='modal wide';
+  $('#modalBody').innerHTML=`
+    <div class="modal-head"><div><div style="font-size:17px;font-weight:600">ลงทะเบียนนักศึกษา</div><div style="font-size:12.5px;color:var(--muted)">เพิ่มนักศึกษาที่จะออกฝึกงานในรอบ 1 / 2569</div></div>
+    <button class="modal-x" onclick="closeModal()">×</button></div>
+    <form class="modal-form" onsubmit="saveStudent(event)">
+      <div class="form-grid">
+        <div><label class="lbl">รหัสนักศึกษา</label><input id="sf-id" required placeholder="6512112"></div>
+        <div><label class="lbl">ชื่อ - นามสกุล</label><input id="sf-name" required placeholder="ชื่อ นามสกุล"></div>
+        <div><label class="lbl">สายฝึกงาน</label><select id="sf-track"><option>สหกิจ</option><option>ฝึกงานทั่วไป</option></select></div>
+        <div><label class="lbl">อีเมล</label><input id="sf-email" type="email" placeholder="student@university.ac.th"></div>
+        <div class="field-full"><label class="lbl">ทักษะหลัก</label><input id="sf-skills" required placeholder="React, Node.js, SQL"></div>
+      </div>
+      <div class="form-actions"><button type="button" class="btn" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" type="submit">บันทึกนักศึกษา</button></div>
+    </form>`;
+  $('#modal').classList.remove('hidden');
+}
+function saveStudent(ev){
+  ev.preventDefault();
+  const id=cleanInput($('#sf-id').value), name=cleanInput($('#sf-name').value), track=$('#sf-track').value;
+  const skills=splitTags($('#sf-skills').value);
+  if(!id||!name||!skills.length){toast('กรอกข้อมูลนักศึกษาให้ครบก่อนบันทึก');return;}
+  if(students.some(s=>s.id===id)){toast('รหัสนักศึกษานี้มีอยู่แล้ว');return;}
+  students.push({id,name,track,skills,status:'รอจับคู่',company:null,email:cleanInput($('#sf-email').value)});
+  closeModal();
+  stuFilter='all'; $$('#stu-pills .pill').forEach(p=>p.classList.toggle('active',p.dataset.f==='all'));
+  renderStudents(); renderMatchStudents(); renderDash(); renderAdvisorAssignments();
+  toast('ลงทะเบียนนักศึกษา '+name+' แล้ว');
+}
+function openCompanyForm(){
+  $('#modalBody').className='modal wide';
+  $('#modalBody').innerHTML=`
+    <div class="modal-head"><div><div style="font-size:17px;font-weight:600">ลงทะเบียนบริษัท</div><div style="font-size:12.5px;color:var(--muted)">เพิ่มสถานประกอบการและเงื่อนไขรับนักศึกษาฝึกงาน</div></div>
+    <button class="modal-x" onclick="closeModal()">×</button></div>
+    <form class="modal-form" onsubmit="saveCompany(event)">
+      <div class="form-grid">
+        <div class="field-full"><label class="lbl">ชื่อสถานประกอบการ</label><input id="cf-name" required placeholder="บจก. ตัวอย่าง เทคโนโลยี"></div>
+        <div><label class="lbl">รูปแบบงาน</label><select id="cf-mode"><option>Onsite</option><option>Hybrid</option><option>Remote</option></select></div>
+        <div><label class="lbl">ที่ตั้ง</label><input id="cf-loc" required placeholder="กรุงเทพฯ"></div>
+        <div><label class="lbl">ความจุรอบนี้</label><input id="cf-total" type="number" min="1" value="2" required></div>
+        <div><label class="lbl">อัตรารับเข้าทำงานต่อ (%)</label><input id="cf-hire" type="number" min="0" max="100" value="0"></div>
+        <label class="check-row"><input id="cf-coop" type="checkbox" checked> รับสหกิจ</label>
+        <label class="check-row"><input id="cf-gen" type="checkbox" checked> รับฝึกงานทั่วไป</label>
+        <label class="check-row"><input id="cf-nda" type="checkbox"> ต้องเซ็น NDA</label>
+        <div class="field-full"><label class="lbl">Tech stack / เครื่องมือ</label><input id="cf-stack" required placeholder="React, TypeScript, PostgreSQL"></div>
+        <div><label class="lbl">ชื่อพี่เลี้ยงหลัก</label><input id="cf-mentor-name" placeholder="ชื่อพี่เลี้ยง / mentor"></div>
+        <div><label class="lbl">ตำแหน่งพี่เลี้ยง</label><input id="cf-mentor-title" placeholder="Senior Developer"></div>
+        <div><label class="lbl">อีเมลพี่เลี้ยง</label><input id="cf-mentor-email" type="email" placeholder="mentor@company.co.th"></div>
+        <div><label class="lbl">โทรศัพท์พี่เลี้ยง</label><input id="cf-mentor-phone" placeholder="08x-xxx-xxxx"></div>
+      </div>
+      <div class="form-actions"><button type="button" class="btn" onclick="closeModal()">ยกเลิก</button><button class="btn btn-primary" type="submit">บันทึกบริษัท</button></div>
+    </form>`;
+  $('#modal').classList.remove('hidden');
+}
+function saveCompany(ev){
+  ev.preventDefault();
+  const name=cleanInput($('#cf-name').value), loc=cleanInput($('#cf-loc').value), stack=splitTags($('#cf-stack').value);
+  const acceptsCoop=$('#cf-coop').checked, acceptsGen=$('#cf-gen').checked;
+  if(!name||!loc||!stack.length){toast('กรอกข้อมูลบริษัทให้ครบก่อนบันทึก');return;}
+  if(!acceptsCoop&&!acceptsGen){toast('เลือกอย่างน้อยหนึ่งประเภทที่บริษัทรับ');return;}
+  if(establishments.some(e=>e.name===name)){toast('บริษัทนี้มีอยู่แล้ว');return;}
+  const nums=establishments.map(e=>+String(e.id).replace('e','')).filter(Number.isFinite);
+  const id='e'+(Math.max(...nums)+1);
+  const total=Math.max(1,+$('#cf-total').value||1), hire=Math.max(0,Math.min(100,+$('#cf-hire').value||0));
+  const mentorName=cleanInput($('#cf-mentor-name').value);
+  const mentors=mentorName?[{name:mentorName,title:cleanInput($('#cf-mentor-title').value)||'พี่เลี้ยงนักศึกษา',email:cleanInput($('#cf-mentor-email').value)||'-',phone:cleanInput($('#cf-mentor-phone').value)||'-',students:[]}]:[];
+  establishments.push({id,name,mode:$('#cf-mode').value,loc,coop:null,gen:null,acceptCoop:acceptsCoop,acceptGen:acceptsGen,status:'ใหม่',stack,used:0,total,hire,nda:$('#cf-nda').checked,flag:'บริษัทใหม่: ยังไม่มีคะแนนประเมิน ระบบจะแสดงเป็น “ยังไม่มีคะแนน” จนกว่าจะมีผลประเมินจริง',mentors});
+  companyReports[id]={dims:null,roles:[],reviews:[]};
+  closeModal();
+  estFilter='all'; $$('#est-pills .pill').forEach(p=>p.classList.toggle('active',p.dataset.f==='all'));
+  renderEst(); renderDash(); renderReports(); initCompanyReport();
+  toast('ลงทะเบียนบริษัท '+name+' แล้ว');
+}
+
+/* ---------------- matching ---------------- */
+let pickedStu=null;
+function renderMatchStudents(){
+  const waiting=students.filter(s=>s.status==='รอจับคู่');
+  $('#match-students').innerHTML=waiting.map(s=>`
+    <div class="stu-pick" data-id="${s.id}" onclick="pickStudent('${s.id}')">
+      <div class="avatar" style="width:30px;height:30px;font-size:12px">${s.name.charAt(0)}</div>
+      <div style="flex:1"><div style="font-size:13.5px;font-weight:500">${s.name}</div>
+        <div style="font-size:11.5px;color:var(--muted)">${s.track} · ${s.skills.slice(0,2).join(', ')}</div></div>
+    </div>`).join('');
+}
+function pickStudent(id){
+  pickedStu=id;
+  const s=students.find(x=>x.id===id);
+  $$('.stu-pick').forEach(p=>p.classList.toggle('active',p.dataset.id===id));
+  const ranked=establishments.map(e=>{
+    const supports=acceptsTrack(e,s.track);
+    const matches=skillMatch(s.skills,e.stack);
+    const overlap=matches.length;
+    const score=(s.track==='สหกิจ'?e.coop:e.gen);
+    const avail=e.total-e.used;
+    let fit=0;
+    if(supports)fit+=25;
+    fit+=overlap*16;
+    fit+=(score?score:0)*7;
+    if(score==null)fit+=4;
+    if(avail>0)fit+=12; else fit-=20;
+    if(e.status==='เฝ้าระวัง')fit-=22;
+    fit=Math.max(8,Math.min(98,Math.round(fit)));
+    return {e,overlap,score,avail,supports,fit,matches};
+  }).filter(r=>r.supports).sort((a,b)=>b.fit-a.fit);
+
+  const cls=f=>f>=70?'hi':f>=45?'mid':'lo';
+  $('#match-result').classList.remove('card-pad');
+  $('#match-result').innerHTML=`
+    <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+      <div class="avatar">${s.name.charAt(0)}</div>
+      <div><div style="font-weight:600">${s.name}</div><div style="font-size:12px;color:var(--muted)">${s.track} · ${s.skills.join(', ')}</div></div>
+    </div>
+    <div style="padding:16px 18px">
+      <div class="sec-sub" style="margin-bottom:12px">สถานประกอบการที่แนะนำ (${ranked.length})</div>
+      ${ranked.map(r=>{
+        const reasons=[];
+        const syn=r.matches.filter(m=>m.student.toLowerCase()!==m.stack.toLowerCase());
+        reasons.push(`<span class="reason good"><i>✓</i> skill ตรง ${r.overlap}/${r.e.stack.length}</span>`);
+        if(syn.length)reasons.push(`<span class="reason good"><i>≈</i> synonym: ${syn.slice(0,2).map(m=>m.student+'≈'+m.stack).join(', ')}</span>`);
+        if(r.score)reasons.push(`<span class="reason good"><i>★</i> คะแนน ${r.score.toFixed(1)}</span>`);
+        else reasons.push(`<span class="reason"><i>○</i> บริษัทใหม่ยังไม่มีคะแนน</span>`);
+        reasons.push(r.avail>0?`<span class="reason good"><i>✓</i> ว่าง ${r.avail} ที่</span>`:`<span class="reason warnr"><i>✕</i> เต็ม</span>`);
+        if(r.e.status==='เฝ้าระวัง')reasons.push(`<span class="reason warnr"><i>⚑</i> เฝ้าระวัง</span>`);
+        if(r.e.nda)reasons.push(`<span class="reason"><i>🔒</i> NDA</span>`);
+        return `<div class="rank">
+          <div class="fit ${cls(r.fit)}"><div class="n">${r.fit}</div><div class="p">FIT</div></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:14.5px">${r.e.name}</div>
+            <div style="font-size:12px;color:var(--muted)">${r.e.mode} · ${r.e.loc}</div>
+            <div class="reasons">${reasons.join('')}</div></div>
+          <button class="btn btn-sm ${r.avail>0&&r.e.status!=='เฝ้าระวัง'?'btn-primary':''}" ${r.avail<=0?'disabled title="บริษัทเต็มแล้ว"':''} onclick="assign('${s.id}','${r.e.id}')">${r.avail>0?'มอบหมาย':'เต็ม'}</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+function renderAdvisorAssignments(){
+  const pending=students.filter(s=>s.company&&['จับคู่แล้ว','กำลังฝึก'].includes(s.status)&&!advisorAssignments.some(a=>a.studentId===s.id));
+  const pendingHtml=pending.length?`
+    <div class="sec-sub" style="margin:0 0 10px">รอมอบหมายอาจารย์นิเทศ (${pending.length})</div>
+    <div class="assignment-grid" style="margin-bottom:16px">${pending.map(s=>{
+      const e=establishments.find(x=>x.name===s.company);
+      return `<div class="assign-card">
+        <div class="top">
+          <div><div class="nm">${s.name}</div><div class="sub">${s.track} · ${s.company}</div></div>
+          <span class="badge b-amber">รอมอบหมาย</span>
+        </div>
+        <div class="advisor-tools">
+          <select class="advisor-select" id="later-adv-${s.id}">${advisorOptions()}</select>
+          <button class="btn btn-sm btn-primary" onclick="assignAdvisorLater('${s.id}')">มอบหมายอาจารย์</button>
+        </div>
+        <div class="meta"><span class="reason">${e?e.mode:'-'}</span><span class="reason">${s.skills.slice(0,2).join(', ')}</span></div>
+      </div>`;
+    }).join('')}</div>`:'';
+  const assignedHtml=advisorAssignments.length?`
+    <div class="sec-sub" style="margin:0 0 10px">มอบหมายแล้ว (${advisorAssignments.length})</div>
+    <div class="assignment-grid">${advisorAssignments.map(a=>{
+    const {student,company,advisor}=assignmentContext(a);
+    if(!student||!company||!advisor)return '';
+    const stCls=a.status==='ประเมินแล้ว'?'b-gray':a.status==='กำลังติดตาม'?'b-accent':'b-amber';
+    return `<div class="assign-card">
+      <div class="top">
+        <div><div class="nm">${advisor.name}</div><div class="sub">${advisor.team}</div></div>
+        <span class="badge ${stCls}">${a.status}</span>
+      </div>
+      <div class="kv"><span class="k">นักศึกษา</span><span class="v">${student.name}</span></div>
+      <div class="kv"><span class="k">สถานประกอบการ</span><span class="v">${company.name}</span></div>
+      <div class="meta"><span class="reason">กำหนด ${a.due}</span><span class="reason">${a.visit}</span></div>
+    </div>`;
+  }).join('')}</div>`:'';
+  $('#advisor-assignments').innerHTML=pendingHtml||assignedHtml?pendingHtml+assignedHtml:'<div class="empty">ยังไม่มีรายการรอมอบหมายหรือมอบหมายให้อาจารย์</div>';
+}
+function assign(sid,eid){
+  const s=students.find(x=>x.id===sid), e=establishments.find(x=>x.id===eid);
+  if(!s||!e)return;
+  if(!acceptsTrack(e,s.track)){ toast('บริษัทนี้ไม่รับสาย '+s.track); return; }
+  if(e.used>=e.total){ toast('มอบหมายไม่ได้: '+e.name+' เต็ม '+e.used+'/'+e.total+' แล้ว'); return; }
+  if(e.status==='เฝ้าระวัง'){ toast('บริษัทนี้ติดธงเฝ้าระวัง ต้องปลดธงก่อนมอบหมาย'); return; }
+  const oldCompany=s.company;
+  if(oldCompany&&oldCompany!==e.name){
+    const old=establishments.find(x=>x.name===oldCompany);
+    if(old&&old.used>0)old.used-=1;
+  }
+  s.status='จับคู่แล้ว'; s.company=e.name;
+  if(oldCompany!==e.name)e.used+=1;
+  toast('มอบหมาย '+s.name+' → '+e.name+' แล้ว · รอมอบหมายอาจารย์นิเทศ');
+  renderMatchStudents(); renderStudents(); renderEst(); renderDash(); renderAdvisorAssignments();
+  $('#match-result').classList.add('card-pad');
+  $('#match-result').innerHTML='<div class="empty">เลือกนักศึกษาทางซ้ายเพื่อดูบริษัทที่แนะนำ</div>';
+}
+function assignAdvisorLater(sid){
+  const s=students.find(x=>x.id===sid);
+  const e=establishments.find(x=>x.name===s?.company);
+  const sel=$(`#later-adv-${sid}`);
+  const advisorId=sel?sel.value:advisors[0].id;
+  const advisor=advisors.find(a=>a.id===advisorId);
+  if(!s||!e||!advisor)return;
+  const existing=advisorAssignments.find(a=>a.studentId===sid);
+  if(existing){
+    existing.companyId=e.id; existing.advisorId=advisorId; existing.status='รอประเมิน'; existing.visit='รอเลือกเวลา';
+  }else{
+    advisorAssignments.push({id:'as'+(advisorAssignments.length+1), studentId:sid, companyId:e.id, advisorId, due:'15 ก.ย. 2569', visit:'รอเลือกเวลา', status:'รอประเมิน'});
+  }
+  toast('มอบหมายอาจารย์นิเทศ '+advisor.name+' ให้ '+s.name+' แล้ว');
+  renderAdvisorAssignments();
+}
+
+/* ---------------- evaluation forms ---------------- */
+function buildCrit(arr,host,preset=true){
+  $(host).innerHTML=arr.map((c,i)=>{
+    const val=preset?c[2]:0;
+    return `<div class="crit"><div class="crit-row">
+      <div><div class="cn">${c[0]}</div><div class="cd">${c[1]}</div></div>
+      <div class="stars" data-val="${val}">${[1,2,3,4,5].map(n=>`<span class="star ${n<=val?'on':''}" onclick="setStar(this,${n})">★</span>`).join('')}</div>
+    </div></div>`;
+  }).join('');
+}
+function setStar(el,n){
+  const grp=el.parentElement; grp.dataset.val=n;
+  $$('.star',grp).forEach((s,i)=>s.classList.toggle('on',i<n));
+}
+function pickSeg(el){ $$('.opt',el.parentElement).forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
+/* ---------------- advisor portal ---------------- */
+function advisorInitial(name){
+  const cleaned=String(name).replace(/^อ\.?\s*/,'').replace(/^ดร\.?\s*/,'');
+  return cleaned.charAt(0)||'อ';
+}
+function companyInitial(name){
+  return String(name||'').replace(/^บจก\.\s*/,'').charAt(0)||'บ';
+}
+function openAdvisorPortal(){
+  const adv=advisors.find(a=>a.id===currentAdvisorId)||advisors[0];
+  currentAdvisorId=adv.id;
+  $('#ap-avatar').textContent=advisorInitial(adv.name);
+  $('#ap-hello').textContent='สวัสดี, '+adv.name;
+  $('#ap-sub').textContent=adv.team+' · ประเมินสถานประกอบการที่คุณรับผิดชอบนิเทศ รอบ 1 / 2569';
+  renderAdvisorPortal();
+}
+function renderAdvisorPortal(selId){
+  const mine=advisorAssignments.filter(a=>a.advisorId===currentAdvisorId);
+  if(!mine.length){
+    $('#ap-body').innerHTML='<div class="card card-pad"><div class="empty">ยังไม่มีสถานประกอบการที่ได้รับมอบหมายให้นิเทศในรอบนี้</div></div>';
+    return;
+  }
+  const cur=mine.find(a=>a.id===selId)||mine[0];
+  const list=mine.map(a=>{
+    const {student,company}=assignmentContext(a);
+    const done=a.status==='ประเมินแล้ว';
+    const badge=done?'<span class="badge b-green">✓ ประเมินแล้ว</span>':'<span class="badge b-amber">รอประเมิน</span>';
+    return `<div class="stu-pick ${a.id===cur.id?'active':''}" onclick="renderAdvisorPortal('${a.id}')">
+      <div class="avatar" style="width:30px;height:30px;font-size:12px">${companyInitial(company&&company.name)}</div>
+      <div style="flex:1"><div style="font-size:13.5px;font-weight:500">${company?company.name:'-'}</div>
+        <div style="font-size:11.5px;color:var(--muted)">${student?student.name:'-'} · กำหนด ${a.due}</div></div>
+      ${badge}
+    </div>`;
+  }).join('');
+  $('#ap-body').innerHTML=`
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div class="sec-title">งานนิเทศของคุณ (${mine.length})</div>
+      <div class="sec-sub">เลือกสถานประกอบการเพื่อกรอกผลประเมิน</div>
+      <div style="margin-top:8px">${list}</div>
+    </div>
+    <div class="card card-pad" id="ap-form"></div>`;
+  renderAdvisorEvalForm(cur.id);
+}
+function renderAdvisorEvalForm(id){
+  const a=advisorAssignments.find(x=>x.id===id);
+  if(!a)return;
+  const {student,company}=assignmentContext(a);
+  const done=a.status==='ประเมินแล้ว';
+  const win=evalWindowState('advisor');
+  if(!win.open){
+    $('#ap-form').innerHTML=`
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div><div class="sec-title">ประเมินสถานประกอบการ</div><div class="sec-sub">แบบประเมินอาจารย์นิเทศเปิดตามช่วงเวลาที่เจ้าหน้าที่กำหนดเท่านั้น</div></div>
+        ${evalBadge('advisor')}
+      </div>
+      <div class="ctx-bar" style="margin-top:14px">
+        <div class="it"><div class="k">สถานประกอบการ</div><div class="v">${company?company.name:'-'}</div></div>
+        <div class="it"><div class="k">นักศึกษาที่นิเทศ</div><div class="v">${student?student.name+' ('+student.id+')':'-'}</div></div>
+        <div class="it"><div class="k">ช่วงประเมินที่เจ้าหน้าที่กำหนด</div><div class="v">${win.range}</div></div>
+      </div>
+      <div class="rule-note" style="margin-top:14px"><span>◷</span><span><b>${win.state==='upcoming'?'ยังไม่ถึงช่วงประเมิน':'ปิดช่วงประเมินแล้ว'}</b><br>${win.note}</span></div>`;
+    return;
+  }
+  $('#ap-form').innerHTML=`
+    <div class="sec-title">ประเมินสถานประกอบการ ${done?'<span class="badge b-green" style="vertical-align:middle">✓ ประเมินแล้ว</span>':''}</div>
+    <div class="sec-sub">ให้คะแนนความเหมาะสมของสถานประกอบการสำหรับการฝึกงานสายไอที — เปิดตามช่วงเวลาที่เจ้าหน้าที่กำหนด: ${win.range}</div>
+    <div class="ctx-bar" style="margin-top:14px">
+      <div class="it"><div class="k">สถานประกอบการ</div><div class="v">${company?company.name:'-'}</div></div>
+      <div class="it"><div class="k">นักศึกษาที่นิเทศ</div><div class="v">${student?student.name+' ('+student.id+')':'-'}</div></div>
+      <div class="it"><div class="k">กำหนดประเมิน</div><div class="v">${a.due}</div></div>
+    </div>
+    <div id="ap-crit"></div>
+    <div class="form-grid" style="margin-top:16px">
+      <div>
+        <label class="lbl">รูปแบบการนิเทศ</label>
+        <div class="seg" data-seg="visit">
+          <span class="opt sel" onclick="pickSeg(this)">Onsite visit</span>
+          <span class="opt" onclick="pickSeg(this)">Video call</span>
+          <span class="opt" onclick="pickSeg(this)">เอกสาร / โทรศัพท์</span>
+        </div>
+      </div>
+      <div>
+        <label class="lbl">ผลสรุปเบื้องต้น</label>
+        <div class="seg" data-seg="result">
+          <span class="opt sel" onclick="pickSeg(this)">ผ่านเกณฑ์</span>
+          <span class="opt" onclick="pickSeg(this)">ต้องติดตาม</span>
+          <span class="opt" onclick="pickSeg(this)">ไม่ควรส่งรุ่นถัดไป</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <label class="lbl">บันทึกการนิเทศ</label>
+      <textarea rows="3" placeholder="สรุปสิ่งที่พบจากการเยี่ยม งานที่นักศึกษาได้รับ ความพร้อมของพี่เลี้ยง และข้อเสนอแนะต่อบริษัท…"></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+      <button class="btn">บันทึกแบบร่าง</button>
+      <button class="btn btn-primary" onclick="submitAdvisorEval('${a.id}')">ส่งผลประเมิน</button>
+    </div>`;
+  buildCrit(critTeacher,'#ap-crit',false);
+}
+function submitAdvisorEval(id){
+  const a=advisorAssignments.find(x=>x.id===id);
+  if(!a)return;
+  const vals=$$('#ap-crit .stars').map(g=>+g.dataset.val);
+  if(vals.some(v=>v===0)){ toast('กรุณาให้คะแนนทุกด้านก่อนส่ง'); return; }
+  a.status='ประเมินแล้ว';
+  a.visit='บันทึกผลแล้ว';
+  renderAdvisorAssignments();
+  renderAdvisorPortal(id);
+  toast('ส่งผลประเมินสถานประกอบการแล้ว');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------------- reports ---------------- */
+function renderReports(){
+  const max=Math.max(...stackDemand.map(d=>d[1]));
+  $('#rep-stack').innerHTML=stackDemand.map(([k,v])=>`
+    <div class="rep-bar-row"><div class="nm">${k}</div><div class="tr"><i style="width:${Math.round(v/max*100)}%"></i></div><div class="vv">${v}%</div></div>`).join('');
+  $('#rep-rec').textContent=establishments.filter(e=>e.status==='แนะนำ').length+' แห่ง';
+  $('#rep-watch').textContent=establishments.filter(e=>e.status==='เฝ้าระวัง').length+' แห่ง';
+}
+
+function miniStars(v){const f=Math.round(v);return '★★★★★'.slice(0,f)+'☆☆☆☆☆'.slice(0,5-f);}
+function dimColor(v){return v>=4?'var(--green)':v>=3?'var(--accent)':'var(--amber)';}
+function initCompanyReport(){
+  $('#cr-select').innerHTML=establishments.map(e=>`<option value="${e.id}">${e.name}${e.status==='เฝ้าระวัง'?' — เฝ้าระวัง':''}</option>`).join('');
+  renderCompanyReport(establishments[0].id);
+}
+function renderCompanyReport(id){
+  const e=establishments.find(x=>x.id===id), r=companyReports[id];
+  $('#cr-select').value=id;
+  if(!r||!r.dims){
+    $('#company-report').innerHTML=`
+      <div class="cr-head">
+        <div><div style="font-size:16px;font-weight:600">${e.name}</div>
+          <div style="font-size:12px;color:var(--muted)">${e.mode} · ${e.loc} · บริษัทใหม่ยังไม่มีผลประเมินสะสม</div>
+          <div style="margin-top:8px">${statusBadge(e.status)}</div></div>
+        <div style="display:flex;gap:10px">
+          <div class="scorebox" style="min-width:128px"><div class="k">สหกิจ</div><div class="v na">${scoreText(e.coop,acceptsTrack(e,'สหกิจ'))}</div></div>
+          <div class="scorebox" style="min-width:128px"><div class="k">ฝึกงานทั่วไป</div><div class="v na">${scoreText(e.gen,acceptsTrack(e,'ฝึกงานทั่วไป'))}</div></div>
+        </div>
+      </div>
+      <div class="rule-note"><span>○</span><span><b>ไม่มีคะแนนปลอม</b><br>ระบบจะยังไม่จัดอันดับคุณภาพบริษัทนี้ด้วยคะแนนเฉลี่ย จนกว่าจะมีแบบประเมินจริงจากนักศึกษา อาจารย์ หรือพี่เลี้ยง</span></div>`;
+    return;
+  }
+  const total=r.roles.reduce((a,b)=>a+b[1],0);
+  const scoreBox=(v,k)=> v==null?'':`<div class="scorebox" style="min-width:104px"><div class="k">${k}</div><div class="v ${e.status==='เฝ้าระวัง'?'warn':''}">${v.toFixed(1)}<small> /5</small></div></div>`;
+  const dims=r.dims.map((v,i)=>`<div class="cr-dim"><div class="nm">${dimLabels[i]}</div><div class="tr"><i style="width:${v/5*100}%;background:${dimColor(v)}"></i></div><div class="vv" style="color:${dimColor(v)}">${v.toFixed(1)}</div></div>`).join('');
+  const segs=r.roles.map(([nm,c])=>`<span style="width:${c/total*100}%;background:${roleColor[nm]||'#B4B2A9'}" title="${nm} ${c} คน">${c/total>=0.14?nm:''}</span>`).join('');
+  const legend=r.roles.map(([nm,c])=>`<span><i style="background:${roleColor[nm]||'#B4B2A9'}"></i>${nm} · ${Math.round(c/total*100)}%</span>`).join('');
+  const reviews=r.reviews.map(rv=>`<div class="review">
+    <div class="avatar" style="width:34px;height:34px;font-size:13px">${rv.name.charAt(0)}</div>
+    <div style="flex:1"><div class="meta"><span class="rname">${rv.name}</span><span class="badge b-gray">${rv.role}</span><span class="ministars">${miniStars(rv.score)}</span></div>
+    <div class="q">“${rv.text}”</div></div>`).join('');
+  const mismatch=(r.dims[1]<3||r.dims[2]<3);
+  $('#company-report').innerHTML=`
+    <div class="cr-head">
+      <div><div style="font-size:16px;font-weight:600">${e.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${e.mode} · ${e.loc} · ${total} ผลประเมินสะสม</div>
+        <div style="margin-top:8px">${statusBadge(e.status)}</div></div>
+      <div style="display:flex;gap:10px">${scoreBox(e.coop,'สหกิจ')}${scoreBox(e.gen,'ฝึกงานทั่วไป')}</div>
+    </div>
+    <div class="sec-title">คะแนนรายด้าน</div>
+    <div class="sec-sub">เฉลี่ยจากนักศึกษาที่ไปฝึกและประเมินบริษัทนี้</div>
+    <div style="margin:6px 0 22px">${dims}</div>
+    <div class="sec-title">บทบาทที่นักศึกษาได้ทำจริง</div>
+    <div class="sec-sub">สัดส่วนงานที่นักศึกษารายงาน — บ่งบอกว่างานตรงสาขาแค่ไหน</div>
+    <div class="roledist">${segs}</div>
+    <div class="role-legend">${legend}</div>
+    ${mismatch?`<div class="flagbox" style="margin-top:14px"><i>⚑</i><span>คะแนน “ความตรงสาขา” และ “ได้ลงมือทำจริง” ต่ำกว่าเกณฑ์ — งานที่นักศึกษาได้ทำส่วนใหญ่ไม่ใช่บทบาท developer ควรพิจารณาก่อนส่งนักศึกษารอบถัดไป</span></div>`:''}
+    <div class="sec-title" style="margin-top:24px">เสียงจากนักศึกษา</div>
+    <div class="sec-sub">ความเห็นจากผู้ที่เคยไปฝึกที่นี่</div>
+    <div>${reviews}</div>`;
+}
+
+/* ---------------- toast ---------------- */
+let tT;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.transform='translateX(-50%) translateY(0)'; clearTimeout(tT); tT=setTimeout(()=>t.style.transform='translateX(-50%) translateY(120%)',2200); }
+
+/* ---------------- init ---------------- */
+renderDash(); renderStudents(); renderEst(); renderMatchStudents();
+renderAdvisorAssignments();
+renderReports(); initCompanyReport();
+renderNotifications(); renderCwie(); renderAuditLog(); renderEvalSettings(); renderMentors(); initStudent360Options(); renderStudent360('6512001'); renderCompanyTaskQueue(); renderCompanyWorkflow('positions');
+</script>
+
+<div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+</body>
+</html>
