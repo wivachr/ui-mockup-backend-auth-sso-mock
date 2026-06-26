@@ -1024,9 +1024,9 @@ const critTeacher = [
   ['ความก้าวหน้าของนักศึกษา','นักศึกษามีพัฒนาการและได้ลงมือทำงานจริงตามแผน',5],
 ];
 const advisors=[
-  {id:'t1', name:'อ.ดร.เมธา อินทร์แก้ว', team:'Software Engineering'},
-  {id:'t2', name:'อ.ปรียา วัฒนศิลป์', team:'Data / AI'},
-  {id:'t3', name:'อ.ภาณุพงศ์ ศรีสุข', team:'Network / Cloud'},
+  {id:'t1', name:'อ.ดร.เมธา อินทร์แก้ว', position:'ผู้ช่วยศาสตราจารย์', team:'Software Engineering', email:'metha.i@university.ac.th', phone:'02-555-1201', office:'IT 5-412', officeHours:'พุธ 13:00-15:00', line:'metha-it', expertise:['React','Software Architecture','Testing'], maxSupervise:8, bio:'ดูแลนักศึกษาสาย software engineering, frontend และงานคุณภาพซอฟต์แวร์'},
+  {id:'t2', name:'อ.ปรียา วัฒนศิลป์', position:'อาจารย์', team:'Data / AI', email:'preeya@university.ac.th', phone:'02-555-1218', office:'IT 5-418', officeHours:'อังคาร 10:00-12:00, ศุกร์ 13:00-15:00', line:'preeya-data', expertise:['Data Analytics','Machine Learning','Python'], maxSupervise:10, bio:'ดูแลนักศึกษาสาย data, AI และระบบวิเคราะห์ข้อมูลในสถานประกอบการ'},
+  {id:'t3', name:'อ.ภาณุพงศ์ ศรีสุข', position:'อาจารย์', team:'Network / Cloud', email:'phanupong.s@university.ac.th', phone:'02-555-1230', office:'IT 5-430', officeHours:'จันทร์ 09:00-11:00', line:'panu-cloud', expertise:['Network','Cloud','Cybersecurity'], maxSupervise:7, bio:'ดูแลนักศึกษาสาย network, cloud infrastructure และความมั่นคงปลอดภัย'},
 ];
 const advisorAssignments=[
   {id:'as1', studentId:'6512001', companyId:'e1', advisorId:'t1', due:'20 ส.ค. 2569', visit:'นัดเยี่ยม onsite', status:'รอประเมิน'},
@@ -1525,6 +1525,8 @@ function renderStudent360(id='6512001'){
     <div class="kv"><span class="k">พี่เลี้ยงบริษัท</span><span class="v">${mentorCtx?mentorCtx.mentor.name:'ยังไม่ผูก'}</span></div>
     <div class="kv"><span class="k">อีเมลพี่เลี้ยง</span><span class="v">${mentorCtx?mentorCtx.mentor.email:'-'}</span></div>
     <div class="kv"><span class="k">อาจารย์นิเทศ</span><span class="v">${advisor?advisor.name:'รอมอบหมาย'}</span></div>
+    <div class="kv"><span class="k">อีเมลอาจารย์</span><span class="v">${advisor&&advisor.email?advisor.email:'-'}</span></div>
+    <div class="kv"><span class="k">เวลาพบอาจารย์</span><span class="v">${advisor&&advisor.officeHours?advisor.officeHours:'-'}</span></div>
     <div class="kv"><span class="k">นัดนิเทศ</span><span class="v">${advisorItem?advisorItem.visit:'-'}</span></div>
     <div class="form-actions"><button class="btn btn-sm" onclick="go('cwie')">ดู CWIE</button><button class="btn btn-sm btn-primary" onclick="toast('ส่งแจ้งเตือนเจ้าของงานแล้ว (เดโม)')">แจ้งเตือนเจ้าของงาน</button></div>`;
   $('#student360-logbook').innerHTML=logbookEntries.slice(0,3).map(x=>`
@@ -2042,13 +2044,69 @@ function openAdvisorPortal(){
   currentAdvisorId=adv.id;
   $('#ap-avatar').textContent=advisorInitial(adv.name);
   $('#ap-hello').textContent='สวัสดี, '+adv.name;
-  $('#ap-sub').textContent=adv.team+' · ประเมินสถานประกอบการที่คุณรับผิดชอบนิเทศ รอบ 1 / 2569';
+  $('#ap-sub').textContent=(adv.position?adv.position+' · ':'')+adv.team+' · ประเมินสถานประกอบการที่คุณรับผิดชอบนิเทศ รอบ 1 / 2569';
   renderAdvisorPortal();
 }
+function renderAdvisorProfileCard(adv,mine){
+  const pending=mine.filter(a=>a.status!=='ประเมินแล้ว').length;
+  const expertise=(adv.expertise||[]).join(', ');
+  return `
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px">
+        <div>
+          <div class="sec-title">ข้อมูลอาจารย์นิเทศ</div>
+          <div class="sec-sub">อาจารย์เพิ่มและแก้ไขข้อมูลติดต่อของตนเอง ข้อมูลนี้ใช้แสดงใน Student 360 และงานนิเทศ</div>
+        </div>
+        <span class="badge b-accent">แก้ไขเองได้</span>
+      </div>
+      <div class="ctx-bar" style="margin-bottom:14px">
+        <div class="it"><div class="k">งานนิเทศที่รับผิดชอบ</div><div class="v">${mine.length} รายการ</div></div>
+        <div class="it"><div class="k">รอประเมิน</div><div class="v">${pending} รายการ</div></div>
+        <div class="it"><div class="k">เพดานรับนิเทศ</div><div class="v">${adv.maxSupervise||'-'} คน</div></div>
+      </div>
+      <div class="form-grid">
+        <div><label class="lbl">ชื่อ-สกุล / คำนำหน้า</label><input id="ap-profile-name" value="${escapeHtml(adv.name)}"></div>
+        <div><label class="lbl">ตำแหน่งทางวิชาการ</label><input id="ap-profile-position" value="${escapeHtml(adv.position)}" placeholder="เช่น อาจารย์ / ผู้ช่วยศาสตราจารย์"></div>
+        <div><label class="lbl">กลุ่มความเชี่ยวชาญ</label><input id="ap-profile-team" value="${escapeHtml(adv.team)}"></div>
+        <div><label class="lbl">อีเมล</label><input id="ap-profile-email" value="${escapeHtml(adv.email)}"></div>
+        <div><label class="lbl">เบอร์โทร</label><input id="ap-profile-phone" value="${escapeHtml(adv.phone)}"></div>
+        <div><label class="lbl">ห้องพัก / สถานที่พบ</label><input id="ap-profile-office" value="${escapeHtml(adv.office)}"></div>
+        <div><label class="lbl">เวลาพบ</label><input id="ap-profile-hours" value="${escapeHtml(adv.officeHours)}"></div>
+        <div><label class="lbl">Line / ช่องทางสำรอง</label><input id="ap-profile-line" value="${escapeHtml(adv.line)}"></div>
+        <div><label class="lbl">รับนิเทศสูงสุด</label><input id="ap-profile-max" type="number" min="1" max="30" value="${escapeHtml(adv.maxSupervise)}"></div>
+        <div class="field-full"><label class="lbl">ทักษะที่นิเทศได้</label><input id="ap-profile-expertise" value="${escapeHtml(expertise)}" placeholder="คั่นด้วย comma เช่น React, Python, Cloud"></div>
+        <div class="field-full"><label class="lbl">หมายเหตุแนะนำตัว</label><textarea id="ap-profile-bio" rows="2" placeholder="ข้อมูลสั้นๆ สำหรับนักศึกษาและเจ้าหน้าที่">${escapeHtml(adv.bio)}</textarea></div>
+      </div>
+      <div class="rule-note" style="margin-top:14px"><span>◎</span><span><b>หลักการสิทธิ์</b><br>เจ้าหน้าที่ดูและใช้ข้อมูลเพื่อติดตามได้ แต่อาจารย์เป็นผู้เพิ่ม/แก้ไขข้อมูลติดต่อของตนเอง</span></div>
+      <div class="form-actions" style="margin-top:14px">
+        <button class="btn" onclick="openAdvisorPortal()">ยกเลิกการแก้ไข</button>
+        <button class="btn btn-primary" onclick="saveAdvisorProfile()">บันทึกข้อมูลของฉัน</button>
+      </div>
+    </div>`;
+}
+function saveAdvisorProfile(){
+  const adv=advisors.find(a=>a.id===currentAdvisorId);
+  if(!adv)return;
+  adv.name=cleanInput($('#ap-profile-name').value)||adv.name;
+  adv.position=cleanInput($('#ap-profile-position').value);
+  adv.team=cleanInput($('#ap-profile-team').value)||adv.team;
+  adv.email=cleanInput($('#ap-profile-email').value);
+  adv.phone=cleanInput($('#ap-profile-phone').value);
+  adv.office=cleanInput($('#ap-profile-office').value);
+  adv.officeHours=cleanInput($('#ap-profile-hours').value);
+  adv.line=cleanInput($('#ap-profile-line').value);
+  adv.maxSupervise=Math.max(1,Math.min(30,Number($('#ap-profile-max').value)||adv.maxSupervise||1));
+  adv.expertise=splitTags($('#ap-profile-expertise').value);
+  adv.bio=cleanInput($('#ap-profile-bio').value);
+  auditLogs.unshift({type:'ผู้ใช้',time:'ตอนนี้',act:'อาจารย์แก้ไขข้อมูลส่วนตัว',detail:adv.name+' อัปเดตข้อมูลติดต่อและความเชี่ยวชาญ',user:adv.email||'advisor',ip:'advisor-portal'});
+  openAdvisorPortal();
+  toast('บันทึกข้อมูลอาจารย์นิเทศแล้ว');
+}
 function renderAdvisorPortal(selId){
+  const adv=advisors.find(a=>a.id===currentAdvisorId)||advisors[0];
   const mine=advisorAssignments.filter(a=>a.advisorId===currentAdvisorId);
   if(!mine.length){
-    $('#ap-body').innerHTML='<div class="card card-pad"><div class="empty">ยังไม่มีสถานประกอบการที่ได้รับมอบหมายให้นิเทศในรอบนี้</div></div>';
+    $('#ap-body').innerHTML=renderAdvisorProfileCard(adv,mine)+'<div class="card card-pad"><div class="empty">ยังไม่มีสถานประกอบการที่ได้รับมอบหมายให้นิเทศในรอบนี้</div></div>';
     return;
   }
   const cur=mine.find(a=>a.id===selId)||mine[0];
@@ -2064,6 +2122,7 @@ function renderAdvisorPortal(selId){
     </div>`;
   }).join('');
   $('#ap-body').innerHTML=`
+    ${renderAdvisorProfileCard(adv,mine)}
     <div class="card card-pad" style="margin-bottom:18px">
       <div class="sec-title">งานนิเทศของคุณ (${mine.length})</div>
       <div class="sec-sub">เลือกสถานประกอบการเพื่อกรอกผลประเมิน</div>

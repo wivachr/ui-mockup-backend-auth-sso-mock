@@ -174,6 +174,7 @@ Role หลัก:
 - Staff จัดการข้อมูลระบบและตั้งค่าช่วงประเมิน
 - Student เห็นเฉพาะข้อมูลของตน
 - Advisor เห็นเฉพาะงานนิเทศที่ได้รับมอบหมาย
+- Advisor เพิ่ม/แก้ไขข้อมูล profile ของตนเองได้ เช่น ข้อมูลติดต่อ เวลาพบ ความเชี่ยวชาญ และจำนวนรับนิเทศสูงสุด
 - Company เห็นเฉพาะนักศึกษา/พี่เลี้ยง/เอกสารของบริษัทตน
 - Company เป็นเจ้าของข้อมูลพี่เลี้ยง
 - Staff ติดตามข้อมูลพี่เลี้ยงได้ แต่ไม่แก้ไขแทนบริษัท
@@ -255,7 +256,7 @@ Bucket:
 - company_users
 - company_mentors
 - mentor_assignments
-- advisors
+- advisor_profiles
 - advisor_assignments
 
 ### Workflow
@@ -313,6 +314,7 @@ Bucket:
 - Staff จัดการสถานประกอบการ
 - Company จัดการข้อมูลบริษัทตนเอง
 - Company จัดการพี่เลี้ยง
+- Advisor จัดการ profile ของตนเอง
 - Staff ดูสถานะพี่เลี้ยงแบบ read-only
 
 ผลลัพธ์:
@@ -520,4 +522,3 @@ Stack ที่แนะนำ:
 แนวทางพัฒนา:
 
 เริ่มจาก monolith full-stack ก่อน อย่ารีบแยก service เพราะ domain ยังปรับอยู่มาก สิ่งสำคัญที่สุดคือ data model, permission, audit log และ workflow ownership ให้ถูกตั้งแต่แรก
-
