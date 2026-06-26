@@ -769,23 +769,17 @@
   <header class="sp-top">
     <div class="brand"><div class="m">▦</div> ระบบฝึกงาน ภาควิชาไอที</div>
     <div style="display:flex;align-items:center;gap:12px">
-      <div class="avatar">ก</div>
+      <div class="avatar" id="sp-avatar">ก</div>
       <button class="btn btn-sm btn-ghost" onclick="logoutStudent()">ออกจากระบบ</button>
     </div>
   </header>
   <div class="sp-content student-wide">
-    <div class="sp-hero"><h1>สวัสดี, กิตติพงษ์</h1><p>ส่งแบบประเมินสถานประกอบการที่คุณไปฝึกงานได้ที่นี่</p></div>
+    <div class="sp-hero"><h1 id="sp-hello">สวัสดี</h1><p id="sp-sub">จัดการข้อมูลฝึกงานและสมุดบันทึกการปฏิบัติงาน</p></div>
+    <div id="sp-profile-wrap"></div>
     <div class="card card-pad" style="margin-bottom:18px">
       <div class="sec-title">การฝึกงานของคุณ</div>
       <div class="sec-sub" style="margin:0">รอบ 1 / 2569</div>
-      <div class="pl-grid">
-        <div class="pl-it"><div class="k">สถานประกอบการ</div><div class="v">บจก. คลาวด์เวิร์คส์</div></div>
-        <div class="pl-it"><div class="k">สาย</div><div class="v">สหกิจศึกษา</div></div>
-        <div class="pl-it"><div class="k">พี่เลี้ยง</div><div class="v">คุณวีรภัทร · Senior Developer</div></div>
-        <div class="pl-it"><div class="k">รูปแบบงาน</div><div class="v">Hybrid · กรุงเทพฯ</div></div>
-        <div class="pl-it"><div class="k">ช่วงเวลา</div><div class="v">มิ.ย. – ก.ย. 2569</div></div>
-        <div class="pl-it"><div class="k">สถานะ</div><div class="v"><span class="badge b-green">กำลังฝึกงาน</span></div></div>
-      </div>
+      <div class="pl-grid" id="sp-internship-info"></div>
     </div>
     <div class="card card-pad" style="margin-bottom:18px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap">
@@ -939,7 +933,7 @@
 <script>
 /* ---------------- data ---------------- */
 const students = [
-  {id:'6512001', name:'กิตติพงษ์ ใจดี', track:'สหกิจ', skills:['React','Node.js','AWS'], status:'จับคู่แล้ว', company:'บจก. คลาวด์เวิร์คส์'},
+  {id:'6512001', name:'กิตติพงษ์ ใจดี', track:'สหกิจ', skills:['React','Node.js','AWS'], status:'จับคู่แล้ว', company:'บจก. คลาวด์เวิร์คส์', email:'6512001@university.ac.th', phone:'081-234-5601', line:'kittipong.dev', address:'99/12 ถ.งามวงศ์วาน กรุงเทพฯ', emergencyName:'นางกมลพร ใจดี', emergencyPhone:'089-111-2201', portfolio:'https://github.com/kittipong-cwie', careerGoal:'Frontend / Full-stack Developer', studentNote:'สนใจงาน React, Node.js และ cloud deployment'},
   {id:'6512014', name:'ณัฐนรี สุขสวัสดิ์', track:'สหกิจ', skills:['Python','ML','PyTorch'], status:'รอจับคู่', company:null},
   {id:'6512022', name:'ภาคิน วงศ์ทอง', track:'ฝึกงานทั่วไป', skills:['Vue','Go','Docker'], status:'รอจับคู่', company:null},
   {id:'6512030', name:'ศิรประภา มั่นคง', track:'สหกิจ', skills:['Java','Spring','SQL'], status:'กำลังฝึก', company:'บจก. ดาต้าเซนส์'},
@@ -1213,6 +1207,7 @@ function evalBadge(kind){
 function toggleSide(){ $('#sidebar').classList.toggle('open'); }
 const titles={dashboard:'แดชบอร์ด',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
 let loginRole='staff';
+let currentStudentId='6512001';
 let currentAdvisorId='t2';
 const loginFoot={
   staff:'ผู้ประสานงาน — จัดการนักศึกษา บริษัท และการจับคู่',
@@ -1229,7 +1224,13 @@ function pickLoginRole(el,r){
 }
 function doLogin(){
   $('#login').classList.add('hidden');
-  if(loginRole==='student'){ $('#student-portal').classList.remove('hidden'); openStudentPortal(); }
+  if(loginRole==='student'){
+    const key=String($('#lg-mail').value||'').trim().toLowerCase();
+    const found=students.find(s=>s.id.toLowerCase()===key || String(s.email||'').toLowerCase()===key);
+    if(found)currentStudentId=found.id;
+    $('#student-portal').classList.remove('hidden');
+    openStudentPortal();
+  }
   else if(loginRole==='advisor'){ $('#advisor-portal').classList.remove('hidden'); openAdvisorPortal(); }
   else if(loginRole==='company'){ $('#company-portal').classList.remove('hidden'); openCompanyPortal(); }
   else { $('#app').classList.remove('hidden'); go('dashboard'); }
@@ -1239,8 +1240,78 @@ function logoutAdvisor(){ $('#advisor-portal').classList.add('hidden'); $('#logi
 function logoutCompany(){ $('#company-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
 function logoutStaff(){ $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); $('#sidebar').classList.remove('open'); window.scrollTo(0,0); }
 function openStudentPortal(){
+  renderStudentPortalProfile();
   renderLogbook();
   renderStudentEvaluation();
+}
+function studentFirstName(name){return String(name||'นักศึกษา').split(' ')[0]||'นักศึกษา';}
+function renderStudentPortalProfile(){
+  const s=students.find(x=>x.id===currentStudentId)||students[0];
+  currentStudentId=s.id;
+  const company=establishments.find(e=>e.name===s.company);
+  const mentorCtx=studentMentor(s);
+  $('#sp-avatar').textContent=s.name.charAt(0)||'น';
+  $('#sp-hello').textContent='สวัสดี, '+studentFirstName(s.name);
+  $('#sp-sub').textContent=s.track+' · จัดการข้อมูลส่วนตัว logbook และแบบประเมินสถานประกอบการ';
+  $('#sp-internship-info').innerHTML=`
+    <div class="pl-it"><div class="k">สถานประกอบการ</div><div class="v">${s.company||'ยังไม่จับคู่'}</div></div>
+    <div class="pl-it"><div class="k">สาย</div><div class="v">${s.track}</div></div>
+    <div class="pl-it"><div class="k">พี่เลี้ยง</div><div class="v">${mentorCtx?mentorCtx.mentor.name+' · '+mentorCtx.mentor.title:'รอสถานประกอบการผูกพี่เลี้ยง'}</div></div>
+    <div class="pl-it"><div class="k">รูปแบบงาน</div><div class="v">${company?company.mode+' · '+company.loc:'-'}</div></div>
+    <div class="pl-it"><div class="k">ช่วงเวลา</div><div class="v">มิ.ย. – ก.ย. 2569</div></div>
+    <div class="pl-it"><div class="k">สถานะ</div><div class="v">${stuStatusBadge(s.status)}</div></div>`;
+  $('#sp-profile-wrap').innerHTML=`
+    <div class="card card-pad" style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+        <div>
+          <div class="sec-title">ข้อมูลส่วนตัวนักศึกษา</div>
+          <div class="sec-sub" style="margin:2px 0 0">นักศึกษาเพิ่มและแก้ไขข้อมูลติดต่อ/โปรไฟล์ของตนเอง เพื่อใช้ในเอกสาร CWIE และการติดต่อระหว่างฝึกงาน</div>
+        </div>
+        <span class="badge b-accent">แก้ไขเองได้</span>
+      </div>
+      <div class="form-grid">
+        <div><label class="lbl">รหัสนักศึกษา</label><input id="sp-profile-id" value="${escapeHtml(s.id)}" disabled></div>
+        <div><label class="lbl">ชื่อ - นามสกุล</label><input id="sp-profile-name" value="${escapeHtml(s.name)}"></div>
+        <div><label class="lbl">ประเภทการฝึก</label><select id="sp-profile-track"><option ${s.track==='สหกิจ'?'selected':''}>สหกิจ</option><option ${s.track==='ฝึกงานทั่วไป'?'selected':''}>ฝึกงานทั่วไป</option></select></div>
+        <div><label class="lbl">อีเมล</label><input id="sp-profile-email" value="${escapeHtml(s.email)}" placeholder="student@university.ac.th"></div>
+        <div><label class="lbl">เบอร์โทร</label><input id="sp-profile-phone" value="${escapeHtml(s.phone)}"></div>
+        <div><label class="lbl">Line / ช่องทางสำรอง</label><input id="sp-profile-line" value="${escapeHtml(s.line)}"></div>
+        <div class="field-full"><label class="lbl">ที่อยู่ติดต่อ</label><input id="sp-profile-address" value="${escapeHtml(s.address)}"></div>
+        <div><label class="lbl">ผู้ติดต่อฉุกเฉิน</label><input id="sp-profile-emergency-name" value="${escapeHtml(s.emergencyName)}"></div>
+        <div><label class="lbl">เบอร์ฉุกเฉิน</label><input id="sp-profile-emergency-phone" value="${escapeHtml(s.emergencyPhone)}"></div>
+        <div class="field-full"><label class="lbl">ทักษะหลัก</label><input id="sp-profile-skills" value="${escapeHtml((s.skills||[]).join(', '))}" placeholder="React, Node.js, SQL"></div>
+        <div><label class="lbl">Portfolio / GitHub</label><input id="sp-profile-portfolio" value="${escapeHtml(s.portfolio)}"></div>
+        <div><label class="lbl">เป้าหมายสายงาน</label><input id="sp-profile-career" value="${escapeHtml(s.careerGoal)}"></div>
+        <div class="field-full"><label class="lbl">หมายเหตุถึงเจ้าหน้าที่/อาจารย์</label><textarea id="sp-profile-note" rows="2" placeholder="ความสนใจ ข้อจำกัด หรือข้อมูลสำคัญระหว่างฝึกงาน">${escapeHtml(s.studentNote)}</textarea></div>
+      </div>
+      <div class="rule-note" style="margin-top:14px"><span>◎</span><span><b>หลักการสิทธิ์</b><br>นักศึกษาแก้ไขข้อมูลติดต่อของตนเองได้ เจ้าหน้าที่ดูและตรวจสอบข้อมูลเพื่อใช้ทำเอกสาร/ติดตามงาน</span></div>
+      <div class="form-actions" style="margin-top:14px">
+        <button class="btn" onclick="renderStudentPortalProfile()">ยกเลิกการแก้ไข</button>
+        <button class="btn btn-primary" onclick="saveStudentProfile()">บันทึกข้อมูลส่วนตัว</button>
+      </div>
+    </div>`;
+}
+function saveStudentProfile(){
+  const s=students.find(x=>x.id===currentStudentId)||students[0];
+  const skills=splitTags($('#sp-profile-skills').value);
+  s.name=cleanInput($('#sp-profile-name').value)||s.name;
+  s.track=$('#sp-profile-track').value;
+  s.email=cleanInput($('#sp-profile-email').value);
+  s.phone=cleanInput($('#sp-profile-phone').value);
+  s.line=cleanInput($('#sp-profile-line').value);
+  s.address=cleanInput($('#sp-profile-address').value);
+  s.emergencyName=cleanInput($('#sp-profile-emergency-name').value);
+  s.emergencyPhone=cleanInput($('#sp-profile-emergency-phone').value);
+  s.skills=skills.length?skills:s.skills;
+  s.portfolio=cleanInput($('#sp-profile-portfolio').value);
+  s.careerGoal=cleanInput($('#sp-profile-career').value);
+  s.studentNote=cleanInput($('#sp-profile-note').value);
+  auditLogs.unshift({type:'ผู้ใช้',time:'ตอนนี้',act:'นักศึกษาแก้ไขข้อมูลส่วนตัว',detail:s.name+' อัปเดตข้อมูลติดต่อและทักษะหลัก',user:s.email||s.id,ip:'student-portal'});
+  renderStudentPortalProfile();
+  renderStudents();
+  initStudent360Options();
+  renderStudent360(s.id);
+  toast('บันทึกข้อมูลส่วนตัวนักศึกษาแล้ว');
 }
 function renderStudentEvaluation(){
   const win=evalWindowState('student');
@@ -1509,7 +1580,7 @@ function renderStudent360(id='6512001'){
     <div class="profile-head">
       <div class="profile-title">
         <div class="avatar">${s.name.charAt(0)}</div>
-        <div><div style="font-size:18px;font-weight:600">${s.name}</div><div class="id">${s.id} · ${s.track} · ${s.skills.join(', ')}</div></div>
+        <div><div style="font-size:18px;font-weight:600">${s.name}</div><div class="id">${s.id} · ${s.track} · ${s.skills.join(', ')}</div><div class="id">${s.email||'-'} · ${s.phone||'-'}</div></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${stuStatusBadge(s.status)}<span class="owner-chip">บริษัท: ${s.company||'ยังไม่จับคู่'}</span></div>
     </div>
@@ -1522,6 +1593,8 @@ function renderStudent360(id='6512001'){
     <div class="person-timeline">${timeline.map(([st,t,m])=>`<div class="tl-row ${st}"><div class="tl-title">${t}</div><div class="tl-meta">${m}</div></div>`).join('')}</div>`;
   $('#student360-owners').innerHTML=`
     <div class="kv"><span class="k">สถานประกอบการ</span><span class="v">${company?company.name:'-'}</span></div>
+    <div class="kv"><span class="k">โทรศัพท์นักศึกษา</span><span class="v">${s.phone||'-'}</span></div>
+    <div class="kv"><span class="k">Portfolio</span><span class="v">${s.portfolio||'-'}</span></div>
     <div class="kv"><span class="k">พี่เลี้ยงบริษัท</span><span class="v">${mentorCtx?mentorCtx.mentor.name:'ยังไม่ผูก'}</span></div>
     <div class="kv"><span class="k">อีเมลพี่เลี้ยง</span><span class="v">${mentorCtx?mentorCtx.mentor.email:'-'}</span></div>
     <div class="kv"><span class="k">อาจารย์นิเทศ</span><span class="v">${advisor?advisor.name:'รอมอบหมาย'}</span></div>
