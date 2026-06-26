@@ -1,5 +1,21 @@
 # Internship / CWIE System Mockup
 
+## GitHub Pages
+
+Live mockup URL after enabling GitHub Pages:
+
+https://wivachr.github.io/ui-mockup-backend-auth-sso-mock/
+
+GitHub setup:
+
+- Go to `Settings` > `Pages`
+- Source: `Deploy from a branch`
+- Branch: `main`
+- Folder: `/ (root)`
+- Click `Save`
+
+After GitHub finishes publishing, the root `index.html` redirects to `outputs/internship-system_feature_mockup.html`.
+
 Repository นี้เก็บ mockup และเอกสารโครงสร้างระบบสำหรับระบบฝึกงาน / CWIE ภาควิชาไอที
 
 ## ไฟล์หลัก
