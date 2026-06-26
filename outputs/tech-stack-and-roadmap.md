@@ -260,6 +260,9 @@ Bucket:
 - mentor_assignments
 - advisor_profiles
 - advisor_assignments
+- supervision_visits
+- student_comments
+- risk_alerts
 
 ### Workflow
 
@@ -360,11 +363,15 @@ Bucket:
 - Staff issue/send document
 - Company submit Job plan
 - Status/action required
+- Supervision schedule
+- Risk / Early Warning
+- Student 360 comment thread
 
 ผลลัพธ์:
 
 - เปิดนักศึกษารายคนแล้วเห็น workflow ทั้งหมด
 - เห็นว่างานค้างที่ใคร
+- เห็นความเสี่ยงและประวัติการประสานงานรายคน
 
 ### Phase 4: Daily Logbook + Mentor Review
 

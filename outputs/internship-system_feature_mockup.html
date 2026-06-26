@@ -445,6 +445,8 @@
       <div class="nav-item" data-pg="establishments"><i>▤</i> สถานประกอบการ <span class="cnt" id="c-est"></span></div>
       <div class="nav-item" data-pg="mentors"><i>◌</i> ติดตามพี่เลี้ยง <span class="cnt" id="c-mentor"></span></div>
       <div class="nav-item" data-pg="matching"><i>⇄</i> จับคู่ฝึกงาน</div>
+      <div class="nav-item" data-pg="supervisionSchedule"><i>◷</i> นัดนิเทศ <span class="cnt" id="c-visit"></span></div>
+      <div class="nav-item" data-pg="riskMonitor"><i>⚑</i> Risk Monitor <span class="cnt" id="c-risk"></span></div>
       <div class="nav-item" data-pg="cwie"><i>▧</i> เอกสาร CWIE <span class="cnt">6</span></div>
       <div class="nav-sec">รายงาน</div>
       <div class="nav-item" data-pg="reports"><i>▥</i> รายงาน</div>
@@ -591,6 +593,18 @@
             <div id="student360-audit"></div>
           </div>
         </div>
+        <div class="split-2" style="grid-template-columns:1fr 1fr;margin-top:18px">
+          <div class="card card-pad">
+            <div class="sec-title">Risk / Early Warning รายคน</div>
+            <div class="sec-sub">สัญญาณเสี่ยงที่ต้องติดตามกับนักศึกษาคนนี้</div>
+            <div id="student360-risks"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">Comment กลางรายคน</div>
+            <div class="sec-sub">บันทึกประสานงานระหว่างเจ้าหน้าที่ อาจารย์ นักศึกษา และสถานประกอบการ</div>
+            <div id="student360-comments"></div>
+          </div>
+        </div>
       </section>
 
       <!-- ========== ESTABLISHMENTS ========== -->
@@ -655,6 +669,60 @@
             </div>
           </div>
           <div id="advisor-assignments"></div>
+        </div>
+      </section>
+
+      <!-- ========== SUPERVISION SCHEDULE ========== -->
+      <section id="page-supervisionSchedule" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>ตารางนัดนิเทศ</h1><p>ติดตามการนัดเยี่ยมสถานประกอบการของอาจารย์นิเทศแบบรายนักศึกษา</p></div>
+          <button class="btn btn-primary" onclick="toast('เปิดฟอร์มนัดนิเทศใหม่ (เดโม)')">＋ เพิ่มนัดนิเทศ</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">นัดทั้งหมด</div><div class="val" id="visit-total">—</div><div class="sub">ในรอบ 1 / 2569</div></div>
+          <div class="metric"><div class="lbl2">รอยืนยัน</div><div class="val" id="visit-pending">—</div><div class="sub">ต้องตามอาจารย์/บริษัท</div></div>
+          <div class="metric"><div class="lbl2">ยืนยันแล้ว</div><div class="val" id="visit-confirmed">—</div><div class="sub">พร้อมนิเทศตามแผน</div></div>
+          <div class="metric"><div class="lbl2">เสร็จแล้ว</div><div class="val" id="visit-done">—</div><div class="sub">มีบันทึกผลแล้ว</div></div>
+        </div>
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div><div class="sec-title">คิวนัดนิเทศ</div><div class="sec-sub" style="margin:2px 0 0">ใช้ประสานอาจารย์นิเทศ นักศึกษา และสถานประกอบการก่อนถึงวันนัด</div></div>
+            <select id="visit-filter" onchange="renderSupervisionSchedule()" style="width:220px">
+              <option value="all">ทุกสถานะ</option>
+              <option value="รอยืนยัน">รอยืนยัน</option>
+              <option value="ยืนยันแล้ว">ยืนยันแล้ว</option>
+              <option value="ต้องเลื่อน">ต้องเลื่อน</option>
+              <option value="นิเทศแล้ว">นิเทศแล้ว</option>
+            </select>
+          </div>
+          <div id="visit-list"></div>
+        </div>
+      </section>
+
+      <!-- ========== RISK MONITOR ========== -->
+      <section id="page-riskMonitor" class="page hidden">
+        <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+          <div><h1>Risk / Early Warning</h1><p>จับสัญญาณเสี่ยงระหว่างฝึกงาน เช่น logbook ค้าง เอกสารล่าช้า งานไม่ตรงสาย หรือยังไม่นัดนิเทศ</p></div>
+          <button class="btn btn-primary" onclick="toast('สร้าง rule แจ้งเตือนใหม่ (เดโม)')">＋ เพิ่ม rule</button>
+        </div>
+        <div class="grid metrics" style="margin-bottom:18px">
+          <div class="metric"><div class="lbl2">ความเสี่ยงเปิดอยู่</div><div class="val" id="risk-open">—</div><div class="sub">ยังต้องติดตาม</div></div>
+          <div class="metric"><div class="lbl2">ระดับสูง</div><div class="val" id="risk-high">—</div><div class="sub">ควรจัดการก่อน</div></div>
+          <div class="metric"><div class="lbl2">ระดับกลาง</div><div class="val" id="risk-mid">—</div><div class="sub">ติดตามตามรอบ</div></div>
+          <div class="metric"><div class="lbl2">ปิดแล้ว</div><div class="val" id="risk-resolved">—</div><div class="sub">มีประวัติใน audit</div></div>
+        </div>
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <div><div class="sec-title">รายการ Early Warning</div><div class="sec-sub" style="margin:2px 0 0">แสดงเจ้าของงาน กำหนดติดตาม และ action ถัดไป</div></div>
+            <select id="risk-filter" onchange="renderRiskMonitor()" style="width:220px">
+              <option value="open">เปิดอยู่</option>
+              <option value="high">ระดับสูง</option>
+              <option value="medium">ระดับกลาง</option>
+              <option value="resolved">ปิดแล้ว</option>
+              <option value="all">ทั้งหมด</option>
+            </select>
+          </div>
+          <div id="risk-list"></div>
         </div>
       </section>
 
@@ -1055,6 +1123,23 @@ const advisorAssignments=[
   {id:'as2', studentId:'6512030', companyId:'e2', advisorId:'t2', due:'28 ส.ค. 2569', visit:'video call', status:'กำลังติดตาม'},
   {id:'as3', studentId:'6512101', companyId:'e2', advisorId:'t2', due:'5 ก.ย. 2569', visit:'รอเลือกเวลา', status:'รอประเมิน'},
 ];
+const supervisionVisits=[
+  {id:'v1',studentId:'6512001',advisorId:'t1',companyId:'e1',type:'Onsite visit',date:'20 ส.ค. 2569',time:'13:30',status:'ยืนยันแล้ว',note:'เยี่ยมทีม frontend และตรวจ Job plan ที่บริษัท'},
+  {id:'v2',studentId:'6512030',advisorId:'t2',companyId:'e2',type:'Video call',date:'28 ส.ค. 2569',time:'10:00',status:'รอยืนยัน',note:'รอ HR ยืนยัน link meeting และพี่เลี้ยงเข้าร่วม'},
+  {id:'v3',studentId:'6512101',advisorId:'t2',companyId:'e2',type:'Onsite visit',date:'5 ก.ย. 2569',time:'14:00',status:'ต้องเลื่อน',note:'นักศึกษาติดอบรมภายในบริษัท ต้องเลือกวันใหม่'},
+  {id:'v4',studentId:'6512078',advisorId:'t1',companyId:'e1',type:'Video call',date:'18 ส.ค. 2569',time:'09:30',status:'นิเทศแล้ว',note:'ส่งผลนิเทศแล้วและไม่มีประเด็นค้าง'},
+];
+const riskAlerts=[
+  {id:'r1',studentId:'6512001',companyId:'e1',level:'high',category:'Logbook',title:'Logbook รอตรวจเกิน 3 วัน',detail:'สัปดาห์ที่ 4 มี 2 รายการรอพี่เลี้ยงตรวจ',owner:'สถานประกอบการ / พี่เลี้ยง',due:'วันนี้',status:'open'},
+  {id:'r2',studentId:'6512101',companyId:'e2',level:'medium',category:'Supervision',title:'นัดนิเทศยังไม่ยืนยัน',detail:'นัด onsite วันที่ 5 ก.ย. ต้องเลื่อนและยังไม่มีวันใหม่',owner:'อาจารย์นิเทศ',due:'ภายใน 2 วัน',status:'open'},
+  {id:'r3',studentId:null,companyId:'e4',level:'high',category:'Company quality',title:'บริษัทเฝ้าระวัง งานไม่ตรงสาย',detail:'ผลประเมินรุ่นก่อนระบุว่าได้ทำ manual QA และงานเอกสารมากกว่างาน developer',owner:'เจ้าหน้าที่',due:'ก่อนจับคู่รอบถัดไป',status:'open'},
+  {id:'r4',studentId:'6512030',companyId:'e2',level:'medium',category:'Document',title:'Job plan รอตรวจขั้นสุดท้าย',detail:'บริษัทส่งไฟล์แล้ว แต่เจ้าหน้าที่ยังไม่กดตรวจรับ',owner:'เจ้าหน้าที่',due:'3 ก.ค.',status:'resolved'},
+];
+const studentComments=[
+  {id:'cm1',studentId:'6512001',role:'เจ้าหน้าที่',by:'อ.ผู้ประสานงาน',time:'26 มิ.ย. 18:40',text:'ส่งแจ้งเตือนไปยังบริษัทเรื่อง logbook ค้างแล้ว รอตอบกลับภายในวันพรุ่งนี้'},
+  {id:'cm2',studentId:'6512001',role:'อาจารย์นิเทศ',by:'อ.ดร.เมธา',time:'27 มิ.ย. 09:10',text:'นัด onsite วันที่ 20 ส.ค. ยืนยันเวลา 13:30 นักศึกษาควรเตรียมสรุปงานล่าสุด'},
+  {id:'cm3',studentId:'6512030',role:'สถานประกอบการ',by:'คุณมณีรัตน์',time:'25 มิ.ย. 16:20',text:'พี่เลี้ยงจะส่ง link video call หลังสรุปตารางทีม data science'},
+];
 const stackDemand = [['React',82],['Python',74],['Node.js',61],['TypeScript',48],['Go',35],['Kubernetes',28],['ML / AI',26]];
 
 const notifications=[
@@ -1242,7 +1327,7 @@ function evalBadge(kind){
 
 /* ---------------- login + nav ---------------- */
 function toggleSide(){ $('#sidebar').classList.toggle('open'); }
-const titles={dashboard:'แดชบอร์ด',accessApprovals:'อนุมัติบัญชี',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
+const titles={dashboard:'แดชบอร์ด',accessApprovals:'อนุมัติบัญชี',students:'นักศึกษา',student360:'นักศึกษา 360°',establishments:'สถานประกอบการ',mentors:'ติดตามพี่เลี้ยง',matching:'จับคู่ฝึกงาน',supervisionSchedule:'นัดนิเทศ',riskMonitor:'Risk Monitor',cwie:'เอกสาร CWIE',reports:'รายงาน',evalSettings:'ตั้งค่าประเมิน',audit:'Audit log'};
 let loginRole='staff';
 let currentStudentId='6512001';
 let currentAdvisorId='t2';
@@ -1483,6 +1568,8 @@ function go(pg){
   $('#pgTitle').textContent=titles[pg];
   if(pg==='student360')renderStudent360($('#student360-select')?.value||'6512001');
   if(pg==='accessApprovals')renderAccessApprovals();
+  if(pg==='supervisionSchedule')renderSupervisionSchedule();
+  if(pg==='riskMonitor')renderRiskMonitor();
   if(pg==='mentors')renderMentors();
   if(pg==='cwie')renderCwie();
   if(pg==='evalSettings')renderEvalSettings();
@@ -1495,8 +1582,12 @@ $$('.nav-item').forEach(n=>n.addEventListener('click',()=>go(n.dataset.pg)));
 
 function renderNotifications(){
   const pending=accessRequests.filter(x=>x.status==='pending');
+  const pendingVisits=supervisionVisits.filter(v=>v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน');
+  const openRisks=riskAlerts.filter(r=>r.status==='open');
   const items=[
     ...(pending.length?[{ic:'◉',tone:'amber',title:'มีบัญชีรออนุมัติ',sub:`นักศึกษา/อาจารย์/สถานประกอบการรวม ${pending.length} รายการ`,pg:'accessApprovals'}]:[]),
+    ...(openRisks.length?[{ic:'⚑',tone:'red',title:'Early Warning เปิดอยู่',sub:`มี ${openRisks.length} รายการที่ต้องติดตาม`,pg:'riskMonitor'}]:[]),
+    ...(pendingVisits.length?[{ic:'◷',tone:'accent',title:'นัดนิเทศรอยืนยัน',sub:`มี ${pendingVisits.length} นัดที่ต้องประสานต่อ`,pg:'supervisionSchedule'}]:[]),
     ...notifications
   ];
   $('#notif-count').textContent=items.length;
@@ -1581,6 +1672,96 @@ function rejectAccessRequest(id){
   auditLogs.unshift({type:'ผู้ใช้',time:'ตอนนี้',act:'ปฏิเสธบัญชีเข้าใช้งาน',detail:`${req.roleLabel} · ${req.name}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
   renderAccessApprovals(); renderDash(); renderNotifications(); renderAuditLog();
   toast('ปฏิเสธบัญชี '+req.name+' แล้ว');
+}
+
+function visitStatusBadge(status){
+  if(status==='นิเทศแล้ว')return '<span class="badge b-green">นิเทศแล้ว</span>';
+  if(status==='ยืนยันแล้ว')return '<span class="badge b-accent">ยืนยันแล้ว</span>';
+  if(status==='ต้องเลื่อน')return '<span class="badge b-amber">ต้องเลื่อน</span>';
+  return '<span class="badge b-amber">รอยืนยัน</span>';
+}
+function renderSupervisionSchedule(){
+  const filter=$('#visit-filter')?$('#visit-filter').value:'all';
+  const rows=supervisionVisits.filter(v=>filter==='all'||v.status===filter);
+  $('#visit-total').textContent=supervisionVisits.length;
+  $('#visit-pending').textContent=supervisionVisits.filter(v=>v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน').length;
+  $('#visit-confirmed').textContent=supervisionVisits.filter(v=>v.status==='ยืนยันแล้ว').length;
+  $('#visit-done').textContent=supervisionVisits.filter(v=>v.status==='นิเทศแล้ว').length;
+  $('#visit-list').innerHTML=rows.length?rows.map(v=>{
+    const student=students.find(s=>s.id===v.studentId);
+    const company=establishments.find(e=>e.id===v.companyId);
+    const advisor=advisors.find(a=>a.id===v.advisorId);
+    const actions=v.status==='นิเทศแล้ว'
+      ? `<button class="btn btn-sm" onclick="openStudent360('${v.studentId}')">ดู Student 360</button>`
+      : `<button class="btn btn-sm" onclick="markVisitReschedule('${v.id}')">ขอเลื่อน</button><button class="btn btn-sm btn-primary" onclick="markVisitDone('${v.id}')">${v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน'?'ยืนยันนัด':'บันทึกว่านิเทศแล้ว'}</button>`;
+    return `<div class="approval-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div><div class="name">${student?student.name:'-'} · ${company?company.name:'-'}</div><div class="meta">${advisor?advisor.name:'-'} · ${v.type} · ${v.date} ${v.time}</div></div>
+        ${visitStatusBadge(v.status)}
+      </div>
+      <div class="rule-note" style="margin-top:12px"><span>◷</span><span><b>หมายเหตุการนัด</b><br>${v.note}</span></div>
+      <div class="form-actions">${actions}</div>
+    </div>`;
+  }).join(''):'<div class="empty">ไม่มีนัดนิเทศในสถานะนี้</div>';
+}
+function markVisitDone(id){
+  const v=supervisionVisits.find(x=>x.id===id);
+  if(!v)return;
+  v.status=v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน'?'ยืนยันแล้ว':'นิเทศแล้ว';
+  const student=students.find(s=>s.id===v.studentId);
+  auditLogs.unshift({type:'นิเทศ',time:'ตอนนี้',act:v.status==='ยืนยันแล้ว'?'ยืนยันนัดนิเทศ':'บันทึกนิเทศแล้ว',detail:`${student?student.name:v.studentId} · ${v.date} ${v.time}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderSupervisionSchedule(); renderDash(); renderRiskMonitor(); renderNotifications(); renderAuditLog();
+  toast(v.status==='ยืนยันแล้ว'?'ยืนยันนัดนิเทศแล้ว':'บันทึกว่านิเทศแล้ว');
+}
+function markVisitReschedule(id){
+  const v=supervisionVisits.find(x=>x.id===id);
+  if(!v)return;
+  v.status='ต้องเลื่อน';
+  auditLogs.unshift({type:'นิเทศ',time:'ตอนนี้',act:'ขอเลื่อนนัดนิเทศ',detail:`${v.studentId} · ${v.date} ${v.time}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderSupervisionSchedule(); renderDash(); renderRiskMonitor(); renderNotifications(); renderAuditLog();
+  toast('บันทึกสถานะต้องเลื่อนนัดแล้ว');
+}
+function riskBadge(level,status){
+  if(status==='resolved')return '<span class="badge b-green">ปิดแล้ว</span>';
+  return level==='high'?'<span class="badge b-amber">เสี่ยงสูง</span>':'<span class="badge b-accent">เสี่ยงกลาง</span>';
+}
+function renderRiskMonitor(){
+  const filter=$('#risk-filter')?$('#risk-filter').value:'open';
+  const open=riskAlerts.filter(r=>r.status==='open');
+  $('#risk-open').textContent=open.length;
+  $('#risk-high').textContent=open.filter(r=>r.level==='high').length;
+  $('#risk-mid').textContent=open.filter(r=>r.level==='medium').length;
+  $('#risk-resolved').textContent=riskAlerts.filter(r=>r.status==='resolved').length;
+  const rows=riskAlerts.filter(r=>{
+    if(filter==='all')return true;
+    if(filter==='open')return r.status==='open';
+    if(filter==='resolved')return r.status==='resolved';
+    return r.status==='open'&&r.level===filter;
+  });
+  $('#risk-list').innerHTML=rows.length?rows.map(r=>riskCard(r,true)).join(''):'<div class="empty">ไม่มีรายการความเสี่ยงในตัวกรองนี้</div>';
+}
+function riskCard(r,showStudent){
+  const s=r.studentId?students.find(x=>x.id===r.studentId):null;
+  const e=r.companyId?establishments.find(x=>x.id===r.companyId):null;
+  const actions=r.status==='resolved'
+    ? `<button class="btn btn-sm" onclick="toast('เปิดประวัติ risk ${r.title} (เดโม)')">ดูประวัติ</button>`
+    : `<button class="btn btn-sm" onclick="${s?`openStudent360('${s.id}')`:`go('establishments')`}">เปิดบริบท</button><button class="btn btn-sm btn-primary" onclick="resolveRisk('${r.id}')">ปิดความเสี่ยง</button>`;
+  return `<div class="approval-card" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+      <div><div class="name">${r.title}</div><div class="meta">${r.category}${showStudent&&s?' · '+s.name:''}${e?' · '+e.name:''}</div></div>
+      ${riskBadge(r.level,r.status)}
+    </div>
+    <div class="rule-note" style="margin-top:12px"><span>⚑</span><span><b>เจ้าของงาน: ${r.owner} · ติดตาม: ${r.due}</b><br>${r.detail}</span></div>
+    <div class="form-actions">${actions}</div>
+  </div>`;
+}
+function resolveRisk(id){
+  const r=riskAlerts.find(x=>x.id===id);
+  if(!r)return;
+  r.status='resolved';
+  auditLogs.unshift({type:'ความเสี่ยง',time:'ตอนนี้',act:'ปิด Early Warning',detail:r.title,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderRiskMonitor(); renderDash(); renderNotifications(); renderStudent360($('#student360-select')?.value||currentStudentId); renderAuditLog();
+  toast('ปิดความเสี่ยงแล้ว');
 }
 
 function renderCwie(){
@@ -1740,6 +1921,35 @@ function renderStudent360(id='6512001'){
     ['24 มิ.ย. 18:05','นักศึกษาส่ง logbook สัปดาห์ที่ 4','นักศึกษา'],
     ['18 มิ.ย. 09:30','บริษัทรับรองตำแหน่งและพี่เลี้ยง','สถานประกอบการ'],
   ].map(([time,act,owner])=>`<div class="audit-row" style="grid-template-columns:110px 1fr 110px"><div class="audit-time">${time}</div><div><div class="audit-act">${act}</div><div class="audit-detail">เกี่ยวข้องกับ ${s.name}</div></div><div class="audit-user">${owner}</div></div>`).join('');
+  renderStudent360Risks(s.id);
+  renderStudent360Comments(s.id);
+}
+
+function renderStudent360Risks(studentId){
+  const rows=riskAlerts.filter(r=>r.studentId===studentId&&r.status==='open');
+  $('#student360-risks').innerHTML=rows.length?rows.map(r=>riskCard(r,false)).join(''):'<div class="empty">ยังไม่มีสัญญาณเสี่ยงเปิดอยู่สำหรับนักศึกษาคนนี้</div>';
+}
+function renderStudent360Comments(studentId){
+  const rows=studentComments.filter(c=>c.studentId===studentId);
+  $('#student360-comments').innerHTML=`
+    <div style="display:grid;gap:10px;margin-bottom:12px">
+      ${rows.length?rows.map(c=>`<div class="approval-card">
+        <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div class="name">${c.by}</div><span class="badge b-gray">${c.role}</span></div>
+        <div class="meta">${c.time}</div>
+        <div style="font-size:13px;line-height:1.55;margin-top:8px;color:var(--ink-2)">${c.text}</div>
+      </div>`).join(''):'<div class="empty">ยังไม่มี comment สำหรับนักศึกษาคนนี้</div>'}
+    </div>
+    <textarea id="student-comment-text" rows="2" placeholder="เพิ่ม comment เพื่อประสานงานกับทีมที่เกี่ยวข้อง..."></textarea>
+    <div class="form-actions"><button class="btn btn-sm btn-primary" onclick="addStudentComment('${studentId}')">เพิ่ม comment</button></div>`;
+}
+function addStudentComment(studentId){
+  const box=$('#student-comment-text');
+  const text=cleanInput(box.value);
+  if(!text){toast('กรอกข้อความ comment ก่อนบันทึก');return;}
+  studentComments.unshift({id:'cm'+(studentComments.length+1),studentId,role:'เจ้าหน้าที่',by:'อ.ผู้ประสานงาน',time:'ตอนนี้',text});
+  auditLogs.unshift({type:'ติดตาม',time:'ตอนนี้',act:'เพิ่ม comment ใน Student 360',detail:`นักศึกษา ${studentId}: ${text}`,user:'coordinator@university.ac.th',ip:'staff-portal'});
+  renderStudent360Comments(studentId); renderAuditLog();
+  toast('เพิ่ม comment แล้ว');
 }
 
 function renderMentors(){
@@ -1883,11 +2093,15 @@ function renderDash(){
   const matched=students.filter(s=>s.status!=='รอจับคู่').length;
   const wait=total-matched, warn=establishments.filter(e=>e.status==='เฝ้าระวัง').length;
   const pendingAccess=accessRequests.filter(x=>x.status==='pending').length;
+  const pendingVisits=supervisionVisits.filter(v=>v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน').length;
+  const openRisks=riskAlerts.filter(r=>r.status==='open').length;
   $('#m-total').textContent=total; $('#m-coop').textContent=coop; $('#m-gen').textContent=total-coop;
   $('#m-matched').textContent=matched; $('#m-matchpct').textContent=Math.round(matched/total*100)+'%';
   $('#m-wait').textContent=wait; $('#m-est').textContent=establishments.length; $('#m-warn').textContent=warn;
   $('#c-stu').textContent=total; $('#c-est').textContent=establishments.length;
   $('#c-access').textContent=pendingAccess;
+  $('#c-visit').textContent=pendingVisits;
+  $('#c-risk').textContent=openRisks;
   $('#c-mentor').textContent=allMentors().length;
 
   const prog=[['สหกิจ','สหกิจ'],['ฝึกงานทั่วไป','ฝึกงานทั่วไป']].map(([lab,tr])=>{
@@ -1901,6 +2115,8 @@ function renderDash(){
 
   const todos=[
     ['◉','var(--amber-ink)','var(--amber-soft)',pendingAccess+' บัญชีรออนุมัติเข้าใช้งาน','ตรวจสอบนักศึกษา อาจารย์ และสถานประกอบการก่อนเปิด portal','accessApprovals'],
+    ['⚑','var(--red)','var(--red-soft)',openRisks+' Early Warning เปิดอยู่','ดูเจ้าของงานและปิดความเสี่ยงเมื่อแก้แล้ว','riskMonitor'],
+    ['◷','var(--accent-ink)','var(--accent-soft)',pendingVisits+' นัดนิเทศรอยืนยัน/ต้องเลื่อน','ประสานอาจารย์และสถานประกอบการเพื่อยืนยันนัด','supervisionSchedule'],
     ['⚑','var(--amber-ink)','var(--amber-soft)','บจก. เน็กซ์เจน ติดธงเฝ้าระวัง','ตรวจสอบก่อนส่งนักศึกษารอบนี้','establishments'],
     ['◷','var(--accent-ink)','var(--accent-soft)',wait+' นักศึกษายังรอจับคู่','เปิดหน้าจับคู่เพื่อดำเนินการ','matching'],
     ['★','var(--green-ink)','var(--green-soft)','ผลประเมินสถานประกอบการเข้ามาใหม่','ดูสรุปคุณภาพในหน้ารายงาน','reports'],
@@ -2286,6 +2502,24 @@ function renderAdvisorProfileCard(adv,mine){
       </div>
     </div>`;
 }
+function renderAdvisorVisitCard(advisorId){
+  const visits=supervisionVisits.filter(v=>v.advisorId===advisorId);
+  const list=visits.length?visits.map(v=>{
+    const student=students.find(s=>s.id===v.studentId);
+    const company=establishments.find(e=>e.id===v.companyId);
+    return `<div class="stu-pick">
+      <div class="avatar" style="width:30px;height:30px;font-size:12px">${companyInitial(company&&company.name)}</div>
+      <div style="flex:1"><div style="font-size:13.5px;font-weight:500">${student?student.name:'-'} · ${company?company.name:'-'}</div>
+        <div style="font-size:11.5px;color:var(--muted)">${v.type} · ${v.date} ${v.time} · ${v.note}</div></div>
+      ${visitStatusBadge(v.status)}
+    </div>`;
+  }).join(''):'<div class="empty">ยังไม่มีนัดนิเทศในรอบนี้</div>';
+  return `<div class="card card-pad" style="margin-bottom:18px">
+    <div class="sec-title">ตารางนัดนิเทศของคุณ</div>
+    <div class="sec-sub">รายการนัดที่เจ้าหน้าที่และบริษัทใช้ประสานงานร่วมกับอาจารย์</div>
+    <div style="margin-top:8px">${list}</div>
+  </div>`;
+}
 function saveAdvisorProfile(){
   const adv=advisors.find(a=>a.id===currentAdvisorId);
   if(!adv)return;
@@ -2325,6 +2559,7 @@ function renderAdvisorPortal(selId){
   }).join('');
   $('#ap-body').innerHTML=`
     ${renderAdvisorProfileCard(adv,mine)}
+    ${renderAdvisorVisitCard(adv.id)}
     <div class="card card-pad" style="margin-bottom:18px">
       <div class="sec-title">งานนิเทศของคุณ (${mine.length})</div>
       <div class="sec-sub">เลือกสถานประกอบการเพื่อกรอกผลประเมิน</div>
@@ -2473,7 +2708,7 @@ function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.transform='
 renderDash(); renderStudents(); renderEst(); renderMatchStudents();
 renderAdvisorAssignments();
 renderReports(); initCompanyReport();
-renderNotifications(); renderCwie(); renderAccessApprovals(); renderAuditLog(); renderEvalSettings(); renderMentors(); initStudent360Options(); renderStudent360('6512001'); renderCompanyTaskQueue(); renderCompanyWorkflow('positions');
+renderNotifications(); renderCwie(); renderAccessApprovals(); renderSupervisionSchedule(); renderRiskMonitor(); renderAuditLog(); renderEvalSettings(); renderMentors(); initStudent360Options(); renderStudent360('6512001'); renderCompanyTaskQueue(); renderCompanyWorkflow('positions');
 </script>
 
 <div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
