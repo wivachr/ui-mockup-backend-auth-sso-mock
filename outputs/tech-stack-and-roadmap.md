@@ -79,6 +79,7 @@ Component ที่ควรทำเป็น shared component:
 - Timeline
 - DocumentFlow
 - TaskQueue
+- ThailandSupervisionMap
 - EvaluationWindowCard
 - LogbookDailyForm
 - AuditLogTable
@@ -98,6 +99,7 @@ server/
     students.service.ts
     companies.service.ts
     matching.service.ts
+    supervision-map.service.ts
     cwie.service.ts
     logbook.service.ts
     evaluations.service.ts
@@ -120,6 +122,7 @@ server/
 - ต้อง query cross-module เช่น student + company + mentor + documents + logbook
 - เหมาะกับ audit log, workflow status, report
 - รองรับ JSONB สำหรับคะแนนประเมินหรือ payload บางส่วนได้
+- เก็บพิกัดสถานประกอบการและจุดฝึกงานของนักศึกษาเป็น latitude/longitude ได้ และสามารถต่อ PostGIS ภายหลังหากต้องคำนวณระยะทางหรือจัดกลุ่มทริปนิเทศจริง
 
 ### 2.5 ORM / Database Access
 

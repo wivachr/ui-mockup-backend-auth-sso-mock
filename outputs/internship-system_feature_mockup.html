@@ -383,6 +383,26 @@
   .portal-intro{margin-bottom:20px}
   .portal-intro h1{font-size:21px;font-weight:600;margin:0 0 3px}
   .portal-intro p{margin:0;color:var(--muted);font-size:13.5px}
+  .geo-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:18px;align-items:stretch;margin-bottom:18px}
+  .thai-map{position:relative;min-height:460px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,#F8FAFC 0%,#F2F6FB 100%);overflow:hidden}
+  .thai-map svg{position:absolute;inset:22px 26px 18px 34px;width:calc(100% - 60px);height:calc(100% - 40px);overflow:visible}
+  .thai-outline{fill:#E8EEF8;stroke:#C7D2E5;stroke-width:1.8}
+  .thai-region{fill:none;stroke:#D8E0EE;stroke-width:1;stroke-dasharray:4 5}
+  .map-marker{position:absolute;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;border:3px solid #fff;box-shadow:0 5px 14px rgba(20,22,34,.22);z-index:3}
+  .map-marker.company{background:var(--accent)}
+  .map-marker.student{background:var(--green)}
+  .map-marker.warn{background:var(--amber)}
+  .map-marker .tip{display:none;position:absolute;left:50%;bottom:22px;transform:translateX(-50%);min-width:190px;background:var(--ink);color:#fff;border-radius:9px;padding:8px 10px;font-size:12px;line-height:1.35;box-shadow:0 10px 30px rgba(20,22,34,.25)}
+  .map-marker:hover .tip{display:block}
+  .map-legend{position:absolute;left:16px;bottom:14px;display:flex;gap:9px;flex-wrap:wrap;background:rgba(255,255,255,.88);border:1px solid var(--border);border-radius:999px;padding:7px 10px;font-size:12px;color:var(--ink-2)}
+  .map-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  .map-note{position:absolute;right:16px;top:14px;max-width:230px;background:rgba(255,255,255,.9);border:1px solid var(--border);border-radius:10px;padding:9px 11px;font-size:12px;color:var(--ink-2);line-height:1.45}
+  .geo-list{display:grid;gap:10px}
+  .geo-row{border:1px solid var(--border);border-radius:11px;background:var(--surface);padding:11px 12px}
+  .geo-row .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .geo-row .name{font-size:13.5px;font-weight:700}
+  .geo-row .meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .geo-row .coords{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);margin-top:7px}
   @media(max-width:900px){
     .portal-layout{grid-template-columns:1fr}
     .portal-side{position:static;display:flex;overflow:auto}
@@ -439,6 +459,7 @@
     .mentor-grid{grid-template-columns:1fr}
     .status-strip{grid-template-columns:1fr 1fr}
     .daily-log-grid{grid-template-columns:1fr}
+    .geo-layout{grid-template-columns:1fr}
   }
   @media(max-width:900px){
     .daily-log-grid{grid-template-columns:1fr}
@@ -543,6 +564,18 @@
           <div class="metric"><div class="lbl2"><i>✓</i> จับคู่แล้ว</div><div class="val" id="m-matched">—</div><div class="sub up">คิดเป็น <span id="m-matchpct">–</span> ของทั้งหมด</div></div>
           <div class="metric"><div class="lbl2"><i>◷</i> รอจับคู่</div><div class="val" id="m-wait">—</div><div class="sub">ต้องดำเนินการรอบนี้</div></div>
           <div class="metric"><div class="lbl2"><i>▤</i> สถานประกอบการ</div><div class="val" id="m-est">—</div><div class="sub">ใช้งานรอบนี้ · <span id="m-warn">–</span> เฝ้าระวัง</div></div>
+        </div>
+        <div class="geo-layout">
+          <div class="card card-pad">
+            <div class="sec-title">แผนที่ตำแหน่งฝึกงานทั่วประเทศ</div>
+            <div class="sec-sub">พิกัดสถานประกอบการและจุดฝึกงานของนักศึกษา ใช้วางแผนเส้นทางออกนิเทศ</div>
+            <div id="dashboard-geo-map"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">กลุ่มพื้นที่นิเทศ</div>
+            <div class="sec-sub">จัดกลุ่มจากจังหวัด/พิกัด เพื่อช่วยรวมทริปของอาจารย์นิเทศ</div>
+            <div id="dashboard-geo-list"></div>
+          </div>
         </div>
 
         <div class="grid" style="grid-template-columns:1.4fr 1fr;align-items:start">
@@ -741,6 +774,18 @@
           <div class="metric"><div class="lbl2">รอยืนยัน</div><div class="val" id="visit-pending">—</div><div class="sub">ต้องตามอาจารย์/บริษัท</div></div>
           <div class="metric"><div class="lbl2">ยืนยันแล้ว</div><div class="val" id="visit-confirmed">—</div><div class="sub">พร้อมนิเทศตามแผน</div></div>
           <div class="metric"><div class="lbl2">เสร็จแล้ว</div><div class="val" id="visit-done">—</div><div class="sub">มีบันทึกผลแล้ว</div></div>
+        </div>
+        <div class="geo-layout">
+          <div class="card card-pad">
+            <div class="sec-title">แผนที่วางแผนออกนิเทศ</div>
+            <div class="sec-sub">แสดงพิกัดบริษัทและนักศึกษาที่ฝึกงานจริง เพื่อรวมจุดใกล้กันเป็นทริปเดียว</div>
+            <div id="visit-geo-map"></div>
+          </div>
+          <div class="card card-pad">
+            <div class="sec-title">ข้อเสนอจัดทริปนิเทศ</div>
+            <div class="sec-sub">ระบบ mock จัดกลุ่มพื้นที่จากสถานประกอบการที่มีนักศึกษาฝึกอยู่</div>
+            <div id="visit-geo-list"></div>
+          </div>
         </div>
         <div class="card card-pad">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
@@ -1209,36 +1254,36 @@
 <script>
 /* ---------------- data ---------------- */
 const students = [
-  {id:'6512001', name:'กิตติพงษ์ ใจดี', track:'สหกิจ', skills:['React','Node.js','AWS'], status:'จับคู่แล้ว', company:'บจก. คลาวด์เวิร์คส์', email:'6512001@university.ac.th', phone:'081-234-5601', line:'kittipong.dev', address:'99/12 ถ.งามวงศ์วาน กรุงเทพฯ', emergencyName:'นางกมลพร ใจดี', emergencyPhone:'089-111-2201', portfolio:'https://github.com/kittipong-cwie', careerGoal:'Frontend / Full-stack Developer', studentNote:'สนใจงาน React, Node.js และ cloud deployment'},
+  {id:'6512001', name:'กิตติพงษ์ ใจดี', track:'สหกิจ', skills:['React','Node.js','AWS'], status:'จับคู่แล้ว', company:'บจก. คลาวด์เวิร์คส์', email:'6512001@university.ac.th', phone:'081-234-5601', line:'kittipong.dev', address:'99/12 ถ.งามวงศ์วาน กรุงเทพฯ', emergencyName:'นางกมลพร ใจดี', emergencyPhone:'089-111-2201', portfolio:'https://github.com/kittipong-cwie', careerGoal:'Frontend / Full-stack Developer', studentNote:'สนใจงาน React, Node.js และ cloud deployment', internshipCoord:{lat:13.744,lng:100.540}},
   {id:'6512014', name:'ณัฐนรี สุขสวัสดิ์', track:'สหกิจ', skills:['Python','ML','PyTorch'], status:'รอจับคู่', company:null},
   {id:'6512022', name:'ภาคิน วงศ์ทอง', track:'ฝึกงานทั่วไป', skills:['Vue','Go','Docker'], status:'รอจับคู่', company:null},
-  {id:'6512030', name:'ศิรประภา มั่นคง', track:'สหกิจ', skills:['Java','Spring','SQL'], status:'กำลังฝึก', company:'บจก. ดาต้าเซนส์'},
+  {id:'6512030', name:'ศิรประภา มั่นคง', track:'สหกิจ', skills:['Java','Spring','SQL'], status:'กำลังฝึก', company:'บจก. ดาต้าเซนส์', internshipCoord:{lat:18.796,lng:98.985}},
   {id:'6512041', name:'ธนกร เกียรติศักดิ์', track:'ฝึกงานทั่วไป', skills:['React','TypeScript'], status:'รอจับคู่', company:null},
-  {id:'6512055', name:'พิมพ์ชนก อารีย์', track:'สหกิจ', skills:['Python','Django','GCP'], status:'จับคู่แล้ว', company:'บจก. ดาต้าเซนส์'},
+  {id:'6512055', name:'พิมพ์ชนก อารีย์', track:'สหกิจ', skills:['Python','Django','GCP'], status:'จับคู่แล้ว', company:'บจก. ดาต้าเซนส์', internshipCoord:{lat:18.781,lng:98.998}},
   {id:'6512063', name:'อนุชา พูนทรัพย์', track:'ฝึกงานทั่วไป', skills:['Vue','Go','K8s'], status:'รอจับคู่', company:null},
-  {id:'6512078', name:'จิราพร แสงเดือน', track:'สหกิจ', skills:['Node.js','React','MongoDB'], status:'ประเมินแล้ว', company:'บจก. คลาวด์เวิร์คส์'},
+  {id:'6512078', name:'จิราพร แสงเดือน', track:'สหกิจ', skills:['Node.js','React','MongoDB'], status:'ประเมินแล้ว', company:'บจก. คลาวด์เวิร์คส์', internshipCoord:{lat:13.731,lng:100.561}},
   {id:'6512090', name:'วรเมธ ชัยพัฒน์', track:'ฝึกงานทั่วไป', skills:['PHP','Laravel','MySQL'], status:'รอจับคู่', company:null},
-  {id:'6512101', name:'สุชานันท์ บุญมา', track:'สหกิจ', skills:['Python','ML','Data'], status:'กำลังฝึก', company:'บจก. ดาต้าเซนส์'},
+  {id:'6512101', name:'สุชานันท์ บุญมา', track:'สหกิจ', skills:['Python','ML','Data'], status:'กำลังฝึก', company:'บจก. ดาต้าเซนส์', internshipCoord:{lat:18.806,lng:98.972}},
 ];
 
 const establishments = [
-  {id:'e1', name:'บจก. คลาวด์เวิร์คส์', mode:'Hybrid', loc:'กรุงเทพฯ', coop:4.6, gen:4.2, status:'แนะนำ', stack:['React','Node.js','AWS','PostgreSQL'], used:3, total:4, hire:40, nda:true, flag:null, mentors:[
+  {id:'e1', name:'บจก. คลาวด์เวิร์คส์', mode:'Hybrid', loc:'กรุงเทพฯ', coord:{lat:13.756,lng:100.502}, coop:4.6, gen:4.2, status:'แนะนำ', stack:['React','Node.js','AWS','PostgreSQL'], used:3, total:4, hire:40, nda:true, flag:null, mentors:[
     {name:'วีรภัทร ศิริกุล', title:'Senior Frontend Developer', email:'weeraphat@cloudworks.co.th', phone:'089-112-4401', students:['6512001']},
     {name:'ณัฐวุฒิ แสงทอง', title:'Full-stack Lead', email:'nattawut@cloudworks.co.th', phone:'086-771-2208', students:['6512078']}
   ]},
-  {id:'e2', name:'บจก. ดาต้าเซนส์ แอนะลิติกส์', mode:'Onsite', loc:'เชียงใหม่', coop:4.3, gen:null, status:'ใช้ได้', stack:['Python','ML','PyTorch','GCP'], used:2, total:2, hire:55, nda:false, flag:null, mentors:[
+  {id:'e2', name:'บจก. ดาต้าเซนส์ แอนะลิติกส์', mode:'Onsite', loc:'เชียงใหม่', coord:{lat:18.788,lng:98.985}, coop:4.3, gen:null, status:'ใช้ได้', stack:['Python','ML','PyTorch','GCP'], used:2, total:2, hire:55, nda:false, flag:null, mentors:[
     {name:'มณีรัตน์ พัฒนากร', title:'Data Science Manager', email:'maneerat@datasense.co.th', phone:'081-555-9012', students:['6512030','6512055','6512101']}
   ]},
-  {id:'e3', name:'บจก. รีโมทสแต็ก', mode:'Remote', loc:'ทำงานทางไกล', coop:null, gen:4.4, status:'แนะนำ', stack:['Vue','Go','Kubernetes'], used:0, total:5, hire:25, nda:true, flag:null, mentors:[
+  {id:'e3', name:'บจก. รีโมทสแต็ก', mode:'Remote', loc:'ทำงานทางไกล', coord:null, coop:null, gen:4.4, status:'แนะนำ', stack:['Vue','Go','Kubernetes'], used:0, total:5, hire:25, nda:true, flag:null, mentors:[
     {name:'กวิน โชติวัฒน์', title:'Platform Engineer', email:'kawin@remotestack.co.th', phone:'082-440-1188', students:[]}
   ]},
-  {id:'e4', name:'บจก. เน็กซ์เจน ซอฟต์แวร์', mode:'Onsite', loc:'นนทบุรี', coop:2.8, gen:3.1, status:'เฝ้าระวัง', stack:['PHP','jQuery','MySQL'], used:1, total:3, hire:12, nda:false, flag:'นักศึกษา 3 ใน 5 คนรุ่นล่าสุดรายงานว่าได้ทำ manual QA และงานเอกสารเป็นหลัก ไม่ตรงบทบาท developer', mentors:[
+  {id:'e4', name:'บจก. เน็กซ์เจน ซอฟต์แวร์', mode:'Onsite', loc:'นนทบุรี', coord:{lat:13.859,lng:100.522}, coop:2.8, gen:3.1, status:'เฝ้าระวัง', stack:['PHP','jQuery','MySQL'], used:1, total:3, hire:12, nda:false, flag:'นักศึกษา 3 ใน 5 คนรุ่นล่าสุดรายงานว่าได้ทำ manual QA และงานเอกสารเป็นหลัก ไม่ตรงบทบาท developer', mentors:[
     {name:'อรทัย วงศ์นิล', title:'QA Supervisor', email:'orathai@nextgen.co.th', phone:'088-901-7761', students:[]}
   ]},
-  {id:'e5', name:'บจก. ไฟน์เทค โซลูชันส์', mode:'Hybrid', loc:'กรุงเทพฯ', coop:4.1, gen:3.9, status:'ใช้ได้', stack:['React','TypeScript','Node.js'], used:1, total:4, hire:33, nda:true, flag:null, mentors:[
+  {id:'e5', name:'บจก. ไฟน์เทค โซลูชันส์', mode:'Hybrid', loc:'กรุงเทพฯ', coord:{lat:13.730,lng:100.542}, coop:4.1, gen:3.9, status:'ใช้ได้', stack:['React','TypeScript','Node.js'], used:1, total:4, hire:33, nda:true, flag:null, mentors:[
     {name:'ปริญญา เทพมนตรี', title:'Engineering Lead', email:'parinya@fintechsol.co.th', phone:'085-660-3310', students:[]}
   ]},
-  {id:'e6', name:'บจก. กรีนบิต ไอที', mode:'Onsite', loc:'ขอนแก่น', coop:null, gen:3.6, status:'ใช้ได้', stack:['Java','Spring','Docker'], used:2, total:3, hire:20, nda:false, flag:null, mentors:[
+  {id:'e6', name:'บจก. กรีนบิต ไอที', mode:'Onsite', loc:'ขอนแก่น', coord:{lat:16.432,lng:102.824}, coop:null, gen:3.6, status:'ใช้ได้', stack:['Java','Spring','Docker'], used:2, total:3, hire:20, nda:false, flag:null, mentors:[
     {name:'ศราวุธ ลิ้มสกุล', title:'Backend Developer', email:'sarawut@greenbit.co.th', phone:'087-330-4415', students:[]}
   ]},
 ];
@@ -1934,6 +1979,79 @@ function visitStatusBadge(status){
   if(status==='ต้องเลื่อน')return '<span class="badge b-amber">ต้องเลื่อน</span>';
   return '<span class="badge b-amber">รอยืนยัน</span>';
 }
+function geoProject(coord){
+  const minLng=97.0,maxLng=106.2,minLat=5.5,maxLat=20.6;
+  const mapLeft=35,mapTop=7,mapWidth=38,mapHeight=86;
+  return {
+    x:Math.max(3,Math.min(97,mapLeft+((coord.lng-minLng)/(maxLng-minLng)*mapWidth))),
+    y:Math.max(3,Math.min(97,mapTop+((maxLat-coord.lat)/(maxLat-minLat)*mapHeight)))
+  };
+}
+function geoArea(loc){
+  if(/กรุงเทพ|นนทบุรี/.test(loc))return 'กรุงเทพฯ และปริมณฑล';
+  if(/เชียงใหม่/.test(loc))return 'ภาคเหนือ / เชียงใหม่';
+  if(/ขอนแก่น/.test(loc))return 'ภาคอีสาน / ขอนแก่น';
+  return loc||'ไม่ระบุพื้นที่';
+}
+function companyGeoRows(visitOnly=false){
+  const visitCompanyIds=new Set(supervisionVisits.map(v=>v.companyId));
+  return establishments
+    .filter(e=>e.coord&&(!visitOnly||visitCompanyIds.has(e.id)))
+    .map(e=>{
+      const interns=students.filter(s=>s.company===e.name);
+      const visits=supervisionVisits.filter(v=>v.companyId===e.id);
+      return {company:e,interns,visits,area:geoArea(e.loc)};
+    });
+}
+function renderThailandGeoMap(mapHostId,listHostId,opts={}){
+  const mapHost=$('#'+mapHostId), listHost=$('#'+listHostId);
+  if(!mapHost||!listHost)return;
+  const rows=companyGeoRows(!!opts.visitOnly).filter(r=>r.interns.length||r.visits.length||!opts.visitOnly);
+  const companyMarkers=rows.map(r=>{
+    const p=geoProject(r.company.coord);
+    const tone=r.company.status==='เฝ้าระวัง'?'warn':'company';
+    return `<button class="map-marker ${tone}" style="left:${p.x}%;top:${p.y}%" title="${r.company.name}">
+      <span class="tip"><b>${r.company.name}</b><br>${r.company.loc} · ${r.company.mode}<br>${r.company.coord.lat.toFixed(3)}, ${r.company.coord.lng.toFixed(3)}<br>นักศึกษาฝึกงาน ${r.interns.length} คน</span>
+    </button>`;
+  }).join('');
+  const studentMarkers=rows.flatMap(r=>r.interns.map((s,i)=>{
+    const coord=s.internshipCoord||r.company.coord;
+    const p=geoProject({lat:coord.lat+(i*.015),lng:coord.lng+(i*.015)});
+    return `<button class="map-marker student" style="left:${p.x}%;top:${p.y}%" title="${s.name}">
+      <span class="tip"><b>${s.name}</b><br>${s.id} · ${s.track}<br>${r.company.name}<br>${coord.lat.toFixed(3)}, ${coord.lng.toFixed(3)}</span>
+    </button>`;
+  })).join('');
+  mapHost.innerHTML=`<div class="thai-map">
+    <svg viewBox="0 0 220 520" aria-label="แผนที่ประเทศไทย">
+      <path class="thai-outline" d="M88 20 C116 28 133 48 128 78 C126 95 141 103 151 119 C165 142 157 166 138 180 C124 190 130 211 147 226 C167 244 169 270 151 287 C137 301 141 324 158 342 C177 361 174 389 157 404 C141 419 145 441 161 462 C171 475 171 492 158 502 C137 518 112 503 103 479 C95 458 82 445 66 431 C49 416 45 393 58 377 C72 361 68 338 51 324 C31 307 35 280 56 268 C73 258 71 235 55 221 C37 205 42 178 64 167 C82 158 85 138 72 121 C56 99 61 75 82 61 C94 53 81 39 88 20 Z"/>
+      <path class="thai-region" d="M74 136 C102 150 129 152 155 136"/>
+      <path class="thai-region" d="M58 252 C87 268 123 270 152 253"/>
+      <path class="thai-region" d="M69 350 C96 360 128 362 160 351"/>
+      <text x="74" y="95" fill="#8A90A0" font-size="13">เหนือ</text>
+      <text x="125" y="207" fill="#8A90A0" font-size="13">อีสาน</text>
+      <text x="75" y="286" fill="#8A90A0" font-size="13">กลาง</text>
+      <text x="110" y="448" fill="#8A90A0" font-size="13">ใต้</text>
+    </svg>
+    ${companyMarkers}${studentMarkers}
+    <div class="map-note"><b>ใช้วางแผนนิเทศ</b><br>รวมบริษัทที่อยู่ใกล้กันเป็นทริปเดียว และตรวจจุดนักศึกษาที่ฝึกงานจริงก่อนนัดหมาย</div>
+    <div class="map-legend"><span><i style="background:var(--accent)"></i>บริษัท</span><span><i style="background:var(--green)"></i>นักศึกษา</span><span><i style="background:var(--amber)"></i>เฝ้าระวัง</span></div>
+  </div>`;
+  const areaRows=Object.values(rows.reduce((acc,r)=>{
+    const key=r.area;
+    if(!acc[key])acc[key]={area:key,companies:[],students:0,visits:0,coords:[]};
+    acc[key].companies.push(r.company.name);
+    acc[key].students+=r.interns.length;
+    acc[key].visits+=r.visits.length;
+    acc[key].coords.push(`${r.company.coord.lat.toFixed(3)}, ${r.company.coord.lng.toFixed(3)}`);
+    return acc;
+  },{})).sort((a,b)=>(b.visits+b.students)-(a.visits+a.students));
+  listHost.innerHTML=areaRows.length?`<div class="geo-list">${areaRows.map((r,i)=>`
+    <div class="geo-row">
+      <div class="top"><div><div class="name">${i+1}. ${r.area}</div><div class="meta">${r.companies.join(' · ')}</div></div><span class="badge ${r.visits?'b-accent':'b-gray'}">${r.students} นักศึกษา</span></div>
+      <div class="coords">${r.coords.join(' | ')}</div>
+      <div class="form-actions" style="margin-top:10px"><button class="btn btn-sm" onclick="toast('เปิดเส้นทาง ${r.area} (เดโม)')">ดูเส้นทาง</button><button class="btn btn-sm btn-primary" onclick="go('supervisionSchedule')">วางแผนนิเทศ</button></div>
+    </div>`).join('')}</div>`:'<div class="empty">ยังไม่มีพิกัดสำหรับวางแผนนิเทศ</div>';
+}
 function renderSupervisionSchedule(){
   const filter=$('#visit-filter')?$('#visit-filter').value:'all';
   const rows=supervisionVisits.filter(v=>filter==='all'||v.status===filter);
@@ -1941,6 +2059,7 @@ function renderSupervisionSchedule(){
   $('#visit-pending').textContent=supervisionVisits.filter(v=>v.status==='รอยืนยัน'||v.status==='ต้องเลื่อน').length;
   $('#visit-confirmed').textContent=supervisionVisits.filter(v=>v.status==='ยืนยันแล้ว').length;
   $('#visit-done').textContent=supervisionVisits.filter(v=>v.status==='นิเทศแล้ว').length;
+  renderThailandGeoMap('visit-geo-map','visit-geo-list',{visitOnly:true});
   $('#visit-list').innerHTML=rows.length?rows.map(v=>{
     const student=students.find(s=>s.id===v.studentId);
     const company=establishments.find(e=>e.id===v.companyId);
@@ -2589,6 +2708,7 @@ function renderDash(){
   $('#c-change').textContent=pendingChanges;
   $('#c-issue').textContent=openIssues;
   $('#c-mentor').textContent=allMentors().length;
+  renderThailandGeoMap('dashboard-geo-map','dashboard-geo-list');
 
   const prog=[['สหกิจ','สหกิจ'],['ฝึกงานทั่วไป','ฝึกงานทั่วไป']].map(([lab,tr])=>{
     const g=students.filter(s=>s.track===tr); const m=g.filter(s=>s.status!=='รอจับคู่').length;
