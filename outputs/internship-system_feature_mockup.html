@@ -348,10 +348,51 @@
   .portal-side .tab{width:100%;justify-content:flex-start;border:1px solid transparent;background:transparent;box-shadow:none;color:var(--ink-2)}
   .portal-side .tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
   .portal-main{min-width:0}
+  #student-portal:not(.hidden),#advisor-portal:not(.hidden),#company-portal:not(.hidden){display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh;background:var(--canvas)}
+  #student-portal .sp-top,#advisor-portal .sp-top,#company-portal .sp-top{grid-column:1;grid-row:1;height:100vh;width:236px;position:sticky;top:0;z-index:30;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:0;background:var(--side);color:var(--side-ink);border-right:1px solid var(--side-line);border-bottom:none}
+  #student-portal .sp-top .brand,#advisor-portal .sp-top .brand,#company-portal .sp-top .brand{display:grid;grid-template-columns:34px 1fr;column-gap:11px;align-items:center;padding:18px 18px 16px;border-bottom:1px solid var(--side-line);color:#fff;font-size:14.5px;line-height:1.25}
+  #student-portal .sp-top .brand .m,#advisor-portal .sp-top .brand .m,#company-portal .sp-top .brand .m{width:34px;height:34px;border-radius:9px;font-size:18px;flex-shrink:0}
+  #student-portal .sp-top .brand .m,#advisor-portal .sp-top .brand .m,#company-portal .sp-top .brand .m{grid-row:1 / span 2}
+  #student-portal .sp-top .brand::after,#advisor-portal .sp-top .brand::after,#company-portal .sp-top .brand::after{content:attr(data-role);grid-column:2;display:block;font-size:11.5px;font-weight:400;color:var(--side-muted);margin-top:-8px}
+  #student-portal .sp-top > div:last-child,#advisor-portal .sp-top > div:last-child,#company-portal .sp-top > div:last-child{margin-top:auto;padding:13px 16px;border-top:1px solid var(--side-line);gap:10px;justify-content:flex-start}
+  #student-portal .sp-top .btn,#advisor-portal .sp-top .btn,#company-portal .sp-top .btn{color:var(--side-ink);border-color:transparent;background:transparent}
+  #student-portal .sp-top .btn:hover,#advisor-portal .sp-top .btn:hover,#company-portal .sp-top .btn:hover{background:var(--side-2);color:#fff}
+  #student-portal .sp-content,#advisor-portal .sp-content,#company-portal .sp-content{grid-column:2;max-width:none;width:100%;margin:0;padding:0;min-width:0}
+  #student-portal .sp-content>.sp-hero,#advisor-portal .sp-content>.sp-hero,#company-portal .company-hero{height:60px;position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 26px;margin:0;background:var(--surface);border-bottom:1px solid var(--border)}
+  #student-portal .sp-hero h1,#advisor-portal .sp-hero h1,#company-portal .company-hero h1{font-size:17px;font-weight:600;margin:0;white-space:nowrap}
+  #student-portal .sp-hero p,#advisor-portal .sp-hero p,#company-portal .company-hero p{font-size:13px;color:var(--muted);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #company-portal .company-hero .sp-hero{margin:0!important;min-width:0}
+  #student-portal .portal-layout,#advisor-portal .portal-layout,#company-portal .portal-layout{display:block;max-width:1180px;width:100%;margin:0 auto;padding:26px}
+  #student-portal .portal-side,#advisor-portal .portal-side,#company-portal .portal-side{position:fixed;left:12px;top:84px;bottom:86px;width:212px;z-index:35;display:block;overflow:auto;border:none;border-radius:0;background:transparent;box-shadow:none;padding:0}
+  #student-portal .portal-side .tab,#advisor-portal .portal-side .tab,#company-portal .portal-side .tab{height:auto;min-height:44px;margin-bottom:3px;padding:10px 12px;border-radius:9px;border:none;background:transparent;color:var(--side-ink);font-size:14px;font-weight:500;justify-content:flex-start;text-align:left}
+  #student-portal .portal-side .tab:hover,#advisor-portal .portal-side .tab:hover,#company-portal .portal-side .tab:hover{background:var(--side-2);color:#fff}
+  #student-portal .portal-side .tab.active,#advisor-portal .portal-side .tab.active,#company-portal .portal-side .tab.active{background:var(--accent);color:#fff}
+  #student-portal .portal-side .tab::before,#advisor-portal .portal-side .tab::before,#company-portal .portal-side .tab::before{width:20px;text-align:center;color:var(--side-muted);font-size:16px;line-height:1}
+  #student-portal .portal-side .tab.active::before,#advisor-portal .portal-side .tab.active::before,#company-portal .portal-side .tab.active::before{color:#fff}
+  [data-sp-tab="overview"]::before,[data-cp-tab="overview"]::before{content:"◧"}
+  [data-sp-tab="profile"]::before,[data-ap-tab="profile"]::before{content:"◉"}
+  [data-sp-tab="logbook"]::before{content:"▤"}
+  [data-sp-tab="evaluation"]::before,[data-ap-tab="evaluation"]::before{content:"★"}
+  [data-sp-tab="issues"]::before,[data-ap-tab="issues"]::before,[data-cp-tab="issues"]::before{content:"!"}
+  [data-ap-tab="schedule"]::before{content:"◷"}
+  [data-ap-tab="students"]::before,[data-cp-tab="students"]::before{content:"●"}
+  [data-cp-tab="workflow"]::before{content:"▦"}
+  [data-cp-tab="mentors"]::before{content:"◎"}
+  #student-portal .portal-main,#advisor-portal .portal-main,#company-portal .portal-main{min-width:0}
   @media(max-width:900px){
     .portal-layout{grid-template-columns:1fr}
     .portal-side{position:static;display:flex;overflow:auto}
     .portal-side .tab{width:auto;flex-shrink:0}
+    #student-portal:not(.hidden),#advisor-portal:not(.hidden),#company-portal:not(.hidden){display:block}
+    #student-portal .sp-top,#advisor-portal .sp-top,#company-portal .sp-top{width:100%;height:60px;position:sticky;top:0;z-index:40;flex-direction:row;align-items:center;justify-content:space-between;padding:0 16px;border-right:none;border-bottom:1px solid var(--side-line)}
+    #student-portal .sp-top .brand,#advisor-portal .sp-top .brand,#company-portal .sp-top .brand{padding:0;border-bottom:none}
+    #student-portal .sp-top .brand::after,#advisor-portal .sp-top .brand::after,#company-portal .sp-top .brand::after{display:none}
+    #student-portal .sp-top > div:last-child,#advisor-portal .sp-top > div:last-child,#company-portal .sp-top > div:last-child{margin-top:0;padding:0;border-top:none}
+    #student-portal .sp-content>.sp-hero,#advisor-portal .sp-content>.sp-hero,#company-portal .company-hero{top:60px;padding:0 16px}
+    #student-portal .portal-layout,#advisor-portal .portal-layout,#company-portal .portal-layout{padding:18px}
+    #student-portal .portal-side,#advisor-portal .portal-side,#company-portal .portal-side{position:static;width:auto;display:flex;overflow:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:8px;margin-bottom:16px}
+    #student-portal .portal-side .tab,#advisor-portal .portal-side .tab,#company-portal .portal-side .tab{width:auto;flex-shrink:0;margin:0 5px 0 0;border:1px solid var(--border);background:var(--surface);color:var(--ink-2)}
+    #student-portal .portal-side .tab.active,#advisor-portal .portal-side .tab.active,#company-portal .portal-side .tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
   }
   .workflow-panel{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:14px;margin-bottom:18px}
   .breadcrumb{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin-bottom:10px}
@@ -954,7 +995,7 @@
 <!-- ===================== STUDENT PORTAL ===================== -->
 <div id="student-portal" class="hidden">
   <header class="sp-top">
-    <div class="brand"><div class="m">▦</div> ระบบฝึกงาน ภาควิชาไอที</div>
+    <div class="brand" data-role="Student Portal"><div class="m">▦</div> ระบบฝึกงาน ภาควิชาไอที</div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="avatar" id="sp-avatar">ก</div>
       <button class="btn btn-sm btn-ghost" onclick="logoutStudent()">ออกจากระบบ</button>
@@ -1027,7 +1068,7 @@
 <!-- ===================== ADVISOR PORTAL ===================== -->
 <div id="advisor-portal" class="hidden">
   <header class="sp-top">
-    <div class="brand"><div class="m">▦</div> ระบบฝึกงาน ภาควิชาไอที</div>
+    <div class="brand" data-role="Advisor Portal"><div class="m">▦</div> ระบบฝึกงาน ภาควิชาไอที</div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="avatar" id="ap-avatar">อ</div>
       <button class="btn btn-sm btn-ghost" onclick="logoutAdvisor()">ออกจากระบบ</button>
@@ -1056,7 +1097,7 @@
 <!-- ===================== COMPANY PORTAL ===================== -->
 <div id="company-portal" class="hidden">
   <header class="sp-top">
-    <div class="brand"><div class="m">▦</div> พอร์ทัลสถานประกอบการ</div>
+    <div class="brand" data-role="Company Portal"><div class="m">▦</div> พอร์ทัลสถานประกอบการ</div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="avatar">ค</div>
       <button class="btn btn-sm btn-ghost" onclick="logoutCompany()">ออกจากระบบ</button>
@@ -1523,9 +1564,44 @@ function logoutStudent(){ $('#student-portal').classList.add('hidden'); $('#logi
 function logoutAdvisor(){ $('#advisor-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
 function logoutCompany(){ $('#company-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
 function logoutStaff(){ $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); $('#sidebar').classList.remove('open'); window.scrollTo(0,0); }
+const portalTitles={
+  student:{
+    overview:['ภาพรวมการฝึกงาน','ดูสถานะการจับคู่ พี่เลี้ยง และเอกสารหลัก'],
+    profile:['ข้อมูลส่วนตัว','จัดการข้อมูลติดต่อ ทักษะ และ Portfolio'],
+    logbook:['Logbook รายวัน','บันทึกงานประจำวันและส่งสรุปรายสัปดาห์'],
+    evaluation:['ประเมินสถานประกอบการ','เปิดตามช่วงเวลาที่เจ้าหน้าที่กำหนด'],
+    issues:['ร้องเรียน / แจ้งปัญหา','ติดตามเคสของตนเองระหว่างฝึกงาน']
+  },
+  advisor:{
+    profile:['ข้อมูลอาจารย์นิเทศ','จัดการข้อมูลติดต่อและความเชี่ยวชาญของตนเอง'],
+    schedule:['นัดนิเทศ','ดูตารางนิเทศและสถานะการประสานงาน'],
+    students:['งานนิเทศ','รายชื่อนักศึกษาที่รับผิดชอบ'],
+    evaluation:['ประเมินบริษัท','เปิดตามช่วงเวลาที่เจ้าหน้าที่กำหนด'],
+    issues:['ร้องเรียนที่เกี่ยวข้อง','เห็นเฉพาะเคสของนักศึกษาที่รับผิดชอบ']
+  },
+  company:{
+    overview:['ภาพรวมบริษัท','งานที่สถานประกอบการต้องดำเนินการในรอบนี้'],
+    workflow:['งานบริษัท','ตำแหน่ง เอกสาร Logbook และการประเมิน'],
+    mentors:['จัดการพี่เลี้ยง','เพิ่ม แก้ไข และผูกพี่เลี้ยงกับนักศึกษา'],
+    students:['นักศึกษา / เอกสาร','ติดตามนักศึกษาฝึกงานและวงจร CWIE'],
+    issues:['ร้องเรียน / แจ้งปัญหา','ส่งและติดตามเคสที่เกี่ยวข้องกับบริษัท']
+  }
+};
+function setPortalTitle(role,key){
+  const item=(portalTitles[role]&&portalTitles[role][key])||['พอร์ทัล',''];
+  const root=role==='student'?$('#student-portal'):role==='advisor'?$('#advisor-portal'):$('#company-portal');
+  if(!root)return;
+  const hero=$('.sp-hero',root);
+  if(hero){
+    const h=$('h1',hero), p=$('p',hero);
+    if(h)h.textContent=item[0];
+    if(p)p.textContent=item[1];
+  }
+}
 function switchCompanyPortalTab(el,key){
   if(el){$$('[data-cp-tab]').forEach(b=>b.classList.remove('active')); el.classList.add('active');}
   $$('[data-cp-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.cpPanel!==key));
+  setPortalTitle('company',key);
 }
 function openStudentPortal(){
   renderStudentPortalProfile();
@@ -1537,6 +1613,7 @@ function openStudentPortal(){
 function switchStudentPortalTab(el,key){
   if(el){$$('[data-sp-tab]').forEach(b=>b.classList.remove('active')); el.classList.add('active');}
   $$('[data-sp-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.spPanel!==key));
+  setPortalTitle('student',key);
 }
 function studentFirstName(name){return String(name||'นักศึกษา').split(' ')[0]||'นักศึกษา';}
 function renderStudentPortalProfile(){
@@ -2863,6 +2940,7 @@ function openAdvisorPortal(){
 function switchAdvisorPortalTab(el,key){
   if(el){$$('[data-ap-tab]').forEach(b=>b.classList.remove('active')); el.classList.add('active');}
   $$('[data-ap-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.apPanel!==key));
+  setPortalTitle('advisor',key);
 }
 function renderAdvisorProfileCard(adv,mine){
   const pending=mine.filter(a=>a.status!=='ประเมินแล้ว').length;
