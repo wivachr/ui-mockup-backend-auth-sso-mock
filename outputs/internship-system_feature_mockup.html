@@ -360,10 +360,11 @@
   #student-portal .sp-content,#advisor-portal .sp-content,#company-portal .sp-content{grid-column:2;max-width:none;width:100%;margin:0;padding:0;min-width:0}
   #student-portal .sp-content>.sp-hero,#advisor-portal .sp-content>.sp-hero,#company-portal .company-hero{height:60px;position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 26px;margin:0;background:var(--surface);border-bottom:1px solid var(--border)}
   #student-portal .sp-hero h1,#advisor-portal .sp-hero h1,#company-portal .company-hero h1{font-size:17px;font-weight:600;margin:0;white-space:nowrap}
-  #student-portal .sp-hero p,#advisor-portal .sp-hero p,#company-portal .company-hero p{font-size:13px;color:var(--muted);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #student-portal .sp-hero p,#advisor-portal .sp-hero p,#company-portal .company-hero p{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);padding:6px 12px;border-radius:999px;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
   #company-portal .company-hero .sp-hero{margin:0!important;min-width:0}
   #student-portal .portal-layout,#advisor-portal .portal-layout,#company-portal .portal-layout{display:block;max-width:1180px;width:100%;margin:0 auto;padding:26px}
   #student-portal .portal-side,#advisor-portal .portal-side,#company-portal .portal-side{position:fixed;left:12px;top:84px;bottom:86px;width:212px;z-index:35;display:block;overflow:auto;border:none;border-radius:0;background:transparent;box-shadow:none;padding:0}
+  #student-portal .portal-side .nav-sec,#advisor-portal .portal-side .nav-sec,#company-portal .portal-side .nav-sec{margin:14px 10px 6px;color:var(--side-muted)}
   #student-portal .portal-side .tab,#advisor-portal .portal-side .tab,#company-portal .portal-side .tab{height:auto;min-height:44px;margin-bottom:3px;padding:10px 12px;border-radius:9px;border:none;background:transparent;color:var(--side-ink);font-size:14px;font-weight:500;justify-content:flex-start;text-align:left}
   #student-portal .portal-side .tab:hover,#advisor-portal .portal-side .tab:hover,#company-portal .portal-side .tab:hover{background:var(--side-2);color:#fff}
   #student-portal .portal-side .tab.active,#advisor-portal .portal-side .tab.active,#company-portal .portal-side .tab.active{background:var(--accent);color:#fff}
@@ -379,6 +380,9 @@
   [data-cp-tab="workflow"]::before{content:"▦"}
   [data-cp-tab="mentors"]::before{content:"◎"}
   #student-portal .portal-main,#advisor-portal .portal-main,#company-portal .portal-main{min-width:0}
+  .portal-intro{margin-bottom:20px}
+  .portal-intro h1{font-size:21px;font-weight:600;margin:0 0 3px}
+  .portal-intro p{margin:0;color:var(--muted);font-size:13.5px}
   @media(max-width:900px){
     .portal-layout{grid-template-columns:1fr}
     .portal-side{position:static;display:flex;overflow:auto}
@@ -1004,8 +1008,11 @@
   <div class="sp-content student-wide">
     <div class="sp-hero"><h1 id="sp-hello">สวัสดี</h1><p id="sp-sub">จัดการข้อมูลฝึกงานและสมุดบันทึกการปฏิบัติงาน</p></div>
     <div class="portal-layout">
+      <div class="page-intro portal-intro"><h1 id="sp-page-title">ภาพรวมการฝึกงาน</h1><p id="sp-page-sub">ดูสถานะการจับคู่ พี่เลี้ยง และเอกสารหลัก</p></div>
       <aside class="portal-side">
+        <div class="nav-sec">ภาพรวม</div>
         <button class="btn tab active" data-sp-tab="overview" onclick="switchStudentPortalTab(this,'overview')">ภาพรวม</button>
+        <div class="nav-sec">งานของฉัน</div>
         <button class="btn tab" data-sp-tab="profile" onclick="switchStudentPortalTab(this,'profile')">ข้อมูลส่วนตัว</button>
         <button class="btn tab" data-sp-tab="logbook" onclick="switchStudentPortalTab(this,'logbook')">Logbook</button>
         <button class="btn tab" data-sp-tab="evaluation" onclick="switchStudentPortalTab(this,'evaluation')">ประเมิน</button>
@@ -1080,8 +1087,11 @@
       <p id="ap-sub">ประเมินสถานประกอบการที่คุณรับผิดชอบนิเทศ</p>
     </div>
     <div class="portal-layout">
+      <div class="page-intro portal-intro"><h1 id="ap-page-title">ข้อมูลอาจารย์นิเทศ</h1><p id="ap-page-sub">จัดการข้อมูลติดต่อและความเชี่ยวชาญของตนเอง</p></div>
       <aside class="portal-side">
+        <div class="nav-sec">ข้อมูลของฉัน</div>
         <button class="btn tab active" data-ap-tab="profile" onclick="switchAdvisorPortalTab(this,'profile')">ข้อมูลอาจารย์</button>
+        <div class="nav-sec">งานนิเทศ</div>
         <button class="btn tab" data-ap-tab="schedule" onclick="switchAdvisorPortalTab(this,'schedule')">นัดนิเทศ</button>
         <button class="btn tab" data-ap-tab="students" onclick="switchAdvisorPortalTab(this,'students')">งานนิเทศ</button>
         <button class="btn tab" data-ap-tab="evaluation" onclick="switchAdvisorPortalTab(this,'evaluation')">ประเมินบริษัท</button>
@@ -1112,8 +1122,11 @@
       <button class="btn btn-primary" onclick="toast('เพิ่มตำแหน่งฝึกงานรอบใหม่ (เดโม)')">＋ เปิดรับตำแหน่ง</button>
     </div>
     <div class="portal-layout">
+      <div class="page-intro portal-intro"><h1 id="cp-page-title">ภาพรวมบริษัท</h1><p id="cp-page-sub">งานที่สถานประกอบการต้องดำเนินการในรอบนี้</p></div>
       <aside class="portal-side">
+        <div class="nav-sec">ภาพรวม</div>
         <button class="btn tab active" data-cp-tab="overview" onclick="switchCompanyPortalTab(this,'overview')">ภาพรวม</button>
+        <div class="nav-sec">จัดการข้อมูล</div>
         <button class="btn tab" data-cp-tab="workflow" onclick="switchCompanyPortalTab(this,'workflow')">งานบริษัท</button>
         <button class="btn tab" data-cp-tab="mentors" onclick="switchCompanyPortalTab(this,'mentors')">พี่เลี้ยง</button>
         <button class="btn tab" data-cp-tab="students" onclick="switchCompanyPortalTab(this,'students')">นักศึกษา / เอกสาร</button>
@@ -1597,6 +1610,10 @@ function setPortalTitle(role,key){
     if(h)h.textContent=item[0];
     if(p)p.textContent=item[1];
   }
+  const title=$(`#${role==='student'?'sp':role==='advisor'?'ap':'cp'}-page-title`);
+  const sub=$(`#${role==='student'?'sp':role==='advisor'?'ap':'cp'}-page-sub`);
+  if(title)title.textContent=item[0];
+  if(sub)sub.textContent=item[1];
 }
 function switchCompanyPortalTab(el,key){
   if(el){$$('[data-cp-tab]').forEach(b=>b.classList.remove('active')); el.classList.add('active');}
