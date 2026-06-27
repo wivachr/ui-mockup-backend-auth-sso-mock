@@ -303,11 +303,13 @@ Bucket:
 - ตั้ง lint, format, typecheck
 - ตั้ง env แยก local/staging/production
 - สร้าง layout ตาม role
+- สร้าง portal shell แบบแท็บด้านซ้ายสำหรับ student/advisor/company
 
 ผลลัพธ์:
 
 - เข้าหน้า login/mock auth ได้
 - มี shell ของ staff/student/advisor/company
+- Portal หลักไม่เป็นหน้าเดียวยาวเกินไป
 - มี database migration แรก
 
 ### Phase 1: Auth + Role + Core Master Data
@@ -371,6 +373,7 @@ Bucket:
 - Student 360 comment thread
 - Change request approval workflow
 - Issue/complaint triage
+- Issue visibility rules: staff เห็นทั้งหมด, advisor เห็นเฉพาะนักศึกษาที่รับผิดชอบ, student/company เห็นเฉพาะของตน
 - CWIE document templates with merge fields
 - Advisor workload dashboard
 

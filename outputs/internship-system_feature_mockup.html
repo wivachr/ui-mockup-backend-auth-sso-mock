@@ -343,6 +343,16 @@
   .portal-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
   .portal-tabs .tab{border:1px solid var(--border);background:var(--surface);box-shadow:none}
   .portal-tabs .tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+  .portal-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}
+  .portal-side{position:sticky;top:86px;display:grid;gap:7px;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:10px;box-shadow:var(--shadow)}
+  .portal-side .tab{width:100%;justify-content:flex-start;border:1px solid transparent;background:transparent;box-shadow:none;color:var(--ink-2)}
+  .portal-side .tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+  .portal-main{min-width:0}
+  @media(max-width:900px){
+    .portal-layout{grid-template-columns:1fr}
+    .portal-side{position:static;display:flex;overflow:auto}
+    .portal-side .tab{width:auto;flex-shrink:0}
+  }
   .workflow-panel{border:1px solid var(--border);border-radius:12px;background:var(--surface-2);padding:14px;margin-bottom:18px}
   .breadcrumb{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin-bottom:10px}
   .breadcrumb button{border:none;background:none;color:var(--accent);font:inherit;cursor:pointer;padding:0}
@@ -777,7 +787,7 @@
       <!-- ========== ISSUE REPORTS ========== -->
       <section id="page-issueReports" class="page hidden">
         <div class="page-intro" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
-          <div><h1>ร้องเรียน / แจ้งปัญหาระหว่างฝึกงาน</h1><p>ช่องทางให้นักศึกษาหรือผู้เกี่ยวข้องแจ้งปัญหาแบบเป็นระบบ พร้อม triage และการปกป้องความเป็นส่วนตัว</p></div>
+          <div><h1>ร้องเรียน / แจ้งปัญหาระหว่างฝึกงาน</h1><p>เจ้าหน้าที่เห็นทุกเคสจากนักศึกษาและสถานประกอบการ พร้อม triage และติดตามการปิดเคส</p></div>
           <button class="btn btn-primary" onclick="toast('เปิดฟอร์มแจ้งปัญหาใหม่ (เดโม)')">＋ แจ้งปัญหา</button>
         </div>
         <div class="grid metrics" style="margin-bottom:18px">
@@ -952,13 +962,22 @@
   </header>
   <div class="sp-content student-wide">
     <div class="sp-hero"><h1 id="sp-hello">สวัสดี</h1><p id="sp-sub">จัดการข้อมูลฝึกงานและสมุดบันทึกการปฏิบัติงาน</p></div>
-    <div id="sp-profile-wrap"></div>
-    <div class="card card-pad" style="margin-bottom:18px">
+    <div class="portal-layout">
+      <aside class="portal-side">
+        <button class="btn tab active" data-sp-tab="overview" onclick="switchStudentPortalTab(this,'overview')">ภาพรวม</button>
+        <button class="btn tab" data-sp-tab="profile" onclick="switchStudentPortalTab(this,'profile')">ข้อมูลส่วนตัว</button>
+        <button class="btn tab" data-sp-tab="logbook" onclick="switchStudentPortalTab(this,'logbook')">Logbook</button>
+        <button class="btn tab" data-sp-tab="evaluation" onclick="switchStudentPortalTab(this,'evaluation')">ประเมิน</button>
+        <button class="btn tab" data-sp-tab="issues" onclick="switchStudentPortalTab(this,'issues')">ร้องเรียน / แจ้งปัญหา</button>
+      </aside>
+      <main class="portal-main">
+    <div id="sp-profile-wrap" data-sp-panel="profile"></div>
+    <div class="card card-pad" id="sp-overview-card" data-sp-panel="overview" style="margin-bottom:18px">
       <div class="sec-title">การฝึกงานของคุณ</div>
       <div class="sec-sub" style="margin:0">รอบ 1 / 2569</div>
       <div class="pl-grid" id="sp-internship-info"></div>
     </div>
-    <div class="card card-pad" style="margin-bottom:18px">
+    <div class="card card-pad" data-sp-panel="logbook" style="margin-bottom:18px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap">
         <div><div class="sec-title">สมุดบันทึกการปฏิบัติงานรายวัน</div><div class="sec-sub" style="margin:0">บันทึกสิ่งที่ทำจริงทุกวัน แล้วส่งสรุปรายสัปดาห์ให้พี่เลี้ยงตรวจ</div></div>
         <button class="btn btn-primary btn-sm" onclick="saveDailyLog()">บันทึกวันนี้</button>
@@ -998,7 +1017,10 @@
         <div class="row"><span>รอตรวจ / ขอแก้ไข</span><b id="log-pending">—</b></div>
       </div>
     </div>
-    <div id="sp-eval-wrap"></div>
+    <div id="sp-eval-wrap" data-sp-panel="evaluation"></div>
+    <div id="sp-issues-wrap" data-sp-panel="issues"></div>
+      </main>
+    </div>
   </div>
 </div>
 
@@ -1016,7 +1038,18 @@
       <h1 id="ap-hello">สวัสดี</h1>
       <p id="ap-sub">ประเมินสถานประกอบการที่คุณรับผิดชอบนิเทศ</p>
     </div>
-    <div id="ap-body"></div>
+    <div class="portal-layout">
+      <aside class="portal-side">
+        <button class="btn tab active" data-ap-tab="profile" onclick="switchAdvisorPortalTab(this,'profile')">ข้อมูลอาจารย์</button>
+        <button class="btn tab" data-ap-tab="schedule" onclick="switchAdvisorPortalTab(this,'schedule')">นัดนิเทศ</button>
+        <button class="btn tab" data-ap-tab="students" onclick="switchAdvisorPortalTab(this,'students')">งานนิเทศ</button>
+        <button class="btn tab" data-ap-tab="evaluation" onclick="switchAdvisorPortalTab(this,'evaluation')">ประเมินบริษัท</button>
+        <button class="btn tab" data-ap-tab="issues" onclick="switchAdvisorPortalTab(this,'issues')">ร้องเรียนที่เกี่ยวข้อง</button>
+      </aside>
+      <main class="portal-main">
+        <div id="ap-body"></div>
+      </main>
+    </div>
   </div>
 </div>
 
@@ -1037,20 +1070,29 @@
       </div>
       <button class="btn btn-primary" onclick="toast('เพิ่มตำแหน่งฝึกงานรอบใหม่ (เดโม)')">＋ เปิดรับตำแหน่ง</button>
     </div>
-    <div class="grid metrics" style="margin-bottom:18px">
+    <div class="portal-layout">
+      <aside class="portal-side">
+        <button class="btn tab active" data-cp-tab="overview" onclick="switchCompanyPortalTab(this,'overview')">ภาพรวม</button>
+        <button class="btn tab" data-cp-tab="workflow" onclick="switchCompanyPortalTab(this,'workflow')">งานบริษัท</button>
+        <button class="btn tab" data-cp-tab="mentors" onclick="switchCompanyPortalTab(this,'mentors')">พี่เลี้ยง</button>
+        <button class="btn tab" data-cp-tab="students" onclick="switchCompanyPortalTab(this,'students')">นักศึกษา / เอกสาร</button>
+        <button class="btn tab" data-cp-tab="issues" onclick="switchCompanyPortalTab(this,'issues')">ร้องเรียน / แจ้งปัญหา</button>
+      </aside>
+      <main class="portal-main">
+    <div class="grid metrics" data-cp-panel="overview" style="margin-bottom:18px">
       <div class="metric"><div class="lbl2">รับได้รอบนี้</div><div class="val">4</div><div class="sub">ใช้ไปแล้ว 3 ที่</div></div>
       <div class="metric"><div class="lbl2">นักศึกษาปัจจุบัน</div><div class="val">2</div><div class="sub">1 คนรอเริ่มงาน</div></div>
       <div class="metric"><div class="lbl2">เอกสารรอยืนยัน</div><div class="val">3</div><div class="sub">Job plan / Mentor confirm</div></div>
       <div class="metric"><div class="lbl2">Logbook รอตรวจ</div><div class="val">2</div><div class="sub">จากนักศึกษาฝึกงาน</div></div>
     </div>
-    <div class="card card-pad" style="margin-bottom:18px">
+    <div class="card card-pad" data-cp-panel="overview" style="margin-bottom:18px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px">
         <div><div class="sec-title">งานของสถานประกอบการ</div><div class="sec-sub" style="margin:2px 0 0">รายการที่บริษัทต้องดำเนินการต่อในรอบ 1 / 2569</div></div>
         <button class="btn btn-sm" onclick="toast('ส่งออกคิวงานบริษัท (เดโม)')">⬇ Export</button>
       </div>
       <div id="company-task-queue"></div>
     </div>
-    <div class="card card-pad" style="margin-bottom:18px">
+    <div class="card card-pad" data-cp-panel="workflow" style="margin-bottom:18px">
       <div class="portal-tabs" id="company-tabs">
         <button class="tab active" onclick="switchCompanyWorkflow(this,'positions')">ตำแหน่งที่เปิดรับ</button>
         <button class="tab" onclick="switchCompanyWorkflow(this,'mentors')">พี่เลี้ยง</button>
@@ -1061,7 +1103,7 @@
       </div>
       <div class="workflow-panel" id="company-workflow-panel"></div>
     </div>
-    <div class="card card-pad" style="margin-bottom:18px">
+    <div class="card card-pad" data-cp-panel="mentors" style="margin-bottom:18px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
         <div>
           <div class="sec-title">จัดการพี่เลี้ยงของสถานประกอบการ</div>
@@ -1071,7 +1113,7 @@
       </div>
       <div id="company-mentor-manager"></div>
     </div>
-    <div class="split-2">
+    <div class="split-2" data-cp-panel="students">
       <div class="card card-pad">
         <div class="sec-title">นักศึกษาที่ดูแล</div>
         <div class="sec-sub">พี่เลี้ยงบริษัทเห็นงานที่ต้องอนุมัติในที่เดียว</div>
@@ -1100,6 +1142,9 @@
           <div class="tl-row"><div class="tl-title">ประเมินนักศึกษา</div><div class="tl-meta">เปิดแบบฟอร์มหลังฝึกครบ 70%</div></div>
         </div>
       </div>
+    </div>
+    <div id="company-issues-wrap" data-cp-panel="issues"></div>
+      </main>
     </div>
   </div>
 </div>
@@ -1478,10 +1523,20 @@ function logoutStudent(){ $('#student-portal').classList.add('hidden'); $('#logi
 function logoutAdvisor(){ $('#advisor-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
 function logoutCompany(){ $('#company-portal').classList.add('hidden'); $('#login').classList.remove('hidden'); window.scrollTo(0,0); }
 function logoutStaff(){ $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); $('#sidebar').classList.remove('open'); window.scrollTo(0,0); }
+function switchCompanyPortalTab(el,key){
+  if(el){$$('[data-cp-tab]').forEach(b=>b.classList.remove('active')); el.classList.add('active');}
+  $$('[data-cp-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.cpPanel!==key));
+}
 function openStudentPortal(){
   renderStudentPortalProfile();
   renderLogbook();
   renderStudentEvaluation();
+  renderPortalIssues('student');
+  switchStudentPortalTab($('.portal-side [data-sp-tab="overview"]'),'overview');
+}
+function switchStudentPortalTab(el,key){
+  if(el){$$('[data-sp-tab]').forEach(b=>b.classList.remove('active')); el.classList.add('active');}
+  $$('[data-sp-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.spPanel!==key));
 }
 function studentFirstName(name){return String(name||'นักศึกษา').split(' ')[0]||'นักศึกษา';}
 function renderStudentPortalProfile(){
@@ -1989,6 +2044,90 @@ function closeIssueReport(id){
   renderIssueReports(); renderRiskMonitor(); renderDash(); renderNotifications(); renderStudent360(issue.studentId); renderAuditLog();
   toast('ปิดเคสปัญหาแล้ว');
 }
+function issueStudent(issue){return students.find(s=>s.id===issue.studentId);}
+function issueCompany(issue){
+  const s=issueStudent(issue);
+  return s?establishments.find(e=>e.name===s.company):null;
+}
+function issueRowsFor(scope){
+  if(scope==='student')return issueReports.filter(x=>x.studentId===currentStudentId);
+  if(scope==='company')return issueReports.filter(x=>issueCompany(x)?.id==='e1');
+  if(scope==='advisor'){
+    const ids=new Set(advisorAssignments.filter(a=>a.advisorId===currentAdvisorId).map(a=>a.studentId));
+    return issueReports.filter(x=>ids.has(x.studentId));
+  }
+  return issueReports;
+}
+function issuePortalCard(issue,scope){
+  const student=issueStudent(issue);
+  const company=issueCompany(issue);
+  const canClose=scope==='staff';
+  const contextAction=scope==='staff'
+    ? `<button class="btn btn-sm" onclick="openStudent360('${issue.studentId}')">เปิด Student 360</button>`
+    : `<button class="btn btn-sm" onclick="toast('เปิดรายละเอียดเคส ${issue.title} (เดโม)')">ดูรายละเอียดเคส</button>`;
+  return `<div class="approval-card" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+      <div><div class="name">${issue.title}</div><div class="meta">${student?student.name:issue.studentId} · ${company?company.name:'-'} · ${issue.category}</div></div>
+      ${issueBadge(issue)}
+    </div>
+    <div class="rule-note" style="margin-top:12px"><span>!</span><span><b>${issue.confidentiality} · owner: ${issue.owner}</b><br>${issue.detail}</span></div>
+    <div class="form-actions">
+      ${contextAction}
+      ${canClose&&issue.status!=='closed'?`<button class="btn btn-sm btn-primary" onclick="closeIssueReport('${issue.id}')">ปิดเคส</button>`:''}
+    </div>
+  </div>`;
+}
+function renderPortalIssues(scope){
+  const wrap=scope==='student'?$('#sp-issues-wrap'):scope==='company'?$('#company-issues-wrap'):null;
+  if(!wrap)return;
+  const rows=issueRowsFor(scope);
+  const title=scope==='student'?'ร้องเรียน / แจ้งปัญหาของฉัน':'ร้องเรียน / แจ้งปัญหาที่เกี่ยวข้องกับบริษัท';
+  const helper=scope==='student'
+    ? 'นักศึกษาส่งปัญหาได้จากหน้านี้ เจ้าหน้าที่จะเห็นและ triage ต่อ'
+    : 'สถานประกอบการเห็นเฉพาะเคสที่เกี่ยวข้องกับนักศึกษาของบริษัท และสามารถส่งปัญหาเพิ่มได้';
+  wrap.innerHTML=`
+    <div class="card card-pad">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+        <div><div class="sec-title">${title}</div><div class="sec-sub" style="margin:2px 0 0">${helper}</div></div>
+        <span class="badge b-amber">${rows.filter(x=>x.status!=='closed').length} เปิดอยู่</span>
+      </div>
+      <div style="margin-bottom:12px">${rows.length?rows.map(x=>issuePortalCard(x,scope)).join(''):'<div class="empty">ยังไม่มีเคสปัญหาใน scope นี้</div>'}</div>
+      <div class="form-grid">
+        <div><label class="lbl">ประเภทปัญหา</label><select id="${scope}-issue-category"><option>งานไม่ตรงสาย</option><option>Logbook</option><option>นัดนิเทศ</option><option>ความปลอดภัย</option><option>การสื่อสาร</option></select></div>
+        <div><label class="lbl">ระดับความเร่งด่วน</label><select id="${scope}-issue-severity"><option value="medium">ปกติ</option><option value="high">เร่งด่วน</option><option value="low">ต่ำ</option></select></div>
+        <div class="field-full"><label class="lbl">หัวข้อ</label><input id="${scope}-issue-title" placeholder="สรุปปัญหาสั้นๆ"></div>
+        <div class="field-full"><label class="lbl">รายละเอียด</label><textarea id="${scope}-issue-detail" rows="3" placeholder="เล่ารายละเอียดที่ต้องการให้เจ้าหน้าที่ช่วยติดตาม"></textarea></div>
+      </div>
+      <div class="form-actions" style="margin-top:12px"><button class="btn btn-primary" onclick="submitPortalIssue('${scope}')">ส่งเรื่องให้เจ้าหน้าที่</button></div>
+    </div>`;
+}
+function submitPortalIssue(scope){
+  const title=cleanInput($(`#${scope}-issue-title`).value);
+  const detail=cleanInput($(`#${scope}-issue-detail`).value);
+  if(!title||!detail){toast('กรอกหัวข้อและรายละเอียดปัญหาก่อนส่ง');return;}
+  let studentId=currentStudentId;
+  if(scope==='company'){
+    const company=establishments.find(e=>e.id==='e1');
+    studentId=(students.find(s=>s.company===company.name)||students[0]).id;
+  }
+  issueReports.unshift({
+    id:'iss'+(issueReports.length+1),studentId,title,category:$(`#${scope}-issue-category`).value,
+    severity:$(`#${scope}-issue-severity`).value,confidentiality:scope==='student'?'จำกัดเฉพาะเจ้าหน้าที่':'ผู้เกี่ยวข้อง',
+    status:'open',owner:'เจ้าหน้าที่',submitted:'ตอนนี้',detail
+  });
+  auditLogs.unshift({type:'ปัญหา',time:'ตอนนี้',act:'ส่งเรื่องร้องเรียน/แจ้งปัญหา',detail:title,user:scope==='student'?studentId:'hr@cloudworks.co.th',ip:scope+'-portal'});
+  renderPortalIssues(scope); renderIssueReports(); renderDash(); renderNotifications(); renderAuditLog();
+  toast('ส่งเรื่องให้เจ้าหน้าที่แล้ว');
+}
+function renderAdvisorIssuesCard(advisorId){
+  const ids=new Set(advisorAssignments.filter(a=>a.advisorId===advisorId).map(a=>a.studentId));
+  const rows=issueReports.filter(x=>ids.has(x.studentId));
+  return `<div class="card card-pad" data-ap-panel="issues" style="margin-bottom:18px">
+    <div class="sec-title">ร้องเรียน / แจ้งปัญหาที่เกี่ยวข้อง</div>
+    <div class="sec-sub">อาจารย์เห็นเฉพาะเคสของนักศึกษาที่ตนเองรับผิดชอบ</div>
+    <div style="margin-top:12px">${rows.length?rows.map(x=>issuePortalCard(x,'advisor')).join(''):'<div class="empty">ยังไม่มีเคสปัญหาของนักศึกษาที่รับผิดชอบ</div>'}</div>
+  </div>`;
+}
 
 function renderCwie(){
   const options=['6512001','6512030','6512101'].map(id=>{
@@ -2331,6 +2470,8 @@ function openCompanyPortal(){
   renderCompanyTaskQueue();
   renderCompanyMentorManager();
   renderCompanyWorkflow('positions');
+  renderPortalIssues('company');
+  switchCompanyPortalTab($('.portal-side [data-cp-tab="overview"]'),'overview');
   toast('เข้าสู่พอร์ทัลสถานประกอบการ');
 }
 
@@ -2717,12 +2858,17 @@ function openAdvisorPortal(){
   $('#ap-hello').textContent='สวัสดี, '+adv.name;
   $('#ap-sub').textContent=(adv.position?adv.position+' · ':'')+adv.team+' · ประเมินสถานประกอบการที่คุณรับผิดชอบนิเทศ รอบ 1 / 2569';
   renderAdvisorPortal();
+  switchAdvisorPortalTab($('.portal-side [data-ap-tab="profile"]'),'profile');
+}
+function switchAdvisorPortalTab(el,key){
+  if(el){$$('[data-ap-tab]').forEach(b=>b.classList.remove('active')); el.classList.add('active');}
+  $$('[data-ap-panel]').forEach(p=>p.classList.toggle('hidden',p.dataset.apPanel!==key));
 }
 function renderAdvisorProfileCard(adv,mine){
   const pending=mine.filter(a=>a.status!=='ประเมินแล้ว').length;
   const expertise=(adv.expertise||[]).join(', ');
   return `
-    <div class="card card-pad" style="margin-bottom:18px">
+    <div class="card card-pad" data-ap-panel="profile" style="margin-bottom:18px">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px">
         <div>
           <div class="sec-title">ข้อมูลอาจารย์นิเทศ</div>
@@ -2767,7 +2913,7 @@ function renderAdvisorVisitCard(advisorId){
       ${visitStatusBadge(v.status)}
     </div>`;
   }).join(''):'<div class="empty">ยังไม่มีนัดนิเทศในรอบนี้</div>';
-  return `<div class="card card-pad" style="margin-bottom:18px">
+  return `<div class="card card-pad" data-ap-panel="schedule" style="margin-bottom:18px">
     <div class="sec-title">ตารางนัดนิเทศของคุณ</div>
     <div class="sec-sub">รายการนัดที่เจ้าหน้าที่และบริษัทใช้ประสานงานร่วมกับอาจารย์</div>
     <div style="margin-top:8px">${list}</div>
@@ -2795,7 +2941,8 @@ function renderAdvisorPortal(selId){
   const adv=advisors.find(a=>a.id===currentAdvisorId)||advisors[0];
   const mine=advisorAssignments.filter(a=>a.advisorId===currentAdvisorId);
   if(!mine.length){
-    $('#ap-body').innerHTML=renderAdvisorProfileCard(adv,mine)+'<div class="card card-pad"><div class="empty">ยังไม่มีสถานประกอบการที่ได้รับมอบหมายให้นิเทศในรอบนี้</div></div>';
+    $('#ap-body').innerHTML=renderAdvisorProfileCard(adv,mine)+renderAdvisorIssuesCard(adv.id)+'<div class="card card-pad" data-ap-panel="students"><div class="empty">ยังไม่มีสถานประกอบการที่ได้รับมอบหมายให้นิเทศในรอบนี้</div></div>';
+    switchAdvisorPortalTab($('.portal-side [data-ap-tab].active')||$('.portal-side [data-ap-tab="profile"]'), $('.portal-side [data-ap-tab].active')?.dataset.apTab||'profile');
     return;
   }
   const cur=mine.find(a=>a.id===selId)||mine[0];
@@ -2813,13 +2960,15 @@ function renderAdvisorPortal(selId){
   $('#ap-body').innerHTML=`
     ${renderAdvisorProfileCard(adv,mine)}
     ${renderAdvisorVisitCard(adv.id)}
-    <div class="card card-pad" style="margin-bottom:18px">
+    <div class="card card-pad" data-ap-panel="students" style="margin-bottom:18px">
       <div class="sec-title">งานนิเทศของคุณ (${mine.length})</div>
       <div class="sec-sub">เลือกสถานประกอบการเพื่อกรอกผลประเมิน</div>
       <div style="margin-top:8px">${list}</div>
     </div>
-    <div class="card card-pad" id="ap-form"></div>`;
+    <div class="card card-pad" data-ap-panel="evaluation" id="ap-form"></div>
+    ${renderAdvisorIssuesCard(adv.id)}`;
   renderAdvisorEvalForm(cur.id);
+  switchAdvisorPortalTab($('.portal-side [data-ap-tab].active')||$('.portal-side [data-ap-tab="profile"]'), $('.portal-side [data-ap-tab].active')?.dataset.apTab||'profile');
 }
 function renderAdvisorEvalForm(id){
   const a=advisorAssignments.find(x=>x.id===id);
